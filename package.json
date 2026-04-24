@@ -1,0 +1,23 @@
+{
+  "name": "pomo_doro",
+  "version": "0.0.1",
+  "description": "pomodoro tui app",
+  "license": "ISC",
+  "author": "dandrok",
+  "type": "module",
+  "main": "app.tsx",
+  "scripts": {
+    "dev": "tsx src/cli.tsx"
+  },
+  "dependencies": {
+    "@types/node": "^25.6.0",
+    "@types/react": "^19.2.14",
+    "ink": "^7.0.1",
+    "ink-big-text": "^2.0.0",
+    "ink-select-input": "^6.2.0",
+    "ink-spinner": "^5.0.0",
+    "react": "^19.2.5",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
+  }
+}

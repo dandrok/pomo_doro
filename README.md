@@ -2,7 +2,7 @@
 
 ### Simple pomodoro TUI
 
-
+![demo](./docs/screenrecording-2026-04-24_21-02-04.gif)
 
 ## Status: 
 *WIP*

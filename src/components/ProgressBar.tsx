@@ -1,7 +1,8 @@
-import { Box, Text } from "ink"
+import { Box, Text, useInput } from "ink"
 import { useEffect, useState } from "react"
 import BigText from 'ink-big-text';
 import { padStr } from "../helper/index.ts";
+import { RunningScreen } from "./RunningScreen.tsx";
 
 const LOADING_STEPS = 25
 
@@ -14,12 +15,17 @@ export const ProgressBar = ({ time }: ProgressBarProps) => {
   const [elapsed, setElapsed] = useState(0);
   //TODO: move time counter to seperate component
   const [timeOut, setTimeOut] = useState(seconds);
+  //TODO: pause, resume 
+  const [isPaused, setIsPaused] = useState(false);
 
-  const progress = elapsed / seconds;
-  const percentage = Math.floor(progress * 100);
-  const doneReps = Math.floor(progress * LOADING_STEPS);
+
+  useInput(input => {
+    if (input === 'p') setIsPaused(!isPaused)
+    if (input === 'r') setIsPaused(!isPaused)
+  })
 
   useEffect(() => {
+    if (isPaused) return
     if (elapsed >= seconds) return
     const timer = setTimeout(() => {
       setElapsed((sec) => sec + 1)
@@ -27,8 +33,11 @@ export const ProgressBar = ({ time }: ProgressBarProps) => {
     }, 1000)
 
     return () => clearTimeout(timer)
-  }, [elapsed, seconds])
+  }, [elapsed, seconds, isPaused])
 
+  const progress = elapsed / seconds;
+  const percentage = Math.floor(progress * 100);
+  const doneReps = Math.floor(progress * LOADING_STEPS);
 
   const min = padStr(Math.floor(timeOut / 60))
   const sec = padStr(timeOut % 60)
@@ -47,6 +56,7 @@ export const ProgressBar = ({ time }: ProgressBarProps) => {
 
         </Text>
       </Box>
+      <RunningScreen />
     </Box>
   )
 }

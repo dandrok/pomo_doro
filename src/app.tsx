@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Box, Text } from 'ink';
 import SelectInput from 'ink-select-input';
-// import BigText from 'ink-big-text';
 import { ProgressBar } from './components/ProgressBar.tsx';
 
 type Screen = 'menu' | 'time-select' | 'exit';
@@ -37,7 +36,10 @@ const timeItems: TimeItems[] = [
     value: 45
   },
 ]
-
+// TODO: break timer auto play after pomo timer
+// TODO: save sessions - preferably with conf lib 
+// TODO: add to main menu "Resume session" item
+// TODO: "Resume session" should open session from config
 
 export const App = () => {
   // TODO: add custom time

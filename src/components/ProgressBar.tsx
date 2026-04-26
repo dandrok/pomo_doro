@@ -20,8 +20,8 @@ export const ProgressBar = ({ time }: ProgressBarProps) => {
 
 
   useInput(input => {
-    if (input === 'p') setIsPaused(!isPaused)
-    if (input === 'r') setIsPaused(!isPaused)
+    if (input === 'p') setIsPaused(true)
+    if (input === 'r') setIsPaused(false)
   })
 
   useEffect(() => {

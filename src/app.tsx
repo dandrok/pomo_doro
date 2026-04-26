@@ -1,79 +1,77 @@
-import { useState } from 'react';
-import { Box, Text } from 'ink';
-import SelectInput from 'ink-select-input';
-import { ProgressBar } from './components/ProgressBar.tsx';
+import { useState } from "react";
+import { Box, Text } from "ink";
+import SelectInput from "ink-select-input";
+import { ProgressBar } from "./components/ProgressBar.tsx";
 
-type Screen = 'menu' | 'time-select' | 'exit';
-type MenuItems = { label: string, value: Screen }
-type TimeItems = { label: string, value: number }
+type Screen = "menu" | "time-select" | "exit";
+type MenuItems = { label: string; value: Screen };
+type TimeItems = { label: string; value: number };
 
 const menuItems: MenuItems[] = [
   {
-    label: 'Start',
-    value: 'time-select'
+    label: "Start",
+    value: "time-select",
   },
   {
-    label: 'Exit',
-    value: 'exit'
-  }
+    label: "Exit",
+    value: "exit",
+  },
 ];
 
 const timeItems: TimeItems[] = [
   {
-    label: '2min',
-    value: 2
+    label: "2min",
+    value: 2,
   },
   {
-    label: '25min',
-    value: 25
+    label: "25min",
+    value: 25,
   },
   {
-    label: '35min',
-    value: 35
+    label: "35min",
+    value: 35,
   },
   {
-    label: '45min',
-    value: 45
+    label: "45min",
+    value: 45,
   },
-]
+];
 // TODO: break timer auto play after pomo timer
-// TODO: save sessions - preferably with conf lib 
+// TODO: save sessions - preferably with conf lib
 // TODO: add to main menu "Resume session" item
 // TODO: "Resume session" should open session from config
 
 export const App = () => {
   // TODO: add custom time
-  const [screen, setScreen] = useState<Screen>('menu')
-  const [time, setTime] = useState<number | null>(null)
+  const [screen, setScreen] = useState<Screen>("menu");
+  const [time, setTime] = useState<number | null>(null);
 
-  const startHandleSelect = (item: MenuItems) => setScreen(item.value)
+  const startHandleSelect = (item: MenuItems) => setScreen(item.value);
 
   const timeHandlerSelect = (item: TimeItems) => {
-    setTime(item.value)
-    setScreen('menu')
-  }
+    setTime(item.value);
+    setScreen("menu");
+  };
 
-  if (screen === 'time-select') {
+  if (screen === "time-select") {
     return (
-      <Box >
+      <Box>
         <SelectInput items={timeItems} onSelect={timeHandlerSelect} />
       </Box>
-    )
+    );
   }
 
   if (time !== null) {
     return (
-      <Box >
+      <Box>
         <ProgressBar time={time} />
       </Box>
-    )
+    );
   }
 
-
-  if (screen === 'exit') {
-    return <Text>have a nice day and stay focus!</Text>
+  if (screen === "exit") {
+    return <Text>have a nice day and stay focus!</Text>;
   }
 
-  return (<SelectInput items={menuItems} onSelect={startHandleSelect} />)
-
-}
+  return <SelectInput items={menuItems} onSelect={startHandleSelect} />;
+};

@@ -9,7 +9,8 @@ const LOADING_STEPS = 25;
 type ProgressBarProps = {
   time: number;
 };
-
+//TODO: think about the architecure of components
+// we propably need to split the progress bar from runing screen and the timer
 export const ProgressBar = ({ time }: ProgressBarProps) => {
   const seconds = time * 60;
   const [elapsed, setElapsed] = useState(0);
@@ -53,6 +54,7 @@ export const ProgressBar = ({ time }: ProgressBarProps) => {
           <Text> {percentage}%</Text>
         </Text>
       </Box>
+
       <RunningScreen />
     </Box>
   );

@@ -51,12 +51,13 @@ export const ProgressBar = ({ time, mode, setMode, setPomodoroCount, pomodoroCou
       setPomodoroCount(nextPomodoroCount)
       if (nextPomodoroCount % 4 === 0) {
         setMode('longBreak')
-        setProgressTime(.2)
-        setTimeOut(.2 * 60)
+        //TODO: get break values in better way  
+        setProgressTime(time < 1 ? .1 : 5)
+        setTimeOut(time < 1 ? .1 : 5 * 60)
       } else {
         setMode('shortBreak')
-        setProgressTime(.1)
-        setTimeOut(.1 * 60)
+        setProgressTime(time < 1 ? .2 : 15)
+        setTimeOut(time < 1 ? .2 : 15 * 60)
       }
       setElapsed(0)
     } else if (timeOut === 0 && (mode === 'shortBreak' || mode === 'longBreak')) {
@@ -100,10 +101,13 @@ export const ProgressBar = ({ time, mode, setMode, setPomodoroCount, pomodoroCou
 
 
   return (
-    <Box flexDirection="column" gap={2}>
+    <Box flexDirection="column" gap={2} backgroundColor={textColor[mode]} padding={1}>
       <Text>{pomodoroCount}</Text>
       <SelectInput items={items} onSelect={(item) => setFontType(item.value)} />
-      <Box backgroundColor={textColor[mode]}>
+      <Box justifyContent="flex-end">
+        <Text>&#8226; {mode}</Text>
+      </Box>
+      <Box  >
         <BigText text={`${min} : ${sec}`} font={fontType} />
       </Box>
       <Box>

@@ -1,23 +1,33 @@
 import { Box, Text, useInput } from "ink";
 import { useEffect, useState } from "react";
-import BigText from "ink-big-text";
+import BigText, { type CFontProps } from "ink-big-text";
 import { padStr } from "../helper/index.ts";
 import { RunningScreen } from "./RunningScreen.tsx";
+import SelectInput from "ink-select-input";
+import type { Mode } from "../app.tsx";
 
-const LOADING_STEPS = 25;
+const LOADING_STEPS = 50;
 
 type ProgressBarProps = {
-  time: number;
+  time: number,
+  mode: Mode,
+  setMode: React.Dispatch<React.SetStateAction<Mode>>
+  setPomodoroCount: React.Dispatch<React.SetStateAction<number>>
+  pomodoroCount: any // TODO: remove later on
 };
 //TODO: think about the architecure of components
 // we propably need to split the progress bar from runing screen and the timer
-export const ProgressBar = ({ time }: ProgressBarProps) => {
-  const seconds = time * 60;
+export const ProgressBar = ({ time, mode, setMode, setPomodoroCount, pomodoroCount }: ProgressBarProps) => {
+  const [progressTime, setProgressTime] = useState(time)
+
+  const seconds = progressTime * 60;
   const [elapsed, setElapsed] = useState(0);
   //TODO: move time counter to seperate component
   const [timeOut, setTimeOut] = useState(seconds);
   //TODO: pause, resume
   const [isPaused, setIsPaused] = useState(false);
+  // TODO: for testing all of the fonts
+  const [fontType, setFontType] = useState<CFontProps['font']>('block')
 
   useInput((input) => {
     if (input === "p") setIsPaused(true);
@@ -33,7 +43,30 @@ export const ProgressBar = ({ time }: ProgressBarProps) => {
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [elapsed, seconds, isPaused]);
+  }, [elapsed, seconds, isPaused, fontType, progressTime]);
+
+  useEffect(() => {
+    if (timeOut === 0 && mode == 'work') {
+      const nextPomodoroCount = pomodoroCount + 1
+      setPomodoroCount(nextPomodoroCount)
+      if (nextPomodoroCount % 4 === 0) {
+        setMode('longBreak')
+        setProgressTime(.2)
+        setTimeOut(.2 * 60)
+      } else {
+        setMode('shortBreak')
+        setProgressTime(.1)
+        setTimeOut(.1 * 60)
+      }
+      setElapsed(0)
+    } else if (timeOut === 0 && (mode === 'shortBreak' || mode === 'longBreak')) {
+      setProgressTime(time)
+      setTimeOut(time * 60)
+      setElapsed(0)
+      setMode('work')
+    }
+  }, [progressTime, pomodoroCount, timeOut])
+
 
   const progress = elapsed / seconds;
   const percentage = Math.floor(progress * 100);
@@ -41,11 +74,37 @@ export const ProgressBar = ({ time }: ProgressBarProps) => {
 
   const min = padStr(Math.floor(timeOut / 60));
   const sec = padStr(timeOut % 60);
+  const textColor = { work: 'transparent', shortBreak: 'cyan', longBreak: 'magenta' }
+  // const textColor = mode === 'work' ? 'transparent' : mode === 'shortBreak' ? 'cyan' : 'magenta'
+
+  //TODO: move font select to app.tsx
+  //create seperate "Settings" state in which the user will be able to set the correct fontType
+  //in addition we propably would like to set it inside of the config
+  //so in the futuere we could use config lib to setup the .config for this app
+  const textFonts: CFontProps['font'][] = [
+    "huge",
+    "block",
+    "grid",
+    "3d",
+    "chrome",
+    "pallet",
+    "shade",
+    "simple",
+    "simple3d",
+    "simpleBlock",
+    "slick",
+    "tiny"
+  ]
+
+  const items = textFonts.map((font) => ({ ['label']: font, ['value']: font }))
+
 
   return (
     <Box flexDirection="column" gap={2}>
-      <Box>
-        <BigText text={`${min} : ${sec}`} />
+      <Text>{pomodoroCount}</Text>
+      <SelectInput items={items} onSelect={(item) => setFontType(item.value)} />
+      <Box backgroundColor={textColor[mode]}>
+        <BigText text={`${min} : ${sec}`} font={fontType} />
       </Box>
       <Box>
         <Text>

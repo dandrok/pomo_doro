@@ -20,8 +20,8 @@ const menuItems: MenuItems[] = [
 
 const timeItems: TimeItems[] = [
   {
-    label: "2min",
-    value: 2,
+    label: "0.1min",
+    value: .1,
   },
   {
     label: "25min",
@@ -36,15 +36,19 @@ const timeItems: TimeItems[] = [
     value: 45,
   },
 ];
-// TODO: break timer auto play after pomo timer
+// TODO: break timer auto play after pomo timer - in progress
 // TODO: save sessions - preferably with conf lib
 // TODO: add to main menu "Resume session" item
 // TODO: "Resume session" should open session from config
+
+export type Mode = 'work' | 'shortBreak' | 'longBreak'
 
 export const App = () => {
   // TODO: add custom time
   const [screen, setScreen] = useState<Screen>("menu");
   const [time, setTime] = useState<number | null>(null);
+  const [pomodoroCount, setPomodoroCount] = useState(0)
+  const [mode, setMode] = useState<Mode>('work')
 
   const startHandleSelect = (item: MenuItems) => setScreen(item.value);
 
@@ -64,7 +68,7 @@ export const App = () => {
   if (time !== null) {
     return (
       <Box>
-        <ProgressBar time={time} />
+        <ProgressBar time={time} mode={mode} setMode={setMode} setPomodoroCount={setPomodoroCount} pomodoroCount={pomodoroCount} />
       </Box>
     );
   }

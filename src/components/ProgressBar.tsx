@@ -7,6 +7,9 @@ import SelectInput from "ink-select-input";
 import type { Mode } from "../app.tsx";
 
 const LOADING_STEPS = 50;
+const SHORT_BREAK_TIME = 5;
+const LONG_BREAK_TIME = 15;
+const ONE_MINUTE = 60;
 
 type ProgressBarProps = {
   time: number,
@@ -20,7 +23,7 @@ type ProgressBarProps = {
 export const ProgressBar = ({ time, mode, setMode, setPomodoroCount, pomodoroCount }: ProgressBarProps) => {
   const [progressTime, setProgressTime] = useState(time)
 
-  const seconds = progressTime * 60;
+  const seconds = progressTime * ONE_MINUTE;
   const [elapsed, setElapsed] = useState(0);
   //TODO: move time counter to seperate component
   const [timeOut, setTimeOut] = useState(seconds);
@@ -52,17 +55,17 @@ export const ProgressBar = ({ time, mode, setMode, setPomodoroCount, pomodoroCou
       if (nextPomodoroCount % 4 === 0) {
         setMode('longBreak')
         //TODO: get break values in better way  
-        setProgressTime(time < 1 ? .1 : 5)
-        setTimeOut(time < 1 ? .1 : 5 * 60)
+        setProgressTime(time < 1 ? .1 : SHORT_BREAK_TIME)
+        setTimeOut(time < 1 ? .1 : SHORT_BREAK_TIME * ONE_MINUTE)
       } else {
         setMode('shortBreak')
-        setProgressTime(time < 1 ? .2 : 15)
-        setTimeOut(time < 1 ? .2 : 15 * 60)
+        setProgressTime(time < 1 ? .2 : LONG_BREAK_TIME)
+        setTimeOut(time < 1 ? .2 : LONG_BREAK_TIME * ONE_MINUTE)
       }
       setElapsed(0)
     } else if (timeOut === 0 && (mode === 'shortBreak' || mode === 'longBreak')) {
       setProgressTime(time)
-      setTimeOut(time * 60)
+      setTimeOut(time * ONE_MINUTE)
       setElapsed(0)
       setMode('work')
     }
@@ -73,8 +76,8 @@ export const ProgressBar = ({ time, mode, setMode, setPomodoroCount, pomodoroCou
   const percentage = Math.floor(progress * 100);
   const doneReps = Math.floor(progress * LOADING_STEPS);
 
-  const min = padStr(Math.floor(timeOut / 60));
-  const sec = padStr(timeOut % 60);
+  const min = padStr(Math.floor(timeOut / ONE_MINUTE));
+  const sec = padStr(timeOut % ONE_MINUTE);
   const textColor = { work: 'transparent', shortBreak: 'cyan', longBreak: 'magenta' }
   // const textColor = mode === 'work' ? 'transparent' : mode === 'shortBreak' ? 'cyan' : 'magenta'
 

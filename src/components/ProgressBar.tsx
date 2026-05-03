@@ -30,7 +30,8 @@ export const ProgressBar = ({ time, mode, setMode, setPomodoroCount, pomodoroCou
   //TODO: pause, resume
   const [isPaused, setIsPaused] = useState(false);
   // TODO: for testing all of the fonts
-  const [fontType, setFontType] = useState<CFontProps['font']>('block')
+
+  // const [fontType, setFontType] = useState<CFontProps['font']>('block')
 
   useInput((input) => {
     if (input === "p") setIsPaused(true);
@@ -46,8 +47,9 @@ export const ProgressBar = ({ time, mode, setMode, setPomodoroCount, pomodoroCou
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [elapsed, seconds, isPaused, fontType, progressTime]);
 
+  }, [elapsed, seconds, isPaused, progressTime]);
+  // }, [elapsed, seconds, isPaused, fontType, progressTime]);
   useEffect(() => {
     if (timeOut === 0 && mode == 'work') {
       const nextPomodoroCount = pomodoroCount + 1
@@ -85,28 +87,29 @@ export const ProgressBar = ({ time, mode, setMode, setPomodoroCount, pomodoroCou
   //create seperate "Settings" state in which the user will be able to set the correct fontType
   //in addition we propably would like to set it inside of the config
   //so in the futuere we could use config lib to setup the .config for this app
-  const textFonts: CFontProps['font'][] = [
-    "huge",
-    "block",
-    "grid",
-    "3d",
-    "chrome",
-    "pallet",
-    "shade",
-    "simple",
-    "simple3d",
-    "simpleBlock",
-    "slick",
-    "tiny"
-  ]
 
-  const items = textFonts.map((font) => ({ ['label']: font, ['value']: font }))
+  // const textFonts: CFontProps['font'][] = [
+  //   "huge",
+  //   "block",
+  //   "grid",
+  //   "3d",
+  //   "chrome",
+  //   "pallet",
+  //   "shade",
+  //   "simple",
+  //   "simple3d",
+  //   "simpleBlock",
+  //   "slick",
+  //   "tiny"
+  // ]
+
+  // const items = textFonts.map((font) => ({ ['label']: font, ['value']: font }))
 
 
   return (
     <Box flexDirection="column" gap={2} backgroundColor={textColor[mode]} padding={1}>
-      <Text>{pomodoroCount}</Text>
-      <SelectInput items={items} onSelect={(item) => setFontType(item.value)} />
+      <Text>pomodoro count: {pomodoroCount}</Text>
+      {/* <SelectInput items={items} onSelect={(item) => setFontType(item.value)} /> */}
       <Box justifyContent="flex-end">
         <Text>&#8226; {mode}</Text>
       </Box>

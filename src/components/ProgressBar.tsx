@@ -114,7 +114,8 @@ export const ProgressBar = ({ time, mode, setMode, setPomodoroCount, pomodoroCou
         <Text>&#8226; {mode}</Text>
       </Box>
       <Box  >
-        <BigText text={`${min} : ${sec}`} font={fontType} />
+        {/* <BigText text={`${min} : ${sec}`} font={fontType} /> */}
+        <BigText text={`${min} : ${sec}`} />
       </Box>
       <Box>
         <Text>

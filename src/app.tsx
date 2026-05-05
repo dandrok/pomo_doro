@@ -20,10 +20,6 @@ const menuItems: MenuItems[] = [
 
 const timeItems: TimeItems[] = [
   {
-    label: "0.1min",
-    value: .1,
-  },
-  {
     label: "25min",
     value: 25,
   },

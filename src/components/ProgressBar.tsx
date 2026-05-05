@@ -56,13 +56,12 @@ export const ProgressBar = ({ time, mode, setMode, setPomodoroCount, pomodoroCou
       setPomodoroCount(nextPomodoroCount)
       if (nextPomodoroCount % 4 === 0) {
         setMode('longBreak')
-        //TODO: get break values in better way  
-        setProgressTime(time < 1 ? .1 : SHORT_BREAK_TIME)
-        setTimeOut(time < 1 ? .1 : SHORT_BREAK_TIME * ONE_MINUTE)
+        setProgressTime(LONG_BREAK_TIME)
+        setTimeOut(LONG_BREAK_TIME * ONE_MINUTE)
       } else {
         setMode('shortBreak')
-        setProgressTime(time < 1 ? .2 : LONG_BREAK_TIME)
-        setTimeOut(time < 1 ? .2 : LONG_BREAK_TIME * ONE_MINUTE)
+        setProgressTime(SHORT_BREAK_TIME)
+        setTimeOut(SHORT_BREAK_TIME * ONE_MINUTE)
       }
       setElapsed(0)
     } else if (timeOut === 0 && (mode === 'shortBreak' || mode === 'longBreak')) {

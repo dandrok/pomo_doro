@@ -3,7 +3,7 @@ import { Box, Text } from "ink";
 import SelectInput from "ink-select-input";
 import { ProgressBar } from "./components/ProgressBar.tsx";
 
-type Screen = "menu" | "time-select" | "exit";
+type Screen = "menu" | "time-select" | "exit" | 'resume';
 type MenuItems = { label: string; value: Screen };
 type TimeItems = { label: string; value: number };
 
@@ -11,6 +11,10 @@ const menuItems: MenuItems[] = [
   {
     label: "Start",
     value: "time-select",
+  },
+  {
+    label: "Resume",
+    value: "resume",
   },
   {
     label: "Exit",
@@ -34,7 +38,6 @@ const timeItems: TimeItems[] = [
 ];
 // TODO: break timer auto play after pomo timer - in progress
 // TODO: save sessions - preferably with conf lib
-// TODO: add to main menu "Resume session" item
 // TODO: "Resume session" should open session from config
 
 export type Mode = 'work' | 'shortBreak' | 'longBreak'
@@ -57,6 +60,15 @@ export const App = () => {
     return (
       <Box>
         <SelectInput items={timeItems} onSelect={timeHandlerSelect} />
+      </Box>
+    );
+  }
+
+  // TODO: make it work
+  if (screen === "resume") {
+    return (
+      <Box>
+        <Text>add latest pomodoro status</Text>
       </Box>
     );
   }

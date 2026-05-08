@@ -1,9 +1,8 @@
 import { Box, Text, useInput } from "ink";
 import { useEffect, useState } from "react";
-import BigText, { type CFontProps } from "ink-big-text";
+import BigText from "ink-big-text";
 import { padStr } from "../helper/index.ts";
 import { RunningScreen } from "./RunningScreen.tsx";
-import SelectInput from "ink-select-input";
 import type { Mode } from "../app.tsx";
 
 const LOADING_STEPS = 50;
@@ -30,8 +29,6 @@ export const ProgressBar = ({ time, mode, setMode, setPomodoroCount, pomodoroCou
   //TODO: pause, resume
   const [isPaused, setIsPaused] = useState(false);
   // TODO: for testing all of the fonts
-
-  // const [fontType, setFontType] = useState<CFontProps['font']>('block')
 
   useInput((input) => {
     if (input === "p") setIsPaused(true);
@@ -79,31 +76,7 @@ export const ProgressBar = ({ time, mode, setMode, setPomodoroCount, pomodoroCou
 
   const min = padStr(Math.floor(timeOut / ONE_MINUTE));
   const sec = padStr(timeOut % ONE_MINUTE);
-  const textColor = { work: 'transparent', shortBreak: 'cyan', longBreak: 'magenta' }
-  // const textColor = mode === 'work' ? 'transparent' : mode === 'shortBreak' ? 'cyan' : 'magenta'
-
-  //TODO: move font select to app.tsx
-  //create seperate "Settings" state in which the user will be able to set the correct fontType
-  //in addition we propably would like to set it inside of the config
-  //so in the futuere we could use config lib to setup the .config for this app
-
-  // const textFonts: CFontProps['font'][] = [
-  //   "huge",
-  //   "block",
-  //   "grid",
-  //   "3d",
-  //   "chrome",
-  //   "pallet",
-  //   "shade",
-  //   "simple",
-  //   "simple3d",
-  //   "simpleBlock",
-  //   "slick",
-  //   "tiny"
-  // ]
-
-  // const items = textFonts.map((font) => ({ ['label']: font, ['value']: font }))
-
+  const textColor = { work: 'transparent', shortBreak: 'cyan', longBreak: 'magenta' };
 
   return (
     <Box flexDirection="column" gap={2} backgroundColor={textColor[mode]} padding={1}>
@@ -113,7 +86,6 @@ export const ProgressBar = ({ time, mode, setMode, setPomodoroCount, pomodoroCou
         <Text>&#8226; {mode}</Text>
       </Box>
       <Box  >
-        {/* <BigText text={`${min} : ${sec}`} font={fontType} /> */}
         <BigText text={`${min} : ${sec}`} />
       </Box>
       <Box>

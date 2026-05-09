@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Box, Text } from "ink";
 import SelectInput from "ink-select-input";
 import { ProgressBar } from "./components/ProgressBar.tsx";
+import { History } from "./components/History.tsx";
 
 type Screen = "menu" | "time-select" | "exit" | 'resume';
 type MenuItems = { label: string; value: Screen };
@@ -68,7 +69,7 @@ export const App = () => {
   if (screen === "resume") {
     return (
       <Box>
-        <Text>add latest pomodoro status</Text>
+        <History />
       </Box>
     );
   }

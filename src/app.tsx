@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Text } from "ink";
 import SelectInput from "ink-select-input";
 import { ProgressBar } from "./components/ProgressBar.tsx";
 import { History } from "./components/History.tsx";
+import Conf from "conf";
+
 
 type Screen = "menu" | "time-select" | "exit" | 'resume';
 type MenuItems = { label: string; value: Screen };
@@ -25,6 +27,10 @@ const menuItems: MenuItems[] = [
 
 const timeItems: TimeItems[] = [
   {
+    label: ".1min",
+    value: .1,
+  },
+  {
     label: "25min",
     value: 25,
   },
@@ -43,12 +49,19 @@ const timeItems: TimeItems[] = [
 
 export type Mode = 'work' | 'shortBreak' | 'longBreak'
 
+const config = new Conf({ projectName: 'pomo-doro' });
+
 export const App = () => {
   // TODO: add custom time
   const [screen, setScreen] = useState<Screen>("menu");
   const [time, setTime] = useState<number | null>(null);
-  const [pomodoroCount, setPomodoroCount] = useState(0)
+  const [pomodoroCount, setPomodoroCount] = useState<number>(() => (config.get('pomodoroCount') as number) || 0)
   const [mode, setMode] = useState<Mode>('work')
+
+  useEffect(() => {
+    config.set('pomodoroCount', pomodoroCount)
+  }, [pomodoroCount])
+
 
   const startHandleSelect = (item: MenuItems) => setScreen(item.value);
 
@@ -69,7 +82,8 @@ export const App = () => {
   if (screen === "resume") {
     return (
       <Box>
-        <History />
+        {/* <History /> */}
+        <Text>{pomodoroCount}</Text>
       </Box>
     );
   }

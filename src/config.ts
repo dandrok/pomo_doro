@@ -8,10 +8,10 @@ export type Session = {
   pomodoroCount: number;
 }
 
-type ConfigSshema = {
+type ConfigSchema = {
   pomodoroCount: number;
   activeSession?: Session;
 }
 
-export const config = new Conf<ConfigSshema>({ projectName: 'pomo-doro' });
+export const config = new Conf<ConfigSchema>({ projectName: 'pomo-doro' });
 

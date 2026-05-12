@@ -4,6 +4,7 @@ import BigText from "ink-big-text";
 import { padStr } from "../helper/index.ts";
 import { RunningScreen } from "./RunningScreen.tsx";
 import type { Mode } from "../app.tsx";
+import { config } from "../config.ts";
 
 const LOADING_STEPS = 50;
 const SHORT_BREAK_TIME = 5;
@@ -15,17 +16,18 @@ type ProgressBarProps = {
   mode: Mode,
   setMode: React.Dispatch<React.SetStateAction<Mode>>
   setPomodoroCount: React.Dispatch<React.SetStateAction<number>>
-  pomodoroCount: any // TODO: remove later on
+  pomodoroCount: number // TODO: remove later on
+  initialTimeOut?: number
 };
 //TODO: think about the architecure of components
 // we propably need to split the progress bar from runing screen and the timer
-export const ProgressBar = ({ time, mode, setMode, setPomodoroCount, pomodoroCount }: ProgressBarProps) => {
+export const ProgressBar = ({ time, mode, setMode, setPomodoroCount, pomodoroCount, initialTimeOut }: ProgressBarProps) => {
   const [progressTime, setProgressTime] = useState(time)
 
   const seconds = progressTime * ONE_MINUTE;
-  const [elapsed, setElapsed] = useState(0);
+  const [elapsed, setElapsed] = useState(seconds - (initialTimeOut ?? seconds));
   //TODO: move time counter to seperate component
-  const [timeOut, setTimeOut] = useState(seconds);
+  const [timeOut, setTimeOut] = useState(initialTimeOut ?? seconds);
   //TODO: pause, resume
   const [isPaused, setIsPaused] = useState(false);
   // TODO: for testing all of the fonts
@@ -34,6 +36,15 @@ export const ProgressBar = ({ time, mode, setMode, setPomodoroCount, pomodoroCou
     if (input === "p") setIsPaused(true);
     if (input === "r") setIsPaused(false);
   });
+
+  useEffect(() => {
+    config.set('activeSession', {
+      timeOut,
+      mode,
+      time: progressTime,
+      pomodoroCount
+    });
+  }, [timeOut, mode, progressTime, pomodoroCount]);
 
   useEffect(() => {
     if (isPaused) return;

@@ -3,7 +3,7 @@ import { Box, Text } from "ink";
 import SelectInput from "ink-select-input";
 import { ProgressBar } from "./components/ProgressBar.tsx";
 import { History } from "./components/History.tsx";
-import Conf from "conf";
+import { config } from "./config.ts";
 
 
 type Screen = "menu" | "time-select" | "exit" | 'resume';
@@ -49,7 +49,6 @@ const timeItems: TimeItems[] = [
 
 export type Mode = 'work' | 'shortBreak' | 'longBreak'
 
-const config = new Conf({ projectName: 'pomo-doro' });
 
 export const App = () => {
   // TODO: add custom time
@@ -80,10 +79,28 @@ export const App = () => {
 
   // TODO: make it work
   if (screen === "resume") {
+    const session = config.get('activeSession')
+
+    if (!session) {
+
+      return (
+        <Box>
+          <Text color={'red'}>no active session found</Text>
+        </Box>
+      );
+    }
+
     return (
       <Box>
-        {/* <History /> */}
-        <Text>{pomodoroCount}</Text>
+        <ProgressBar
+          time={session.time}
+          mode={session.mode}
+          setMode={setMode}
+          setPomodoroCount={setPomodoroCount}
+          pomodoroCount={session.pomodoroCount}
+          initialTimeOut={session.timeOut}
+        />
+
       </Box>
     );
   }

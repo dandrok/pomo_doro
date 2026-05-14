@@ -26,11 +26,8 @@ export const ProgressBar = ({ time, mode, setMode, setPomodoroCount, pomodoroCou
 
   const seconds = progressTime * ONE_MINUTE;
   const [elapsed, setElapsed] = useState(seconds - (initialTimeOut ?? seconds));
-  //TODO: move time counter to seperate component
   const [timeOut, setTimeOut] = useState(initialTimeOut ?? seconds);
-  //TODO: pause, resume
   const [isPaused, setIsPaused] = useState(false);
-  // TODO: for testing all of the fonts
 
   useInput((input) => {
     if (input === "p") setIsPaused(true);

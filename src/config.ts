@@ -6,12 +6,11 @@ export type Session = {
   mode: Mode;
   time: number;
   pomodoroCount: number;
-}
+};
 
 type ConfigSchema = {
   pomodoroCount: number;
   activeSession?: Session;
-}
+};
 
-export const config = new Conf<ConfigSchema>({ projectName: 'pomo-doro' });
-
+export const config = new Conf<ConfigSchema>({ projectName: "pomo-doro" });

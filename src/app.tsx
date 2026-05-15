@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import { Box, Text } from "ink";
+import { Box, Text, useApp } from "ink";
 import SelectInput from "ink-select-input";
 import { ProgressBar } from "./components/ProgressBar.tsx";
-import { History } from "./components/History.tsx";
 import { config } from "./config.ts";
 
-
-type Screen = "menu" | "time-select" | "exit" | 'resume';
+type Screen = "menu" | "time-select" | "exit" | "resume";
 type MenuItems = { label: string; value: Screen };
 type TimeItems = { label: string; value: number };
 
@@ -28,7 +26,7 @@ const menuItems: MenuItems[] = [
 const timeItems: TimeItems[] = [
   {
     label: ".1min",
-    value: .1,
+    value: 0.1,
   },
   {
     label: "25min",
@@ -47,20 +45,27 @@ const timeItems: TimeItems[] = [
 // TODO: save sessions - preferably with conf lib
 // TODO: "Resume session" should open session from config
 
-export type Mode = 'work' | 'shortBreak' | 'longBreak'
-
+export type Mode = "work" | "shortBreak" | "longBreak";
 
 export const App = () => {
   // TODO: add custom time
   const [screen, setScreen] = useState<Screen>("menu");
   const [time, setTime] = useState<number | null>(null);
-  const [pomodoroCount, setPomodoroCount] = useState<number>(() => (config.get('pomodoroCount') as number) || 0)
-  const [mode, setMode] = useState<Mode>('work')
+  const [pomodoroCount, setPomodoroCount] = useState<number>(
+    () => (config.get("pomodoroCount") as number) || 0,
+  );
+  const [mode, setMode] = useState<Mode>("work");
+  const { exit } = useApp();
 
   useEffect(() => {
-    config.set('pomodoroCount', pomodoroCount)
-  }, [pomodoroCount])
+    config.set("pomodoroCount", pomodoroCount);
+  }, [pomodoroCount]);
 
+  useEffect(() => {
+    if (screen === "exit") {
+      exit();
+    }
+  }, [screen, exit]);
 
   const startHandleSelect = (item: MenuItems) => setScreen(item.value);
 
@@ -79,13 +84,12 @@ export const App = () => {
 
   // TODO: make it work
   if (screen === "resume") {
-    const session = config.get('activeSession')
+    const session = config.get("activeSession");
 
     if (!session) {
-
       return (
         <Box>
-          <Text color={'red'}>no active session found</Text>
+          <Text color={"red"}>no active session found</Text>
         </Box>
       );
     }
@@ -100,7 +104,6 @@ export const App = () => {
           pomodoroCount={session.pomodoroCount}
           initialTimeOut={session.timeOut}
         />
-
       </Box>
     );
   }
@@ -108,7 +111,13 @@ export const App = () => {
   if (time !== null) {
     return (
       <Box>
-        <ProgressBar time={time} mode={mode} setMode={setMode} setPomodoroCount={setPomodoroCount} pomodoroCount={pomodoroCount} />
+        <ProgressBar
+          time={time}
+          mode={mode}
+          setMode={setMode}
+          setPomodoroCount={setPomodoroCount}
+          pomodoroCount={pomodoroCount}
+        />
       </Box>
     );
   }

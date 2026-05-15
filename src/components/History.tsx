@@ -1,8 +1,5 @@
-import { Text } from "ink"
+import { Text } from "ink";
 
 export const History = () => {
-  return (
-    <Text>History component</Text>
-  )
-}
-
+  return <Text>History component</Text>;
+};

@@ -1,5 +1,4 @@
 import { Box, Text } from "ink";
-// TODO: q logic still missing
 export const RunningScreen = () => {
   return (
     <Box flexDirection="column">

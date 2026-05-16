@@ -3,49 +3,15 @@ import { Box, Text, useApp } from "ink";
 import SelectInput from "ink-select-input";
 import { ProgressBar } from "./components/ProgressBar.tsx";
 import { config } from "./config.ts";
+import { FooterBar } from "./components/FooterBar.tsx";
+import { menuItems, timeItems, type MenuItems, type Screen, type TimeItems } from "./constants/index.ts";
 
-type Screen = "menu" | "time-select" | "exit" | "resume";
-type MenuItems = { label: string; value: Screen };
-type TimeItems = { label: string; value: number };
+export type Mode = "work" | "shortBreak" | "longBreak";
 
-const menuItems: MenuItems[] = [
-  {
-    label: "Start",
-    value: "time-select",
-  },
-  {
-    label: "Resume",
-    value: "resume",
-  },
-  {
-    label: "Exit",
-    value: "exit",
-  },
-];
-
-const timeItems: TimeItems[] = [
-  {
-    label: ".1min",
-    value: 0.1,
-  },
-  {
-    label: "25min",
-    value: 25,
-  },
-  {
-    label: "35min",
-    value: 35,
-  },
-  {
-    label: "45min",
-    value: 45,
-  },
-];
 // TODO: break timer auto play after pomo timer - in progress
 // TODO: save sessions - preferably with conf lib
 // TODO: "Resume session" should open session from config
 
-export type Mode = "work" | "shortBreak" | "longBreak";
 
 export const App = () => {
   // TODO: add custom time
@@ -104,6 +70,7 @@ export const App = () => {
           pomodoroCount={session.pomodoroCount}
           initialTimeOut={session.timeOut}
         />
+        <FooterBar />
       </Box>
     );
   }
@@ -118,10 +85,10 @@ export const App = () => {
           setPomodoroCount={setPomodoroCount}
           pomodoroCount={pomodoroCount}
         />
+        <FooterBar />
       </Box>
     );
   }
-
   if (screen === "exit") {
     return <Text>have a nice day and stay focus!</Text>;
   }

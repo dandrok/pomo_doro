@@ -2,9 +2,9 @@ import { Box, Text, useInput, useApp } from "ink";
 import { useEffect, useState } from "react";
 import BigText from "ink-big-text";
 import { padStr } from "../helper/index.ts";
-import { RunningScreen } from "./RunningScreen.tsx";
 import type { Mode } from "../app.tsx";
 import { config } from "../config.ts";
+import { textColor } from "../constants/index.ts";
 
 const LOADING_STEPS = 50;
 const SHORT_BREAK_TIME = 5;
@@ -62,7 +62,7 @@ export const ProgressBar = ({
 
     return () => clearTimeout(timer);
   }, [elapsed, seconds, isPaused, progressTime]);
-  // }, [elapsed, seconds, isPaused, fontType, progressTime]);
+
   useEffect(() => {
     if (timeOut === 0 && mode == "work") {
       const nextPomodoroCount = pomodoroCount + 1;
@@ -94,11 +94,6 @@ export const ProgressBar = ({
 
   const min = padStr(Math.floor(timeOut / ONE_MINUTE));
   const sec = padStr(timeOut % ONE_MINUTE);
-  const textColor = {
-    work: "transparent",
-    shortBreak: "cyan",
-    longBreak: "magenta",
-  };
 
   return (
     <Box
@@ -108,7 +103,6 @@ export const ProgressBar = ({
       padding={1}
     >
       <Text>pomodoro count: {pomodoroCount}</Text>
-      {/* <SelectInput items={items} onSelect={(item) => setFontType(item.value)} /> */}
       <Box justifyContent="flex-end">
         <Text>&#8226; {mode}</Text>
       </Box>
@@ -122,8 +116,6 @@ export const ProgressBar = ({
           <Text> {percentage}%</Text>
         </Text>
       </Box>
-
-      <RunningScreen />
     </Box>
   );
 };

@@ -1,5 +1,5 @@
 import { Box, Text } from "ink";
-export const RunningScreen = () => {
+export const FooterBar = () => {
   return (
     <Box flexDirection="column">
       <Box marginTop={1}>

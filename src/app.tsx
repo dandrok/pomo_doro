@@ -4,7 +4,7 @@ import SelectInput from "ink-select-input";
 import { ProgressBar } from "./components/ProgressBar.tsx";
 import { config } from "./config.ts";
 import { FooterBar } from "./components/FooterBar.tsx";
-import { menuItems, timeItems, type MenuItems, type Screen, type TimeItems } from "./constants/index.ts";
+import { menuItems, timeItems, type MenuItems, type Screen, type TimeItems } from "./constants.ts";
 
 export type Mode = "work" | "shortBreak" | "longBreak";
 

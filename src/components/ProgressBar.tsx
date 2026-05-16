@@ -1,10 +1,10 @@
 import { Box, Text, useInput, useApp } from "ink";
 import { useEffect, useState } from "react";
 import BigText from "ink-big-text";
-import { padStr } from "../helper/index.ts";
+import { padStr } from "../helpers.ts";
 import type { Mode } from "../app.tsx";
 import { config } from "../config.ts";
-import { textColor } from "../constants/index.ts";
+import { textColor } from "../constants.ts";
 
 const LOADING_STEPS = 50;
 const SHORT_BREAK_TIME = 5;

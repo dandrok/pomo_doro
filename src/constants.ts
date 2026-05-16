@@ -1,3 +1,4 @@
+
 export type Screen = "menu" | "time-select" | "exit" | "resume";
 export type MenuItems = { label: string; value: Screen };
 export type TimeItems = { label: string; value: number };

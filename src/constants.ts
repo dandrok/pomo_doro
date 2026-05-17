@@ -3,6 +3,10 @@ export type Screen = "menu" | "time-select" | "exit" | "resume";
 export type MenuItems = { label: string; value: Screen };
 export type TimeItems = { label: string; value: number };
 
+export const ONE_MINUTE = 60;
+export const SHORT_BREAK_TIME = 5;
+export const LONG_BREAK_TIME = 15;
+
 export const textColor = {
   work: "transparent",
   shortBreak: "cyan",

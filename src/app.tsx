@@ -1,31 +1,16 @@
 import { useEffect, useState } from "react";
 import { Box, Text, useApp } from "ink";
 import SelectInput from "ink-select-input";
-import { ProgressBar } from "./components/ProgressBar.tsx";
+import { TimerView } from "./components/TimerView.tsx";
 import { config } from "./config.ts";
-import { FooterBar } from "./components/FooterBar.tsx";
 import { menuItems, timeItems, type MenuItems, type Screen, type TimeItems } from "./constants.ts";
 
 export type Mode = "work" | "shortBreak" | "longBreak";
 
-// TODO: break timer auto play after pomo timer - in progress
-// TODO: save sessions - preferably with conf lib
-// TODO: "Resume session" should open session from config
-
-
 export const App = () => {
-  // TODO: add custom time
   const [screen, setScreen] = useState<Screen>("menu");
   const [time, setTime] = useState<number | null>(null);
-  const [pomodoroCount, setPomodoroCount] = useState<number>(
-    () => (config.get("pomodoroCount") as number) || 0,
-  );
-  const [mode, setMode] = useState<Mode>("work");
   const { exit } = useApp();
-
-  useEffect(() => {
-    config.set("pomodoroCount", pomodoroCount);
-  }, [pomodoroCount]);
 
   useEffect(() => {
     if (screen === "exit") {
@@ -48,7 +33,6 @@ export const App = () => {
     );
   }
 
-  // TODO: make it work
   if (screen === "resume") {
     const session = config.get("activeSession");
 
@@ -61,34 +45,24 @@ export const App = () => {
     }
 
     return (
-      <Box>
-        <ProgressBar
-          time={session.time}
-          mode={session.mode}
-          setMode={setMode}
-          setPomodoroCount={setPomodoroCount}
-          pomodoroCount={session.pomodoroCount}
-          initialTimeOut={session.timeOut}
-        />
-        <FooterBar />
-      </Box>
+      <TimerView
+        initialMinutes={session.time}
+        initialSecondsRemaining={session.timeOut}
+        initialMode={session.mode}
+        initialPomodoroCount={session.pomodoroCount}
+      />
     );
   }
 
   if (time !== null) {
     return (
-      <Box>
-        <ProgressBar
-          time={time}
-          mode={mode}
-          setMode={setMode}
-          setPomodoroCount={setPomodoroCount}
-          pomodoroCount={pomodoroCount}
-        />
-        <FooterBar />
-      </Box>
+      <TimerView 
+        initialMinutes={time} 
+        initialPomodoroCount={config.get("pomodoroCount") as number || 0}
+      />
     );
   }
+
   if (screen === "exit") {
     return <Text>have a nice day and stay focus!</Text>;
   }

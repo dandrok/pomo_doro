@@ -1,11 +1,10 @@
 import { Box, Text } from "ink";
 import BigText from "ink-big-text";
 import { padStr } from "../helpers.ts";
-import { textColor } from "../constants.ts";
+import { textColor, modeIcons, ONE_MINUTE } from "../constants.ts";
 import type { Mode } from "../app.tsx";
 
 const LOADING_STEPS = 50;
-const ONE_MINUTE = 60;
 
 interface ProgressBarProps {
   secondsRemaining: number;
@@ -32,17 +31,25 @@ export const ProgressBar = ({
     <Box
       flexDirection="column"
       gap={2}
-      backgroundColor={textColor[mode]}
+      // backgroundColor={textColor[mode]}
       padding={1}
     >
       <Box justifyContent="space-between">
-        <Text>pomodoro count: {pomodoroCount}</Text>
-        <Text color={isPaused ? "yellow" : "green"}>
-          {isPaused ? "PAUSED ⏸" : "RUNNING ▶"}
-        </Text>
+        <Box gap={1}>
+          <Text color="gray">{modeIcons[mode]}</Text>
+          <Text>{mode}</Text>
+        </Box>
+        <Box gap={1}>
+          <Text color={isPaused ? "yellow" : "green"}>
+            {isPaused ? "⏸" : "▶"}
+          </Text>
+          <Text color={isPaused ? "yellow" : "green"}>
+            {isPaused ? "PAUSED" : "RUNNING"}
+          </Text>
+        </Box>
       </Box>
       <Box justifyContent="flex-end">
-        <Text>&#8226; {mode}</Text>
+        <Text>count: {pomodoroCount}</Text>
       </Box>
       <Box>
         <BigText text={`${min} : ${sec}`} />

@@ -13,6 +13,12 @@ export const textColor = {
   longBreak: "magenta",
 };
 
+export const modeIcons = {
+  work: "◈",
+  shortBreak: "◇",
+  longBreak: "◆",
+};
+
 export const menuItems: MenuItems[] = [
   {
     label: "Start",

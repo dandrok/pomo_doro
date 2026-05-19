@@ -36,10 +36,11 @@ export const App = () => {
   if (screen === "resume") {
     const session = config.get("activeSession");
 
-    if (!session) {
+    if (!session || typeof session.time !== "number") {
       return (
-        <Box>
-          <Text color={"red"}>no active session found</Text>
+        <Box flexDirection="column">
+          <Text color={"red"}>No valid active session found.</Text>
+          <Text color={"gray"}>Press any key to return to menu (not implemented) or restart the app.</Text>
         </Box>
       );
     }
@@ -58,7 +59,7 @@ export const App = () => {
     return (
       <TimerView 
         initialMinutes={time} 
-        initialPomodoroCount={config.get("pomodoroCount") as number || 0}
+        initialPomodoroCount={0}
       />
     );
   }

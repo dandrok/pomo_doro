@@ -21,8 +21,9 @@ export const ProgressBar = ({
   pomodoroCount,
   isPaused,
 }: ProgressBarProps) => {
-  const percentage = Math.floor(progress * 100);
-  const doneReps = Math.floor(progress * LOADING_STEPS);
+  const progressSafe = Math.max(0, Math.min(1, progress));
+  const percentage = Math.floor(progressSafe * 100);
+  const doneReps = Math.floor(progressSafe * LOADING_STEPS);
 
   const min = padStr(Math.floor(secondsRemaining / ONE_MINUTE));
   const sec = padStr(secondsRemaining % ONE_MINUTE);

@@ -37,8 +37,8 @@ export const ProgressBar = ({
     >
       <Box justifyContent="space-between">
         <Box gap={1}>
-          <Text color="gray">{modeIcons[mode]}</Text>
-          <Text>{mode}</Text>
+          <Text color={textColor[mode]}>{modeIcons[mode]}</Text>
+          <Text >{mode}</Text>
         </Box>
         <Box gap={1}>
           <Text color={isPaused ? "yellow" : "green"}>
@@ -50,17 +50,19 @@ export const ProgressBar = ({
         </Box>
       </Box>
       <Box justifyContent="flex-end">
-        <Text>count: {pomodoroCount}</Text>
+        <Text>pomodoro_count: {pomodoroCount}</Text>
       </Box>
-      <Box>
-        <BigText text={`${min} : ${sec}`} />
-      </Box>
-      <Box>
-        <Text>
-          [<Text>{"█".repeat(doneReps)}</Text>
-          <Text>{"░".repeat(LOADING_STEPS - doneReps)}</Text>]
-          <Text> {percentage}%</Text>
-        </Text>
+      <Box flexDirection="column" flexBasis={'center'}>
+        <Box>
+          <BigText text={`${min} : ${sec}`} colors={[textColor[mode], textColor[mode]]} />
+        </Box>
+        <Box>
+          <Text>
+            [<Text>{"█".repeat(doneReps)}</Text>
+            <Text>{"░".repeat(LOADING_STEPS - doneReps)}</Text>]
+            <Text> {percentage}%</Text>
+          </Text>
+        </Box>
       </Box>
     </Box>
   );

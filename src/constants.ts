@@ -8,9 +8,9 @@ export const SHORT_BREAK_TIME = 5;
 export const LONG_BREAK_TIME = 15;
 
 export const textColor = {
-  work: "transparent",
-  shortBreak: "cyan",
-  longBreak: "magenta",
+  work: "system",
+  shortBreak: "greenBright",
+  longBreak: "magentaBright",
 };
 
 export const modeIcons = {

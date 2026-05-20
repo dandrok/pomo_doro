@@ -2,12 +2,7 @@
 
 A sleek, modular Pomodoro timer for your terminal, built with React, Ink, and TypeScript.
 
-![demo](./docs/demo.mp4)
-
-
 https://github.com/user-attachments/assets/a78c5aa7-417d-4f7e-967d-2158804bc5e7
-
-
 
 ## Features
 

@@ -2,7 +2,7 @@
 
 A sleek, modular Pomodoro timer for your terminal, built with React, Ink, and TypeScript.
 
-![demo](./docs/screenrecording-2026-04-24_21-02-04-ezgif.com-video-to-gif-converter.gif)
+![demo](./docs/demo.mp4)
 
 ## Features
 

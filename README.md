@@ -51,6 +51,15 @@ The project is structured for readability and modularity:
 # Run in development mode
 npm run dev
 
+# Run tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with Vitest UI
+npm run test:ui
+
 # Run type checking
 npm run typecheck
 

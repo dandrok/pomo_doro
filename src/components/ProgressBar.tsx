@@ -32,13 +32,12 @@ export const ProgressBar = ({
     <Box
       flexDirection="column"
       gap={2}
-      // backgroundColor={textColor[mode]}
       padding={1}
     >
       <Box justifyContent="space-between">
         <Box gap={1}>
           <Text color={textColor[mode]}>{modeIcons[mode]}</Text>
-          <Text >{mode}</Text>
+          <Text>{mode}</Text>
         </Box>
         <Box gap={1}>
           <Text color={isPaused ? "yellow" : "green"}>

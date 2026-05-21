@@ -5,7 +5,22 @@
   "license": "ISC",
   "author": "dandrok",
   "type": "module",
-  "main": "app.tsx",
+  "main": "src/cli.tsx",
+  "bin": {
+    "pomo": "./src/cli.tsx"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "keywords": [
+    "pomodoro",
+    "timer",
+    "tui",
+    "ink",
+    "cli",
+    "productivity"
+  ],
   "scripts": {
     "dev": "tsx src/cli.tsx",
     "typecheck": "tsc --noEmit",

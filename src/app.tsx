@@ -5,9 +5,8 @@ import { TimerView } from "./components/TimerView.tsx";
 import { config } from "./config.ts";
 import { menuItems, timeItems, type MenuItems, type Screen, type TimeItems } from "./constants.ts";
 
-export type Mode = "work" | "shortBreak" | "longBreak";
-
 export const App = () => {
+
   const [screen, setScreen] = useState<Screen>("menu");
   const [time, setTime] = useState<number | null>(null);
   const { exit } = useApp();
@@ -57,8 +56,8 @@ export const App = () => {
 
   if (time !== null) {
     return (
-      <TimerView 
-        initialMinutes={time} 
+      <TimerView
+        initialMinutes={time}
         initialPomodoroCount={0}
       />
     );

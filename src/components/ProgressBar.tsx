@@ -2,7 +2,7 @@ import { Box, Text } from "ink";
 import BigText from "ink-big-text";
 import { padStr } from "../helpers.ts";
 import { textColor, modeIcons, ONE_MINUTE } from "../constants.ts";
-import type { Mode } from "../app.tsx";
+import type { Mode } from "../helpers.ts";
 
 const LOADING_STEPS = 50;
 

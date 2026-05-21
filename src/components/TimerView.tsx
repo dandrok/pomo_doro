@@ -5,7 +5,7 @@ import { ProgressBar } from "./ProgressBar.tsx";
 import { FooterBar } from "./FooterBar.tsx";
 import { config } from "../config.ts";
 import { ONE_MINUTE, SHORT_BREAK_TIME, LONG_BREAK_TIME } from "../constants.ts";
-import type { Mode } from "../app.tsx";
+import { getNextSessionType, type Mode } from "../helpers.ts";
 
 interface TimerViewProps {
   initialMinutes: number;
@@ -26,19 +26,16 @@ export const TimerView = ({
   const [currentWorkMinutes] = useState(initialMinutes);
 
   const handleTimeUp = useCallback(() => {
+    const nextMode = getNextSessionType(mode, pomodoroCount);
+    setMode(nextMode);
+
     if (mode === "work") {
       const nextCount = pomodoroCount + 1;
       setPomodoroCount(nextCount);
       
-      if (nextCount % 4 === 0) {
-        setMode("longBreak");
-        reset(LONG_BREAK_TIME * ONE_MINUTE);
-      } else {
-        setMode("shortBreak");
-        reset(SHORT_BREAK_TIME * ONE_MINUTE);
-      }
+      const duration = nextMode === "longBreak" ? LONG_BREAK_TIME : SHORT_BREAK_TIME;
+      reset(duration * ONE_MINUTE);
     } else {
-      setMode("work");
       reset(currentWorkMinutes * ONE_MINUTE);
     }
   }, [mode, pomodoroCount, currentWorkMinutes]);

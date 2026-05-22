@@ -13,7 +13,22 @@ https://github.com/user-attachments/assets/a78c5aa7-417d-4f7e-967d-2158804bc5e7
 
 ## Installation & Usage
 
-To get started locally:
+### Global Installation (Recommended)
+
+You can install Pomo Doro globally and run it from anywhere in your terminal:
+
+```bash
+npm install -g pomo-doro-tui
+```
+
+After installation, simply run:
+```bash
+pomo
+```
+
+### Local Development
+
+Or if you want to run from source:
 
 ```bash
 # Clone the repository

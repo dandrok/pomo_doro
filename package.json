@@ -1,13 +1,13 @@
 {
-  "name": "pomo_doro",
-  "version": "0.0.2",
+  "name": "pomo-doro-tui",
+  "version": "0.0.3",
   "description": "pomodoro tui app",
   "license": "ISC",
   "author": "dandrok",
   "type": "module",
   "main": "src/cli.tsx",
   "bin": {
-    "pomo": "./src/cli.tsx"
+    "pomo": "src/cli.tsx"
   },
   "files": [
     "src",

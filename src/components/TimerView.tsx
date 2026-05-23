@@ -1,11 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
 import { useInput, useApp, Box } from "ink";
-import { useTimer } from "../hooks/useTimer.ts";
-import { ProgressBar } from "./ProgressBar.tsx";
-import { FooterBar } from "./FooterBar.tsx";
-import { config } from "../config.ts";
-import { ONE_MINUTE, SHORT_BREAK_TIME, LONG_BREAK_TIME } from "../constants.ts";
-import { getNextSessionType, type Mode } from "../helpers.ts";
+import { useTimer } from "../hooks/useTimer";
+import { ProgressBar } from "./ProgressBar";
+import { FooterBar } from "./FooterBar";
+import { config } from "../config";
+import { ONE_MINUTE, SHORT_BREAK_TIME, LONG_BREAK_TIME } from "../constants";
+import { getNextSessionType, type Mode } from "../helpers";
 
 interface TimerViewProps {
   initialMinutes: number;

@@ -1,5 +1,5 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env node
 import { render } from "ink";
-import { App } from "./app.tsx";
+import { App } from "./app";
 
 render(<App />);

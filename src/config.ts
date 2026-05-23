@@ -1,5 +1,5 @@
 import Conf from "conf";
-import type { Mode } from "./helpers.ts";
+import type { Mode } from "./helpers";
 
 export type Session = {
   timeOut: number;

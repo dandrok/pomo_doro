@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { padStr, getNextSessionType } from "./helpers.ts";
+import { padStr, getNextSessionType } from "./helpers";
 
 describe("helpers", () => {
   describe("padStr", () => {

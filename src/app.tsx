@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Box, Text, useApp } from "ink";
 import SelectInput from "ink-select-input";
-import { TimerView } from "./components/TimerView.tsx";
-import { config } from "./config.ts";
-import { menuItems, timeItems, type MenuItems, type Screen, type TimeItems } from "./constants.ts";
+import { TimerView } from "./components/TimerView";
+import { config } from "./config";
+import { menuItems, timeItems, type MenuItems, type Screen, type TimeItems } from "./constants";
 
 export const App = () => {
 

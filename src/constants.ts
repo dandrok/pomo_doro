@@ -36,10 +36,6 @@ export const menuItems: MenuItems[] = [
 
 export const timeItems: TimeItems[] = [
   {
-    label: ".1min",
-    value: 0.1,
-  },
-  {
     label: "25min",
     value: 25,
   },

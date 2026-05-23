@@ -1,7 +1,7 @@
 import { Box, Text } from "ink";
 import BigText from "ink-big-text";
 import { padStr } from "../helpers";
-import { textColor, modeIcons, ONE_MINUTE } from "../constants";
+import { textColor, modeIcons, ONE_MINUTE, IS_TEST_MODE } from "../constants";
 import type { Mode } from "../helpers";
 
 const LOADING_STEPS = 50;
@@ -31,9 +31,14 @@ export const ProgressBar = ({
   return (
     <Box
       flexDirection="column"
-      gap={2}
+      gap={1}
       padding={1}
     >
+      {IS_TEST_MODE && (
+        <Box justifyContent="center" marginBottom={1}>
+          <Text color="yellow" bold inverse> ⚠️ TEST MODE - DATA SANDBOXED </Text>
+        </Box>
+      )}
       <Box justifyContent="space-between">
         <Box gap={1}>
           <Text color={textColor[mode]}>{modeIcons[mode]}</Text>

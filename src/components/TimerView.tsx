@@ -33,6 +33,23 @@ export const TimerView = ({
       const nextCount = pomodoroCount + 1;
       setPomodoroCount(nextCount);
       
+      // Update completion in history
+      const today = new Date().toISOString().split("T")[0];
+      const history = config.get("history") || [];
+      const todayIndex = history.findIndex((h) => h.date === today);
+      
+      if (todayIndex !== -1) {
+        const updatedHistory = [...history];
+        const day = updatedHistory[todayIndex];
+        if (day) {
+          updatedHistory[todayIndex] = {
+            ...day,
+            completedPomodoros: day.completedPomodoros + 1,
+          };
+          config.set("history", updatedHistory);
+        }
+      }
+
       const duration = nextMode === "longBreak" ? LONG_BREAK_TIME : SHORT_BREAK_TIME;
       reset(duration * ONE_MINUTE);
     } else {
@@ -55,7 +72,31 @@ export const TimerView = ({
       pomodoroCount,
     });
     config.set("pomodoroCount", pomodoroCount);
-  }, [secondsRemaining, mode, currentWorkMinutes, pomodoroCount]);
+
+    // Update Focus Time (only for work mode)
+    if (mode === "work" && !isPaused) {
+      const today = new Date().toISOString().split("T")[0];
+      const history = config.get("history") || [];
+      const todayIndex = history.findIndex((h) => h.date === today);
+
+      if (todayIndex !== -1) {
+        const updatedHistory = [...history];
+        const day = updatedHistory[todayIndex];
+        if (day) {
+          updatedHistory[todayIndex] = {
+            ...day,
+            totalFocusSeconds: day.totalFocusSeconds + 1,
+          };
+          config.set("history", updatedHistory);
+        }
+      } else {
+        config.set("history", [
+          ...history,
+          { date: today || "", totalFocusSeconds: 1, completedPomodoros: 0 },
+        ]);
+      }
+    }
+  }, [secondsRemaining, mode, currentWorkMinutes, pomodoroCount, isPaused]);
 
   useInput((input) => {
     if (input === "p") pause();

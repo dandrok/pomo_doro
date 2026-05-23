@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { Box, Text, useApp } from "ink";
 import SelectInput from "ink-select-input";
 import { TimerView } from "./components/TimerView";
+import { History } from "./components/History";
 import { config } from "./config";
 import { menuItems, timeItems, type MenuItems, type Screen, type TimeItems } from "./constants";
 
 export const App = () => {
-
   const [screen, setScreen] = useState<Screen>("menu");
   const [time, setTime] = useState<number | null>(null);
   const { exit } = useApp();
@@ -52,6 +52,10 @@ export const App = () => {
         initialPomodoroCount={session.pomodoroCount}
       />
     );
+  }
+
+  if (screen === "history") {
+    return <History onBack={() => setScreen("menu")} />;
   }
 
   if (time !== null) {

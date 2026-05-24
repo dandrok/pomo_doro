@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { padStr, getNextSessionType } from "./helpers";
+import { padStr, getNextSessionType, formatTime } from "./helpers";
 
 describe("helpers", () => {
   describe("padStr", () => {
@@ -12,6 +12,17 @@ describe("helpers", () => {
     it("should not pad double digit numbers", () => {
       expect(padStr(10)).toBe("10");
       expect(padStr(59)).toBe("59");
+    });
+  });
+
+  describe("formatTime", () => {
+    it("should format seconds correctly", () => {
+      expect(formatTime(45)).toBe("45s");
+      expect(formatTime(60)).toBe("1m");
+      expect(formatTime(120)).toBe("2m");
+      expect(formatTime(3600)).toBe("1h 0m");
+      expect(formatTime(3661)).toBe("1h 1m");
+      expect(formatTime(7320)).toBe("2h 2m");
     });
   });
 

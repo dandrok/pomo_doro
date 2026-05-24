@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useInput, useApp, Box } from "ink";
 import { useTimer } from "../hooks/useTimer";
+import { useHistory } from "../hooks/useHistory";
 import { ProgressBar } from "./ProgressBar";
 import { FooterBar } from "./FooterBar";
 import { config } from "../config";
@@ -24,6 +25,7 @@ export const TimerView = ({
   const [mode, setMode] = useState<Mode>(initialMode);
   const [pomodoroCount, setPomodoroCount] = useState(initialPomodoroCount);
   const [currentWorkMinutes] = useState(initialMinutes);
+  const { addFocusSecond, completeSession } = useHistory();
 
   const handleTimeUp = useCallback(() => {
     const nextMode = getNextSessionType(mode, pomodoroCount);
@@ -32,30 +34,14 @@ export const TimerView = ({
     if (mode === "work") {
       const nextCount = pomodoroCount + 1;
       setPomodoroCount(nextCount);
-      
-      // Update completion in history
-      const today = new Date().toISOString().split("T")[0];
-      const history = config.get("history") || [];
-      const todayIndex = history.findIndex((h) => h.date === today);
-      
-      if (todayIndex !== -1) {
-        const updatedHistory = [...history];
-        const day = updatedHistory[todayIndex];
-        if (day) {
-          updatedHistory[todayIndex] = {
-            ...day,
-            completedPomodoros: day.completedPomodoros + 1,
-          };
-          config.set("history", updatedHistory);
-        }
-      }
+      completeSession();
 
       const duration = nextMode === "longBreak" ? LONG_BREAK_TIME : SHORT_BREAK_TIME;
       reset(duration * ONE_MINUTE);
     } else {
       reset(currentWorkMinutes * ONE_MINUTE);
     }
-  }, [mode, pomodoroCount, currentWorkMinutes]);
+  }, [mode, pomodoroCount, currentWorkMinutes, completeSession]);
 
   const { secondsRemaining, progress, isPaused, pause, resume, reset } = useTimer({
     initialSeconds: initialMinutes * ONE_MINUTE,
@@ -63,7 +49,7 @@ export const TimerView = ({
     onTimeUp: handleTimeUp,
   });
 
-  // Persist state
+  // Persist current session state
   useEffect(() => {
     config.set("activeSession", {
       timeOut: secondsRemaining,
@@ -75,28 +61,9 @@ export const TimerView = ({
 
     // Update Focus Time (only for work mode)
     if (mode === "work" && !isPaused) {
-      const today = new Date().toISOString().split("T")[0];
-      const history = config.get("history") || [];
-      const todayIndex = history.findIndex((h) => h.date === today);
-
-      if (todayIndex !== -1) {
-        const updatedHistory = [...history];
-        const day = updatedHistory[todayIndex];
-        if (day) {
-          updatedHistory[todayIndex] = {
-            ...day,
-            totalFocusSeconds: day.totalFocusSeconds + 1,
-          };
-          config.set("history", updatedHistory);
-        }
-      } else {
-        config.set("history", [
-          ...history,
-          { date: today || "", totalFocusSeconds: 1, completedPomodoros: 0 },
-        ]);
-      }
+      addFocusSecond();
     }
-  }, [secondsRemaining, mode, currentWorkMinutes, pomodoroCount, isPaused]);
+  }, [secondsRemaining, mode, currentWorkMinutes, pomodoroCount, isPaused, addFocusSecond]);
 
   useInput((input) => {
     if (input === "p") pause();
@@ -105,7 +72,7 @@ export const TimerView = ({
   });
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" gap={1} padding={1}>
       <ProgressBar
         secondsRemaining={secondsRemaining}
         progress={progress}
@@ -113,7 +80,13 @@ export const TimerView = ({
         pomodoroCount={pomodoroCount}
         isPaused={isPaused}
       />
-      <FooterBar />
+      <FooterBar 
+        controls={[
+          { key: "p", label: "pause" },
+          { key: "r", label: "resume" },
+          { key: "q", label: "quit" },
+        ]} 
+      />
     </Box>
   );
 };

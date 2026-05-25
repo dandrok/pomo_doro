@@ -3,6 +3,7 @@ import { Box, Text, useApp } from "ink";
 import SelectInput from "ink-select-input";
 import { TimerView } from "./components/TimerView";
 import { History } from "./components/History";
+import { About } from "./components/About";
 import { config } from "./config";
 import { menuItems, timeItems, type MenuItems, type Screen, type TimeItems } from "./constants";
 
@@ -56,6 +57,10 @@ export const App = () => {
 
   if (screen === "history") {
     return <History onBack={() => setScreen("menu")} />;
+  }
+
+  if (screen === "about") {
+    return <About onBack={() => setScreen("menu")} />;
   }
 
   if (time !== null) {

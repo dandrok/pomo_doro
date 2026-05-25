@@ -2,13 +2,10 @@ import type { ForegroundColorName } from "chalk";
 import type { LiteralUnion } from "type-fest";
 import type { Mode } from "./helpers";
 
-export type Screen = "menu" | "time-select" | "exit" | "resume" | "history";
+export type Screen = "menu" | "time-select" | "exit" | "resume" | "history" | "about";
 export type MenuItems = { label: string; value: Screen };
 export type TimeItems = { label: string; value: number };
 
-/**
- * Valid colors supported by Ink (matches Text component props)
- */
 export type InkColor = LiteralUnion<ForegroundColorName, string>;
 
 export const IS_TEST_MODE = process.env["NODE_ENV"] === "test";
@@ -41,6 +38,10 @@ export const menuItems: MenuItems[] = [
   {
     label: "History",
     value: "history",
+  },
+  {
+    label: "About",
+    value: "about",
   },
   {
     label: "Exit",

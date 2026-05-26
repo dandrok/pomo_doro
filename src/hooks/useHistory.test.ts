@@ -2,7 +2,6 @@ import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { useHistory } from "./useHistory";
 import { config } from "../config";
-import { IS_TEST_MODE } from "../constants";
 
 // Mock the config module
 vi.mock("../config", () => ({

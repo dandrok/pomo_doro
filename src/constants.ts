@@ -1,6 +1,22 @@
 import type { ForegroundColorName } from "chalk";
 import type { LiteralUnion } from "type-fest";
 import type { Mode } from "./helpers";
+import packageJson from "../package.json" with { type: "json" };
+
+export const APP_VERSION = packageJson.version;
+export const APP_AUTHOR = packageJson.author;
+export const APP_DESCRIPTION = packageJson.description;
+
+export const APP_LINKS = {
+  github: "https://github.com/dandrok/pomo_doro",
+  npm: "https://www.npmjs.com/package/pomo-doro-tui",
+};
+
+export const TECHNOLOGIES = [
+  "React & Ink (Terminal UI)",
+  "TypeScript",
+  "Vitest (Testing)",
+];
 
 export type Screen = "menu" | "time-select" | "exit" | "resume" | "history" | "about";
 export type MenuItems = { label: string; value: Screen };

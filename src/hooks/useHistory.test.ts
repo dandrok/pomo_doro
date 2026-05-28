@@ -27,7 +27,9 @@ describe("useHistory", () => {
   });
 
   it("should initialize with data from config", () => {
-    const mockData = [{ date: "2026-05-16", totalFocusSeconds: 60, completedPomodoros: 1 }];
+    const mockData = [
+      { date: "2026-05-16", totalFocusSeconds: 60, completedPomodoros: 1 },
+    ];
     vi.mocked(config.get).mockReturnValue(mockData);
 
     const { result } = renderHook(() => useHistory());

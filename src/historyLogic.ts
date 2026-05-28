@@ -1,6 +1,9 @@
 import type { DailyStats } from "./config";
 
-export const updateFocusTime = (history: DailyStats[], date: string): DailyStats[] => {
+export const updateFocusTime = (
+  history: DailyStats[],
+  date: string,
+): DailyStats[] => {
   const todayIndex = history.findIndex((h) => h.date === date);
 
   if (todayIndex !== -1) {
@@ -15,13 +18,13 @@ export const updateFocusTime = (history: DailyStats[], date: string): DailyStats
     }
   }
 
-  return [
-    ...history,
-    { date, totalFocusSeconds: 1, completedPomodoros: 0 },
-  ];
+  return [...history, { date, totalFocusSeconds: 1, completedPomodoros: 0 }];
 };
 
-export const incrementPomodoroCount = (history: DailyStats[], date: string): DailyStats[] => {
+export const incrementPomodoroCount = (
+  history: DailyStats[],
+  date: string,
+): DailyStats[] => {
   const todayIndex = history.findIndex((h) => h.date === date);
 
   if (todayIndex !== -1) {
@@ -36,15 +39,18 @@ export const incrementPomodoroCount = (history: DailyStats[], date: string): Dai
     }
   }
 
-  return [
-    ...history,
-    { date, totalFocusSeconds: 0, completedPomodoros: 1 },
-  ];
+  return [...history, { date, totalFocusSeconds: 0, completedPomodoros: 1 }];
 };
 
 export const calculateTotals = (history: DailyStats[]) => {
-  const totalFocusSeconds = history.reduce((acc, curr) => acc + curr.totalFocusSeconds, 0);
-  const totalCompleted = history.reduce((acc, curr) => acc + curr.completedPomodoros, 0);
+  const totalFocusSeconds = history.reduce(
+    (acc, curr) => acc + curr.totalFocusSeconds,
+    0,
+  );
+  const totalCompleted = history.reduce(
+    (acc, curr) => acc + curr.completedPomodoros,
+    0,
+  );
 
   return { totalFocusSeconds, totalCompleted };
 };

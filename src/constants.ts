@@ -18,7 +18,13 @@ export const TECHNOLOGIES = [
   "Vitest (Testing)",
 ];
 
-export type Screen = "menu" | "time-select" | "exit" | "resume" | "history" | "about";
+export type Screen =
+  | "menu"
+  | "time-select"
+  | "exit"
+  | "resume"
+  | "history"
+  | "about";
 export type MenuItems = { label: string; value: Screen };
 export type TimeItems = { label: string; value: number };
 
@@ -28,7 +34,7 @@ export const IS_TEST_MODE = process.env["NODE_ENV"] === "test";
 
 export const ONE_MINUTE = 60;
 export const SHORT_BREAK_TIME = IS_TEST_MODE ? 0.05 : 5; // 3 seconds in test
-export const LONG_BREAK_TIME = IS_TEST_MODE ? 0.1 : 15;  // 6 seconds in test
+export const LONG_BREAK_TIME = IS_TEST_MODE ? 0.1 : 15; // 6 seconds in test
 
 export const textColor: Record<Mode, InkColor> = {
   work: "system",
@@ -67,11 +73,11 @@ export const menuItems: MenuItems[] = [
 
 export const timeItems: TimeItems[] = IS_TEST_MODE
   ? [
-    { label: "6 sec", value: 0.1 },
-    { label: "12 sec", value: 0.2 },
-  ]
+      { label: "6 sec", value: 0.1 },
+      { label: "12 sec", value: 0.2 },
+    ]
   : [
-    { label: "25min", value: 25 },
-    { label: "35min", value: 35 },
-    { label: "45min", value: 45 },
-  ];
+      { label: "25min", value: 25 },
+      { label: "35min", value: 35 },
+      { label: "45min", value: 45 },
+    ];

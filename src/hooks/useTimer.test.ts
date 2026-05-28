@@ -12,9 +12,7 @@ describe("useTimer", () => {
   });
 
   it("should initialize with the correct values", () => {
-    const { result } = renderHook(() =>
-      useTimer({ initialSeconds: 60 })
-    );
+    const { result } = renderHook(() => useTimer({ initialSeconds: 60 }));
 
     expect(result.current.secondsRemaining).toBe(60);
     expect(result.current.totalSeconds).toBe(60);
@@ -24,7 +22,7 @@ describe("useTimer", () => {
 
   it("should initialize with initialSecondsRemaining if provided", () => {
     const { result } = renderHook(() =>
-      useTimer({ initialSeconds: 60, initialSecondsRemaining: 30 })
+      useTimer({ initialSeconds: 60, initialSecondsRemaining: 30 }),
     );
 
     expect(result.current.secondsRemaining).toBe(30);
@@ -33,9 +31,7 @@ describe("useTimer", () => {
   });
 
   it("should countdown every second", () => {
-    const { result } = renderHook(() =>
-      useTimer({ initialSeconds: 10 })
-    );
+    const { result } = renderHook(() => useTimer({ initialSeconds: 10 }));
 
     act(() => {
       vi.advanceTimersByTime(1000);
@@ -54,9 +50,7 @@ describe("useTimer", () => {
   });
 
   it("should pause the countdown", () => {
-    const { result } = renderHook(() =>
-      useTimer({ initialSeconds: 10 })
-    );
+    const { result } = renderHook(() => useTimer({ initialSeconds: 10 }));
 
     act(() => {
       result.current.pause();
@@ -71,14 +65,12 @@ describe("useTimer", () => {
   });
 
   it("should resume the countdown after pausing", () => {
-    const { result } = renderHook(() =>
-      useTimer({ initialSeconds: 10 })
-    );
+    const { result } = renderHook(() => useTimer({ initialSeconds: 10 }));
 
     act(() => {
       result.current.pause();
     });
-    
+
     act(() => {
       vi.advanceTimersByTime(2000);
     });
@@ -96,9 +88,7 @@ describe("useTimer", () => {
   });
 
   it("should reset to a new total duration", () => {
-    const { result } = renderHook(() =>
-      useTimer({ initialSeconds: 10 })
-    );
+    const { result } = renderHook(() => useTimer({ initialSeconds: 10 }));
 
     act(() => {
       vi.advanceTimersByTime(1000);
@@ -116,9 +106,7 @@ describe("useTimer", () => {
 
   it("should trigger onTimeUp when timer reaches zero", () => {
     const onTimeUp = vi.fn();
-    renderHook(() =>
-      useTimer({ initialSeconds: 3, onTimeUp })
-    );
+    renderHook(() => useTimer({ initialSeconds: 3, onTimeUp }));
 
     act(() => {
       vi.advanceTimersByTime(1000); // 3 -> 2
@@ -129,14 +117,12 @@ describe("useTimer", () => {
     act(() => {
       vi.advanceTimersByTime(1000); // 1 -> 0
     });
-    
+
     expect(onTimeUp).toHaveBeenCalledTimes(1);
   });
 
   it("should calculate progress correctly during countdown", () => {
-    const { result } = renderHook(() =>
-      useTimer({ initialSeconds: 4 })
-    );
+    const { result } = renderHook(() => useTimer({ initialSeconds: 4 }));
 
     act(() => {
       vi.advanceTimersByTime(1000); // 4 -> 3 (25%)

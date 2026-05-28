@@ -24,6 +24,7 @@ npm install -g pomo-doro-tui
 ```
 
 After installation, simply run:
+
 ```bash
 pomo
 ```
@@ -46,12 +47,12 @@ npm run dev
 
 ## Controls
 
-| Key | Action |
-| :--- | :--- |
-| p | Pause timer |
-| r | Resume timer |
-| q | Quit application |
-| b | Back to menu (from History view) |
+| Key | Action                           |
+| :-- | :------------------------------- |
+| p   | Pause timer                      |
+| r   | Resume timer                     |
+| q   | Quit application                 |
+| b   | Back to menu (from History view) |
 
 ## Project Structure
 
@@ -84,6 +85,7 @@ npm run build
 ## CI/CD & Releases
 
 This project uses **GitHub Actions** for automated quality control:
+
 - **On Push/PR**: Automatically runs type-checking and unit tests.
 - **On Release**: Automatically builds and publishes the new version to the NPM registry when a GitHub Release is created.
 

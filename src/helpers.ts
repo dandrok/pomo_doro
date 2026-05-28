@@ -9,11 +9,14 @@ export const formatTime = (seconds: number) => {
   return h > 0 ? `${h}h ${m}m` : `${m}m`;
 };
 
-export const getNextSessionType = (currentMode: Mode, pomodoroCount: number): Mode => {
+export const getNextSessionType = (
+  currentMode: Mode,
+  pomodoroCount: number,
+): Mode => {
   if (currentMode !== "work") {
     return "work";
   }
-  
+
   // After every 4th pomodoro, take a long break
   const completedPomodoros = pomodoroCount + 1;
   return completedPomodoros % 4 === 0 ? "longBreak" : "shortBreak";

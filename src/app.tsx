@@ -5,7 +5,13 @@ import { TimerView } from "./components/TimerView";
 import { History } from "./components/History";
 import { About } from "./components/About";
 import { config } from "./config";
-import { menuItems, timeItems, type MenuItems, type Screen, type TimeItems } from "./constants";
+import {
+  menuItems,
+  timeItems,
+  type MenuItems,
+  type Screen,
+  type TimeItems,
+} from "./constants";
 
 export const App = () => {
   const [screen, setScreen] = useState<Screen>("menu");
@@ -40,7 +46,10 @@ export const App = () => {
       return (
         <Box flexDirection="column">
           <Text color={"red"}>No valid active session found.</Text>
-          <Text color={"gray"}>Press any key to return to menu (not implemented) or restart the app.</Text>
+          <Text color={"gray"}>
+            Press any key to return to menu (not implemented) or restart the
+            app.
+          </Text>
         </Box>
       );
     }
@@ -64,12 +73,7 @@ export const App = () => {
   }
 
   if (time !== null) {
-    return (
-      <TimerView
-        initialMinutes={time}
-        initialPomodoroCount={0}
-      />
-    );
+    return <TimerView initialMinutes={time} initialPomodoroCount={0} />;
   }
 
   if (screen === "exit") {

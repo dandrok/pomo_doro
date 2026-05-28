@@ -7,6 +7,7 @@ import { FooterBar } from "./FooterBar";
 import { config } from "../config";
 import { ONE_MINUTE, SHORT_BREAK_TIME, LONG_BREAK_TIME } from "../constants";
 import { getNextSessionType, type Mode } from "../helpers";
+import { notifyUser } from "../notifications";
 
 interface TimerViewProps {
   initialMinutes: number;
@@ -36,18 +37,30 @@ export const TimerView = ({
       setPomodoroCount(nextCount);
       completeSession();
 
-      const duration = nextMode === "longBreak" ? LONG_BREAK_TIME : SHORT_BREAK_TIME;
+      const duration =
+        nextMode === "longBreak" ? LONG_BREAK_TIME : SHORT_BREAK_TIME;
       reset(duration * ONE_MINUTE);
+
+      const breakType = nextMode === "longBreak" ? "long break" : "short break";
+      notifyUser(
+        "Pomo Doro - Work Done!",
+        `Focus session complete! Take a ${breakType}.`,
+      );
     } else {
       reset(currentWorkMinutes * ONE_MINUTE);
+      notifyUser(
+        "Pomo Doro - Break Finished!",
+        "Break is over. Time to focus!",
+      );
     }
   }, [mode, pomodoroCount, currentWorkMinutes, completeSession]);
 
-  const { secondsRemaining, progress, isPaused, pause, resume, reset } = useTimer({
-    initialSeconds: initialMinutes * ONE_MINUTE,
-    initialSecondsRemaining: initialSecondsRemaining,
-    onTimeUp: handleTimeUp,
-  });
+  const { secondsRemaining, progress, isPaused, pause, resume, reset } =
+    useTimer({
+      initialSeconds: initialMinutes * ONE_MINUTE,
+      initialSecondsRemaining: initialSecondsRemaining,
+      onTimeUp: handleTimeUp,
+    });
 
   // Persist current session state
   useEffect(() => {
@@ -63,7 +76,14 @@ export const TimerView = ({
     if (mode === "work" && !isPaused) {
       addFocusSecond();
     }
-  }, [secondsRemaining, mode, currentWorkMinutes, pomodoroCount, isPaused, addFocusSecond]);
+  }, [
+    secondsRemaining,
+    mode,
+    currentWorkMinutes,
+    pomodoroCount,
+    isPaused,
+    addFocusSecond,
+  ]);
 
   useInput((input) => {
     if (input === "p") pause();
@@ -80,12 +100,12 @@ export const TimerView = ({
         pomodoroCount={pomodoroCount}
         isPaused={isPaused}
       />
-      <FooterBar 
+      <FooterBar
         controls={[
           { key: "p", label: "pause" },
           { key: "r", label: "resume" },
           { key: "q", label: "quit" },
-        ]} 
+        ]}
       />
     </Box>
   );

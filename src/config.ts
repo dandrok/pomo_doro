@@ -9,9 +9,9 @@ export type Session = {
 };
 
 export type DailyStats = {
-  date: string;              // "YYYY-MM-DD"
+  date: string; // "YYYY-MM-DD"
   totalFocusSeconds: number; // Cumulative work time
-  completedPomodoros: number;// Natural completions
+  completedPomodoros: number; // Natural completions
 };
 
 type ConfigSchema = {
@@ -29,4 +29,3 @@ export const config = new Conf<ConfigSchema>({
     history: [],
   },
 });
-

@@ -29,14 +29,13 @@ export const ProgressBar = ({
   const sec = padStr(secondsRemaining % ONE_MINUTE);
 
   return (
-    <Box
-      flexDirection="column"
-      gap={1}
-      padding={1}
-    >
+    <Box flexDirection="column" gap={1} padding={1}>
       {IS_TEST_MODE && (
         <Box justifyContent="center" marginBottom={1}>
-          <Text color="yellow" bold inverse> ⚠️ TEST MODE - DATA SANDBOXED </Text>
+          <Text color="yellow" bold inverse>
+            {" "}
+            ⚠️ TEST MODE - DATA SANDBOXED{" "}
+          </Text>
         </Box>
       )}
       <Box justifyContent="space-between">
@@ -56,9 +55,12 @@ export const ProgressBar = ({
       <Box justifyContent="flex-end">
         <Text>pomodoro_count: {pomodoroCount}</Text>
       </Box>
-      <Box flexDirection="column" flexBasis={'center'}>
+      <Box flexDirection="column" flexBasis={"center"}>
         <Box>
-          <BigText text={`${min} : ${sec}`} colors={[textColor[mode], textColor[mode]]} />
+          <BigText
+            text={`${min} : ${sec}`}
+            colors={[textColor[mode], textColor[mode]]}
+          />
         </Box>
         <Box>
           <Text>

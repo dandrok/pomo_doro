@@ -4,14 +4,9 @@ import SelectInput from "ink-select-input";
 import { TimerView } from "./components/TimerView";
 import { History } from "./components/History";
 import { About } from "./components/About";
-import { config } from "./config";
-import {
-  menuItems,
-  timeItems,
-  type MenuItems,
-  type Screen,
-  type TimeItems,
-} from "./constants";
+import { config } from "./utils/config";
+import { menuItems, timeItems } from "./utils/constants";
+import type { MenuItems, Screen, TimeItems } from "./types";
 
 export const App = () => {
   const [screen, setScreen] = useState<Screen>("menu");

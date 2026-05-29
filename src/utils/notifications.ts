@@ -47,7 +47,7 @@ export const sendNotification = (title: string, message: string): void => {
   } else if (platform === "win32") {
     // TODO: same aswell, not sure if executing the powershell with this kind of huge value is a good and proper way
     // maybe we could execute it in a different way? or we could execute any "alarm" sound insted?
-    // other solution is provide the "default" sound. we could consider it. 
+    // other solution is provide the "default" sound. we could consider it.
     const winCmd = `powershell -c "[void] [System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); $objNotification = New-Object System.Windows.Forms.NotifyIcon; $objNotification.Icon = [System.Drawing.SystemIcons]::Information; $objNotification.BalloonTipIcon = 'Info'; $objNotification.BalloonTipText = '${escapedMessage}'; $objNotification.BalloonTipTitle = '${escapedTitle}'; $objNotification.Visible = $True; $objNotification.ShowBalloonTip(5000)"`;
     exec(winCmd);
   }

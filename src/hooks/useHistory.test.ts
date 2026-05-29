@@ -1,10 +1,10 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { useHistory } from "./useHistory";
-import { config } from "../config";
+import { config } from "../utils/config";
 
 // Mock the config module
-vi.mock("../config", () => ({
+vi.mock("../utils/config", () => ({
   config: {
     get: vi.fn(),
     set: vi.fn(),
@@ -12,7 +12,7 @@ vi.mock("../config", () => ({
 }));
 
 // Mock IS_TEST_MODE to false for predictable tests
-vi.mock("../constants", () => ({
+vi.mock("../utils/constants", () => ({
   IS_TEST_MODE: false,
 }));
 

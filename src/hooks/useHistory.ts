@@ -1,11 +1,12 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { config, type DailyStats } from "../config";
+import { config } from "../utils/config";
+import type { DailyStats } from "../types";
 import {
   updateFocusTime,
   incrementPomodoroCount,
   calculateTotals,
-} from "../historyLogic";
-import { IS_TEST_MODE } from "../constants";
+} from "../utils/historyLogic";
+import { IS_TEST_MODE } from "../utils/constants";
 
 export const useHistory = () => {
   const [history, setHistory] = useState<DailyStats[]>(() => {

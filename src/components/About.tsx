@@ -6,7 +6,7 @@ import {
   APP_DESCRIPTION,
   APP_LINKS,
   TECHNOLOGIES,
-} from "../constants";
+} from "../utils/constants";
 
 interface AboutProps {
   onBack: () => void;

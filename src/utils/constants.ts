@@ -1,7 +1,5 @@
-import type { ForegroundColorName } from "chalk";
-import type { LiteralUnion } from "type-fest";
-import type { Mode } from "./helpers";
-import packageJson from "../package.json" with { type: "json" };
+import type { Mode, MenuItems, TimeItems, InkColor } from "../types";
+import packageJson from "../../package.json" with { type: "json" };
 
 export const APP_VERSION = packageJson.version;
 export const APP_AUTHOR = packageJson.author;
@@ -17,18 +15,6 @@ export const TECHNOLOGIES = [
   "TypeScript",
   "Vitest (Testing)",
 ];
-
-export type Screen =
-  | "menu"
-  | "time-select"
-  | "exit"
-  | "resume"
-  | "history"
-  | "about";
-export type MenuItems = { label: string; value: Screen };
-export type TimeItems = { label: string; value: number };
-
-export type InkColor = LiteralUnion<ForegroundColorName, string>;
 
 export const IS_TEST_MODE = process.env["NODE_ENV"] === "test";
 

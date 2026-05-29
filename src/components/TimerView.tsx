@@ -4,10 +4,15 @@ import { useTimer } from "../hooks/useTimer";
 import { useHistory } from "../hooks/useHistory";
 import { ProgressBar } from "./ProgressBar";
 import { FooterBar } from "./FooterBar";
-import { config } from "../config";
-import { ONE_MINUTE, SHORT_BREAK_TIME, LONG_BREAK_TIME } from "../constants";
-import { getNextSessionType, type Mode } from "../helpers";
-import { notifyUser } from "../notifications";
+import { config } from "../utils/config";
+import {
+  ONE_MINUTE,
+  SHORT_BREAK_TIME,
+  LONG_BREAK_TIME,
+} from "../utils/constants";
+import { getNextSessionType } from "../utils/helpers";
+import type { Mode } from "../types";
+import { notifyUser } from "../utils/notifications";
 
 interface TimerViewProps {
   initialMinutes: number;

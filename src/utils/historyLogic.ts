@@ -1,4 +1,4 @@
-import type { DailyStats } from "./config";
+import type { DailyStats } from "../types";
 
 export const updateFocusTime = (
   history: DailyStats[],

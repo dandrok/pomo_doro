@@ -4,7 +4,7 @@ import {
   incrementPomodoroCount,
   calculateTotals,
 } from "./historyLogic";
-import type { DailyStats } from "./config";
+import type { DailyStats } from "../types";
 
 describe("historyLogic", () => {
   describe("updateFocusTime", () => {

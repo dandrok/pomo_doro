@@ -1,8 +1,13 @@
 import { Box, Text } from "ink";
 import BigText from "ink-big-text";
-import { padStr } from "../helpers";
-import { textColor, modeIcons, ONE_MINUTE, IS_TEST_MODE } from "../constants";
-import type { Mode } from "../helpers";
+import { padStr } from "../utils/helpers";
+import {
+  textColor,
+  modeIcons,
+  ONE_MINUTE,
+  IS_TEST_MODE,
+} from "../utils/constants";
+import type { Mode } from "../types";
 
 const LOADING_STEPS = 50;
 

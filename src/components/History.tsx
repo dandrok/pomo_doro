@@ -1,6 +1,6 @@
 import { Box, Text, useInput } from "ink";
 import { useHistory } from "../hooks/useHistory";
-import { formatTime } from "../helpers";
+import { formatTime } from "../utils/helpers";
 import { DailyBarChart } from "./DailyBarChart";
 import { FooterBar } from "./FooterBar";
 

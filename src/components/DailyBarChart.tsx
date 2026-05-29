@@ -1,6 +1,6 @@
 import { Box, Text } from "ink";
-import { type DailyStats } from "../config";
-import { formatTime } from "../helpers";
+import type { DailyStats } from "../types";
+import { formatTime } from "../utils/helpers";
 
 interface DailyBarChartProps {
   data: DailyStats[];

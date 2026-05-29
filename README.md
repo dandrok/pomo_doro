@@ -10,6 +10,7 @@ https://github.com/user-attachments/assets/a78c5aa7-417d-4f7e-967d-2158804bc5e7
 - **Productivity Dashboard**: Track your total focus time and see a 7-day history chart.
 - **Modular Architecture**: Built with custom React hooks and decoupled components.
 - **Smart Sessions**: Automatically cycles between Work, Short Breaks, and Long Breaks.
+- **OS Notifications & Audio Alerts**: Native desktop notifications and sound alerts when sessions complete (supports Linux, macOS, and Windows).
 - **Persistence**: Remembers your progress and allows you to resume sessions.
 - **Development Sandbox**: Dedicated test mode with ultra-short timers for rapid testing.
 
@@ -56,11 +57,15 @@ npm run dev
 
 ## Project Structure
 
-- `src/hooks/`: Core logic for time management (e.g., `useTimer`).
-- `src/components/`: Modular UI components (e.g., `ProgressBar`, `TimerView`, `History`).
-- `src/constants.ts`: Centralized configuration for durations, colors, and symbols.
-- `src/helpers.ts`: Shared utility functions and types.
-- `src/config.ts`: Handles local session and history persistence.
+- `src/types.ts`: Centralized application-wide TypeScript types.
+- `src/hooks/`: Core React hooks for time and history management.
+- `src/components/`: Modular React components for UI rendering (e.g., `ProgressBar`, `TimerView`, `History`).
+- `src/utils/`: Shared configurations, constants, formatting helpers, and notification services.
+  - `config.ts`: Local session and productivity history persistence.
+  - `constants.ts`: Layout colors, icons, and timer settings.
+  - `helpers.ts`: Pure formatting and state utilities.
+  - `historyLogic.ts`: Productivity statistic calculations.
+  - `notifications.ts`: Cross-platform OS notification and audio alerts.
 
 ## Development
 

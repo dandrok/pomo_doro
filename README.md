@@ -7,9 +7,9 @@ https://github.com/user-attachments/assets/a78c5aa7-417d-4f7e-967d-2158804bc5e7
 ## Features
 
 - **TUI Interface**: Clean terminal UI with big text and progress bars.
+- **Smart & Customizable Sessions**: Cycle between Work and Breaks automatically with built-in presets, or create custom intervals using the interactive setup wizard.
 - **Productivity Dashboard**: Track your total focus time and see a 7-day history chart.
 - **Modular Architecture**: Built with custom React hooks and decoupled components.
-- **Smart Sessions**: Automatically cycles between Work, Short Breaks, and Long Breaks.
 - **OS Notifications & Audio Alerts**: Native desktop notifications and sound alerts when sessions complete (supports Linux, macOS, and Windows).
 - **Persistence**: Remembers your progress and allows you to resume sessions.
 - **Development Sandbox**: Dedicated test mode with ultra-short timers for rapid testing.
@@ -48,12 +48,22 @@ npm run dev
 
 ## Controls
 
-| Key | Action                           |
-| :-- | :------------------------------- |
-| p   | Pause timer                      |
-| r   | Resume timer                     |
-| q   | Quit application                 |
-| b   | Back to menu (from History view) |
+### General & Timer Controls
+
+| Key         | Action                                                             |
+| :---------- | :----------------------------------------------------------------- |
+| `p`         | Pause timer                                                        |
+| `r`         | Resume timer                                                       |
+| `q`         | Quit application (when timer is not running)                       |
+| `b` / `Esc` | Go back to previous menu (from History, Preset, or Wizard screens) |
+
+### Custom Preset Wizard Controls
+
+| Key              | Action                                                          |
+| :--------------- | :-------------------------------------------------------------- |
+| `Up` / `Down`    | Navigate between fields (Focus, Short Break, Long Break, Start) |
+| `Left` / `Right` | Decrease / Increase the active duration value                   |
+| `Enter`          | Advance to the next field, or start session (when on Start)     |
 
 ## Project Structure
 

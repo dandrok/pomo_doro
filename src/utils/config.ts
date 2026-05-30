@@ -1,5 +1,5 @@
 import Conf from "conf";
-import type { ConfigSchema } from "../types";
+import type { ConfigSchema } from "@types";
 
 const IS_TEST_MODE = process.env["NODE_ENV"] === "test";
 

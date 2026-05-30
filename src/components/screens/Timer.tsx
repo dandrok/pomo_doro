@@ -3,7 +3,7 @@ import { useInput, useApp, Box } from "ink";
 import { useTimer, useHistory } from "@hooks";
 import { ProgressBar, FooterBar } from "@ui";
 import { config, ONE_MINUTE, getNextSessionType, notifyUser } from "@utils";
-import type { Mode } from "../../types";
+import type { Mode } from "@types";
 
 interface TimerProps {
   focus: number;

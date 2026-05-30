@@ -5,7 +5,7 @@ import { CustomPresetWizard } from "./CustomPresetWizard";
 import { History } from "./History";
 import { About } from "./About";
 import { Resume } from "./Resume";
-import type { Screen, MenuItems, TimeSelectItem } from "../../types";
+import type { Screen, MenuItems, TimeSelectItem } from "@types";
 
 interface RouterProps {
   screen: Screen;

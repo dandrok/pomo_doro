@@ -1,7 +1,7 @@
 import { Box, Text } from "ink";
 import BigText from "ink-big-text";
 import { padStr, textColor, modeIcons, ONE_MINUTE, IS_TEST_MODE } from "@utils";
-import type { Mode } from "../../types";
+import type { Mode } from "@types";
 
 const LOADING_STEPS = 50;
 

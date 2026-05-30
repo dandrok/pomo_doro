@@ -1,7 +1,7 @@
 import SelectInput from "ink-select-input";
 import { Layout } from "@ui";
 import { menuItems } from "@utils";
-import type { MenuItems } from "../../types";
+import type { MenuItems } from "@types";
 
 interface MainMenuProps {
   onSelect: (item: MenuItems) => void;

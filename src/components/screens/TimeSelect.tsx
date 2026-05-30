@@ -1,7 +1,7 @@
 import SelectInput from "ink-select-input";
 import { Layout } from "@ui";
 import { timeSelectItems } from "@utils";
-import type { TimeSelectItem } from "../../types";
+import type { TimeSelectItem } from "@types";
 
 interface TimeSelectProps {
   onSelect: (item: TimeSelectItem) => void;

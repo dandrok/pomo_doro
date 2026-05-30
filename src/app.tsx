@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useApp, useInput } from "ink";
 import { Timer, Router } from "@screens";
 import { PRESETS } from "@utils";
-import type { MenuItems, Screen, TimeSelectItem } from "./types";
+import type { MenuItems, Screen, TimeSelectItem } from "@types";
 
 export const App = () => {
   const [screen, setScreen] = useState<Screen>("menu");

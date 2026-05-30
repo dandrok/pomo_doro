@@ -1,5 +1,5 @@
 import { Box, Text } from "ink";
-import type { DailyStats } from "../../types";
+import type { DailyStats } from "@types";
 import { formatTime } from "@utils";
 
 interface DailyBarChartProps {

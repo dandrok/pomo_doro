@@ -1,4 +1,4 @@
-import type { Mode } from "../types";
+import type { Mode } from "@types";
 
 export const padStr = (num: number) => String(num).padStart(2, "0");
 

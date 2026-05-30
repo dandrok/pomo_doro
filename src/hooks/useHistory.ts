@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import type { DailyStats } from "../types";
+import type { DailyStats } from "@types";
 import {
   config,
   updateFocusTime,

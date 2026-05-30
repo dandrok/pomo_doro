@@ -1,9 +1,7 @@
 import { Box, Text, useInput } from "ink";
-import { useHistory } from "../hooks/useHistory";
-import { formatTime } from "../utils/helpers";
-import { DailyBarChart } from "./DailyBarChart";
-import { FooterBar } from "./FooterBar";
-import { HeaderBar } from "./HeaderBar";
+import { useHistory } from "@hooks";
+import { formatTime } from "@utils";
+import { DailyBarChart, Layout } from "@ui";
 
 interface HistoryProps {
   onBack: () => void;
@@ -20,9 +18,13 @@ export const History = ({ onBack }: HistoryProps) => {
   });
 
   return (
-    <Box flexDirection="column" padding={1}>
-      <HeaderBar title="Productivity Dashboard" />
-
+    <Layout
+      title="Productivity Dashboard"
+      footerControls={[
+        { key: "b", label: "back to menu" },
+        { key: "q", label: "quit" },
+      ]}
+    >
       <Box flexDirection="column" marginBottom={1}>
         <Text>
           Total Focus Time:{" "}
@@ -35,13 +37,6 @@ export const History = ({ onBack }: HistoryProps) => {
       </Box>
 
       <DailyBarChart data={last7Days} />
-
-      <FooterBar
-        controls={[
-          { key: "b", label: "back to menu" },
-          { key: "q", label: "quit" },
-        ]}
-      />
-    </Box>
+    </Layout>
   );
 };

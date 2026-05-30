@@ -1,16 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
 import { useInput, useApp, Box } from "ink";
-import { useTimer } from "../hooks/useTimer";
-import { useHistory } from "../hooks/useHistory";
-import { ProgressBar } from "./ProgressBar";
-import { FooterBar } from "./FooterBar";
-import { config } from "../utils/config";
-import { ONE_MINUTE } from "../utils/constants";
-import { getNextSessionType } from "../utils/helpers";
-import type { Mode } from "../types";
-import { notifyUser } from "../utils/notifications";
+import { useTimer, useHistory } from "@hooks";
+import { ProgressBar, FooterBar } from "@ui";
+import { config, ONE_MINUTE, getNextSessionType, notifyUser } from "@utils";
+import type { Mode } from "../../types";
 
-interface TimerViewProps {
+interface TimerProps {
   focus: number;
   shortBreak: number;
   longBreak: number;
@@ -19,14 +14,14 @@ interface TimerViewProps {
   initialPomodoroCount?: number;
 }
 
-export const TimerView = ({
+export const Timer = ({
   focus,
   shortBreak,
   longBreak,
   initialSecondsRemaining,
   initialMode = "work",
   initialPomodoroCount = 0,
-}: TimerViewProps) => {
+}: TimerProps) => {
   const { exit } = useApp();
   const [mode, setMode] = useState<Mode>(initialMode);
   const [pomodoroCount, setPomodoroCount] = useState(initialPomodoroCount);

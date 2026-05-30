@@ -1,13 +1,12 @@
 import { Box, Text, useInput } from "ink";
-import { FooterBar } from "./FooterBar";
-import { HeaderBar } from "./HeaderBar";
+import { Layout } from "@ui";
 import {
   APP_VERSION,
   APP_AUTHOR,
   APP_DESCRIPTION,
   APP_LINKS,
   TECHNOLOGIES,
-} from "../utils/constants";
+} from "@utils";
 
 interface AboutProps {
   onBack: () => void;
@@ -21,9 +20,13 @@ export const About = ({ onBack }: AboutProps) => {
   });
 
   return (
-    <Box flexDirection="column" padding={1}>
-      <HeaderBar title="About Pomo Doro" />
-
+    <Layout
+      title="About Pomo Doro"
+      footerControls={[
+        { key: "b", label: "back to menu" },
+        { key: "q", label: "quit" },
+      ]}
+    >
       <Box flexDirection="column" marginBottom={1}>
         <Text>
           Version: <Text color="green">{APP_VERSION}</Text>
@@ -54,13 +57,6 @@ export const About = ({ onBack }: AboutProps) => {
           NPM: <Text color="magenta">{APP_LINKS.npm}</Text>
         </Text>
       </Box>
-
-      <FooterBar
-        controls={[
-          { key: "b", label: "back to menu" },
-          { key: "q", label: "quit" },
-        ]}
-      />
-    </Box>
+    </Layout>
   );
 };

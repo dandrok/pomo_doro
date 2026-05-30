@@ -1,19 +1,7 @@
 import { useEffect, useState } from "react";
-import { Box, Text, useApp, useInput } from "ink";
-import SelectInput from "ink-select-input";
-import { TimerView } from "./components/TimerView";
-import { CustomPresetWizard } from "./components/CustomPresetWizard";
-import { History } from "./components/History";
-import { About } from "./components/About";
-import { HeaderBar } from "./components/HeaderBar";
-import { FooterBar } from "./components/FooterBar";
-import { config } from "./utils/config";
-import {
-  menuItems,
-  timeSelectItems,
-  PRESETS,
-  IS_TEST_MODE,
-} from "./utils/constants";
+import { useApp, useInput } from "ink";
+import { Timer, Router } from "@screens";
+import { PRESETS } from "@utils";
 import type { MenuItems, Screen, TimeSelectItem } from "./types";
 
 export const App = () => {
@@ -32,7 +20,7 @@ export const App = () => {
   }, [screen, exit]);
 
   useInput((input, key) => {
-    // If timer is running, let TimerView handle its own keys
+    // If timer is running, let Timer handle its own keys
     if (sessionConfig !== null || screen === "resume") {
       return;
     }
@@ -71,80 +59,9 @@ export const App = () => {
     }
   };
 
-  if (screen === "time-select") {
-    return (
-      <Box flexDirection="column" padding={1}>
-        <HeaderBar title="Select Duration" />
-        <SelectInput items={timeSelectItems} onSelect={timeHandlerSelect} />
-        <FooterBar
-          controls={[
-            { key: "b", label: "back to menu" },
-            { key: "q", label: "quit" },
-          ]}
-        />
-      </Box>
-    );
-  }
-
-  if (screen === "custom-wizard") {
-    return (
-      <CustomPresetWizard
-        onStart={(focus, shortBreak, longBreak) => {
-          setSessionConfig({ focus, shortBreak, longBreak });
-          setScreen("menu");
-        }}
-        onCancel={() => {
-          setScreen("time-select");
-        }}
-      />
-    );
-  }
-
-  if (screen === "resume") {
-    const session = config.get("activeSession");
-
-    if (
-      !session ||
-      (typeof session.focus !== "number" && typeof session.time !== "number")
-    ) {
-      return (
-        <Box flexDirection="column" padding={1}>
-          <Text color={"red"}>No valid active session found.</Text>
-          <Text color={"gray"}>
-            Press any key to return to menu (not implemented) or restart the
-            app.
-          </Text>
-        </Box>
-      );
-    }
-
-    const focus = session.focus ?? session.time ?? 25;
-    const shortBreak = session.shortBreak ?? (IS_TEST_MODE ? 0.05 : 5);
-    const longBreak = session.longBreak ?? (IS_TEST_MODE ? 0.1 : 15);
-
-    return (
-      <TimerView
-        focus={focus}
-        shortBreak={shortBreak}
-        longBreak={longBreak}
-        initialSecondsRemaining={session.timeOut}
-        initialMode={session.mode}
-        initialPomodoroCount={session.pomodoroCount}
-      />
-    );
-  }
-
-  if (screen === "history") {
-    return <History onBack={() => setScreen("menu")} />;
-  }
-
-  if (screen === "about") {
-    return <About onBack={() => setScreen("menu")} />;
-  }
-
   if (sessionConfig !== null) {
     return (
-      <TimerView
+      <Timer
         focus={sessionConfig.focus}
         shortBreak={sessionConfig.shortBreak}
         longBreak={sessionConfig.longBreak}
@@ -153,15 +70,13 @@ export const App = () => {
     );
   }
 
-  if (screen === "exit") {
-    return <Text>have a nice day and stay focus!</Text>;
-  }
-
   return (
-    <Box flexDirection="column" padding={1}>
-      <HeaderBar title="Pomo Doro" />
-      <SelectInput items={menuItems} onSelect={startHandleSelect} />
-      <FooterBar controls={[{ key: "q", label: "quit" }]} />
-    </Box>
+    <Router
+      screen={screen}
+      setScreen={setScreen}
+      setSessionConfig={setSessionConfig}
+      startHandleSelect={startHandleSelect}
+      timeHandlerSelect={timeHandlerSelect}
+    />
   );
 };

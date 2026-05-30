@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Box, Text, useInput } from "ink";
-import { IS_TEST_MODE } from "../utils/constants";
-import { HeaderBar } from "./HeaderBar";
-import { FooterBar } from "./FooterBar";
+import { IS_TEST_MODE } from "@utils";
+import { Layout } from "@ui";
 
 interface CustomPresetWizardProps {
   onStart: (focus: number, shortBreak: number, longBreak: number) => void;
@@ -105,9 +104,16 @@ export const CustomPresetWizard = ({
   const unit = IS_TEST_MODE ? "sec" : "min";
 
   return (
-    <Box flexDirection="column" padding={1}>
-      <HeaderBar title="Custom Preset Wizard" />
-
+    <Layout
+      title="Custom Preset Wizard"
+      footerControls={[
+        { key: "↑/↓", label: "navigate" },
+        { key: "◀/▶", label: "adjust values" },
+        { key: "enter", label: "select" },
+        { key: "b", label: "back" },
+        { key: "q", label: "quit" },
+      ]}
+    >
       <Box flexDirection="column" marginBottom={1}>
         {renderRow("focus", "Focus Time", `${focus} ${unit}`, "greenBright")}
         {renderRow(
@@ -127,16 +133,6 @@ export const CustomPresetWizard = ({
       <Box flexDirection="column" marginTop={1} gap={0}>
         {renderButton("start", "Start Session", "greenBright")}
       </Box>
-
-      <FooterBar
-        controls={[
-          { key: "↑/↓", label: "navigate" },
-          { key: "◀/▶", label: "adjust values" },
-          { key: "enter", label: "select" },
-          { key: "b", label: "back" },
-          { key: "q", label: "quit" },
-        ]}
-      />
-    </Box>
+    </Layout>
   );
 };

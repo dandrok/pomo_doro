@@ -12,7 +12,14 @@
     "allowImportingTsExtensions": false,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-    "moduleDetection": "force"
+    "moduleDetection": "force",
+    "paths": {
+      "@components/*": ["./src/components/*"],
+      "@screens": ["./src/components/screens"],
+      "@ui": ["./src/components/ui"],
+      "@hooks": ["./src/hooks"],
+      "@utils": ["./src/utils"]
+    }
   },
   "include": ["src/**/*"]
 }

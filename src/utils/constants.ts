@@ -1,4 +1,10 @@
-import type { Mode, MenuItems, TimeItems, InkColor } from "../types";
+import type {
+  Mode,
+  MenuItems,
+  InkColor,
+  Preset,
+  TimeSelectItem,
+} from "../types";
 import packageJson from "../../package.json" with { type: "json" };
 
 export const APP_VERSION = packageJson.version;
@@ -51,19 +57,35 @@ export const menuItems: MenuItems[] = [
     label: "About",
     value: "about",
   },
-  {
-    label: "Exit",
-    value: "exit",
-  },
 ];
 
-export const timeItems: TimeItems[] = IS_TEST_MODE
+export const PRESETS: Preset[] = IS_TEST_MODE
   ? [
-      { label: "6 sec", value: 0.1 },
-      { label: "12 sec", value: 0.2 },
+      { label: "6 sec", focus: 0.1, shortBreak: 0.05, longBreak: 0.1 },
+      { label: "12 sec", focus: 0.2, shortBreak: 0.05, longBreak: 0.1 },
     ]
   : [
-      { label: "25min", value: 25 },
-      { label: "35min", value: 35 },
-      { label: "45min", value: 45 },
+      { label: "25min", focus: 25, shortBreak: 5, longBreak: 15 },
+      { label: "35min", focus: 35, shortBreak: 8, longBreak: 20 },
+      { label: "45min", focus: 45, shortBreak: 10, longBreak: 25 },
     ];
+
+export const timeSelectItems: TimeSelectItem[] = [
+  ...PRESETS.map((preset) => {
+    const shortLabel = IS_TEST_MODE
+      ? `${Math.round(preset.shortBreak * 60)}s`
+      : `${preset.shortBreak}m`;
+    const longLabel = IS_TEST_MODE
+      ? `${Math.round(preset.longBreak * 60)}s`
+      : `${preset.longBreak}m`;
+    const label = `${preset.label} (${shortLabel}/${longLabel} breaks)`;
+    return {
+      label,
+      value: `preset_${preset.focus}`,
+    };
+  }),
+  {
+    label: "Custom...",
+    value: "custom",
+  },
+];

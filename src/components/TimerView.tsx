@@ -5,24 +5,24 @@ import { useHistory } from "../hooks/useHistory";
 import { ProgressBar } from "./ProgressBar";
 import { FooterBar } from "./FooterBar";
 import { config } from "../utils/config";
-import {
-  ONE_MINUTE,
-  SHORT_BREAK_TIME,
-  LONG_BREAK_TIME,
-} from "../utils/constants";
+import { ONE_MINUTE } from "../utils/constants";
 import { getNextSessionType } from "../utils/helpers";
 import type { Mode } from "../types";
 import { notifyUser } from "../utils/notifications";
 
 interface TimerViewProps {
-  initialMinutes: number;
+  focus: number;
+  shortBreak: number;
+  longBreak: number;
   initialSecondsRemaining?: number;
   initialMode?: Mode;
   initialPomodoroCount?: number;
 }
 
 export const TimerView = ({
-  initialMinutes,
+  focus,
+  shortBreak,
+  longBreak,
   initialSecondsRemaining,
   initialMode = "work",
   initialPomodoroCount = 0,
@@ -30,7 +30,6 @@ export const TimerView = ({
   const { exit } = useApp();
   const [mode, setMode] = useState<Mode>(initialMode);
   const [pomodoroCount, setPomodoroCount] = useState(initialPomodoroCount);
-  const [currentWorkMinutes] = useState(initialMinutes);
   const { addFocusSecond, completeSession } = useHistory();
 
   const handleTimeUp = useCallback(() => {
@@ -42,8 +41,7 @@ export const TimerView = ({
       setPomodoroCount(nextCount);
       completeSession();
 
-      const duration =
-        nextMode === "longBreak" ? LONG_BREAK_TIME : SHORT_BREAK_TIME;
+      const duration = nextMode === "longBreak" ? longBreak : shortBreak;
       reset(duration * ONE_MINUTE);
 
       const breakType = nextMode === "longBreak" ? "long break" : "short break";
@@ -52,17 +50,17 @@ export const TimerView = ({
         `Focus session complete! Take a ${breakType}.`,
       );
     } else {
-      reset(currentWorkMinutes * ONE_MINUTE);
+      reset(focus * ONE_MINUTE);
       notifyUser(
         "Pomo Doro - Break Finished!",
         "Break is over. Time to focus!",
       );
     }
-  }, [mode, pomodoroCount, currentWorkMinutes, completeSession]);
+  }, [mode, pomodoroCount, focus, shortBreak, longBreak, completeSession]);
 
   const { secondsRemaining, progress, isPaused, pause, resume, reset } =
     useTimer({
-      initialSeconds: initialMinutes * ONE_MINUTE,
+      initialSeconds: focus * ONE_MINUTE,
       initialSecondsRemaining: initialSecondsRemaining,
       onTimeUp: handleTimeUp,
     });
@@ -72,7 +70,10 @@ export const TimerView = ({
     config.set("activeSession", {
       timeOut: secondsRemaining,
       mode,
-      time: currentWorkMinutes,
+      time: focus, // legacy fallback for backward compatibility
+      focus,
+      shortBreak,
+      longBreak,
       pomodoroCount,
     });
     config.set("pomodoroCount", pomodoroCount);
@@ -84,7 +85,9 @@ export const TimerView = ({
   }, [
     secondsRemaining,
     mode,
-    currentWorkMinutes,
+    focus,
+    shortBreak,
+    longBreak,
     pomodoroCount,
     isPaused,
     addFocusSecond,

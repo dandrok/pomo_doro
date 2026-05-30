@@ -1,5 +1,6 @@
 import { Box, Text, useInput } from "ink";
 import { FooterBar } from "./FooterBar";
+import { HeaderBar } from "./HeaderBar";
 import {
   APP_VERSION,
   APP_AUTHOR,
@@ -13,20 +14,15 @@ interface AboutProps {
 }
 
 export const About = ({ onBack }: AboutProps) => {
-  useInput((input) => {
-    if (input === "b" || input === "q" || input === "escape") {
+  useInput((input, key) => {
+    if (input === "b" || key.escape) {
       onBack();
     }
   });
 
   return (
     <Box flexDirection="column" padding={1}>
-      <Box marginBottom={1} borderStyle="round" borderColor="cyan" paddingX={1}>
-        <Text bold color="cyan">
-          {" "}
-          About Pomo Doro{" "}
-        </Text>
-      </Box>
+      <HeaderBar title="About Pomo Doro" />
 
       <Box flexDirection="column" marginBottom={1}>
         <Text>
@@ -59,7 +55,12 @@ export const About = ({ onBack }: AboutProps) => {
         </Text>
       </Box>
 
-      <FooterBar controls={[{ key: "b", label: "back to menu" }]} />
+      <FooterBar
+        controls={[
+          { key: "b", label: "back to menu" },
+          { key: "q", label: "quit" },
+        ]}
+      />
     </Box>
   );
 };

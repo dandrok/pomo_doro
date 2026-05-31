@@ -1,6 +1,6 @@
 {
   "name": "pomo-doro-tui",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "pomodoro tui app",
   "license": "ISC",
   "author": "dandrok",
@@ -40,7 +40,6 @@
     "ink": "^7.0.1",
     "ink-big-text": "^2.0.0",
     "ink-select-input": "^6.2.0",
-    "ink-spinner": "^5.0.0",
     "react": "^19.2.5"
   },
   "devDependencies": {

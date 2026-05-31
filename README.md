@@ -67,15 +67,21 @@ npm run dev
 
 ## Project Structure
 
-- `src/types.ts`: Centralized application-wide TypeScript types.
-- `src/hooks/`: Core React hooks for time and history management.
-- `src/components/`: Modular React components for UI rendering (e.g., `ProgressBar`, `TimerView`, `History`).
-- `src/utils/`: Shared configurations, constants, formatting helpers, and notification services.
-  - `config.ts`: Local session and productivity history persistence.
-  - `constants.ts`: Layout colors, icons, and timer settings.
-  - `helpers.ts`: Pure formatting and state utilities.
-  - `historyLogic.ts`: Productivity statistic calculations.
-  - `notifications.ts`: Cross-platform OS notification and audio alerts.
+The project follows a clean, modular architecture supported by TypeScript path aliases:
+
+- `src/cli.tsx`: The CLI entry point.
+- `src/app.tsx`: Main app container.
+- `src/types.ts`: Centralized TypeScript definitions. Mapped via `@types`.
+- `src/components/`: Reusable React components. Mapped via `@screens` and `@ui`:
+  - `screens/`: High-level views (e.g., `MainMenu`, `Router`, `Timer`, `CustomPresetWizard`, `History`).
+  - `ui/`: Structure and display elements (e.g., `Layout`, `ProgressBar`, `DailyBarChart`, `HeaderBar`, `FooterBar`).
+- `src/hooks/`: Custom React hooks (e.g., `useTimer`, `useHistory`). Mapped via `@hooks`.
+- `src/utils/`: Utilities, configs, and side-effects. Mapped via `@utils`:
+  - `config.ts`: Conf-based settings & history persistence.
+  - `constants.ts`: Timer presets, icons, and color rules.
+  - `helpers.ts`: Pure string and time formatters.
+  - `historyLogic.ts`: Aggregation logic for analytics.
+  - `notifications.ts`: Desktop notification & audio controller.
 
 ## Development
 

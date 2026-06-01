@@ -8,5 +8,6 @@ export const config = new Conf<ConfigSchema>({
   defaults: {
     pomodoroCount: 0,
     history: [],
+    isMuted: false,
   },
 });

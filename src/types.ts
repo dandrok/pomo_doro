@@ -23,6 +23,7 @@ export type ConfigSchema = {
   pomodoroCount: number;
   activeSession?: Session;
   history: DailyStats[];
+  isMuted?: boolean;
 };
 
 export type Screen =

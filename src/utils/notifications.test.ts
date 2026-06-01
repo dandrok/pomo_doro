@@ -1,7 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { exec } from "child_process";
+import { config } from "./config";
 import { playSound, sendNotification, notifyUser } from "./notifications";
+
+vi.mock("./config", () => ({
+  config: {
+    get: vi.fn(),
+    set: vi.fn(),
+  },
+}));
 
 vi.mock("child_process", () => {
   const mockExec = vi.fn();
@@ -22,6 +30,7 @@ describe("notifications", () => {
     stdoutWriteMock = vi
       .spyOn(process.stdout, "write")
       .mockImplementation(() => true);
+    vi.mocked(config.get).mockReturnValue(false);
     vi.clearAllMocks();
   });
 
@@ -124,6 +133,35 @@ describe("notifications", () => {
         ),
         expect.any(Function),
       );
+    });
+  });
+
+  describe("when isMuted is true", () => {
+    beforeEach(() => {
+      vi.mocked(config.get).mockImplementation((key) => {
+        if (key === "isMuted") return true;
+        return false;
+      });
+    });
+
+    it("should not call exec in playSound", () => {
+      setPlatform("linux");
+      playSound();
+      expect(exec).not.toHaveBeenCalled();
+      expect(stdoutWriteMock).not.toHaveBeenCalled();
+    });
+
+    it("should not call exec in sendNotification", () => {
+      setPlatform("linux");
+      sendNotification("Work Done!", "Take a break.");
+      expect(exec).not.toHaveBeenCalled();
+    });
+
+    it("should not call exec in notifyUser", () => {
+      setPlatform("linux");
+      notifyUser("Work Done!", "Take a break.");
+      expect(exec).not.toHaveBeenCalled();
+      expect(stdoutWriteMock).not.toHaveBeenCalled();
     });
   });
 });

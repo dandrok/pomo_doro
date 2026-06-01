@@ -25,6 +25,7 @@ export const Timer = ({
   const { exit } = useApp();
   const [mode, setMode] = useState<Mode>(initialMode);
   const [pomodoroCount, setPomodoroCount] = useState(initialPomodoroCount);
+  const [isMuted, setIsMuted] = useState(() => config.get("isMuted") ?? false);
   const { addFocusSecond, completeSession } = useHistory();
 
   const handleTimeUp = useCallback(() => {
@@ -92,6 +93,11 @@ export const Timer = ({
     if (input === "p") pause();
     if (input === "r") resume();
     if (input === "q") exit();
+    if (input === "m") {
+      const nextMuted = !isMuted;
+      setIsMuted(nextMuted);
+      config.set("isMuted", nextMuted);
+    }
   });
 
   return (
@@ -102,11 +108,13 @@ export const Timer = ({
         mode={mode}
         pomodoroCount={pomodoroCount}
         isPaused={isPaused}
+        isMuted={isMuted}
       />
       <FooterBar
         controls={[
           { key: "p", label: "pause" },
           { key: "r", label: "resume" },
+          { key: "m", label: isMuted ? "unmute" : "mute" },
           { key: "q", label: "quit" },
         ]}
       />

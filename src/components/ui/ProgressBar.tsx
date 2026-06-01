@@ -11,6 +11,7 @@ interface ProgressBarProps {
   mode: Mode;
   pomodoroCount: number;
   isPaused: boolean;
+  isMuted?: boolean;
 }
 
 export const ProgressBar = ({
@@ -19,6 +20,7 @@ export const ProgressBar = ({
   mode,
   pomodoroCount,
   isPaused,
+  isMuted = false,
 }: ProgressBarProps) => {
   const progressSafe = Math.max(0, Math.min(1, progress));
   const percentage = Math.floor(progressSafe * 100);
@@ -42,13 +44,21 @@ export const ProgressBar = ({
           <Text color={textColor[mode]}>{modeIcons[mode]}</Text>
           <Text>{mode}</Text>
         </Box>
-        <Box gap={1}>
-          <Text color={isPaused ? "yellow" : "green"}>
-            {isPaused ? "⏸" : "▶"}
-          </Text>
-          <Text color={isPaused ? "yellow" : "green"}>
-            {isPaused ? "PAUSED" : "RUNNING"}
-          </Text>
+        <Box gap={2}>
+          {isMuted && (
+            <Box gap={1}>
+              <Text color="red">{"\u{1F507}\u{FE0E}"}</Text>
+              <Text color="red">MUTED</Text>
+            </Box>
+          )}
+          <Box gap={1}>
+            <Text color={isPaused ? "yellow" : "green"}>
+              {isPaused ? "⏸" : "▶"}
+            </Text>
+            <Text color={isPaused ? "yellow" : "green"}>
+              {isPaused ? "PAUSED" : "RUNNING"}
+            </Text>
+          </Box>
         </Box>
       </Box>
       <Box justifyContent="flex-end">

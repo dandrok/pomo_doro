@@ -1,6 +1,8 @@
 import { exec } from "child_process";
+import { config } from "./config";
 
 export const playSound = (): void => {
+  if (config.get("isMuted")) return;
   const platform = process.platform;
 
   if (platform === "linux") {
@@ -34,6 +36,7 @@ export const playSound = (): void => {
 };
 
 export const sendNotification = (title: string, message: string): void => {
+  if (config.get("isMuted")) return;
   const platform = process.platform;
   const escapedMessage = message.replace(/"/g, '\\"');
   const escapedTitle = title.replace(/"/g, '\\"');

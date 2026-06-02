@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 
-interface UseTimerProps {
+type UseTimerProps = {
   initialSeconds: number;
   initialSecondsRemaining?: number | undefined;
   onTimeUp?: () => void;
-}
+};
 
 export const useTimer = ({
   initialSeconds,

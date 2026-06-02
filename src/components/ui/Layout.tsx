@@ -2,11 +2,11 @@ import { Box } from "ink";
 import { HeaderBar } from "./HeaderBar";
 import { FooterBar, type Control } from "./FooterBar";
 
-interface LayoutProps {
+type LayoutProps = {
   title: string;
   footerControls?: Control[];
   children: React.ReactNode;
-}
+};
 
 export const Layout = ({ title, footerControls, children }: LayoutProps) => {
   return (

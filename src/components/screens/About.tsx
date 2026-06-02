@@ -8,9 +8,9 @@ import {
   TECHNOLOGIES,
 } from "@utils";
 
-interface AboutProps {
+type AboutProps = {
   onBack: () => void;
-}
+};
 
 export const About = ({ onBack }: AboutProps) => {
   useInput((input, key) => {

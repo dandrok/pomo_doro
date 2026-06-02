@@ -3,10 +3,10 @@ import { Box, Text, useInput } from "ink";
 import { IS_TEST_MODE } from "@utils";
 import { Layout } from "@ui";
 
-interface CustomPresetWizardProps {
+type CustomPresetWizardProps = {
   onStart: (focus: number, shortBreak: number, longBreak: number) => void;
   onCancel: () => void;
-}
+};
 
 type Field = "focus" | "shortBreak" | "longBreak" | "start";
 

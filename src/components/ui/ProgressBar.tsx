@@ -5,14 +5,14 @@ import type { Mode } from "@types";
 
 const LOADING_STEPS = 50;
 
-interface ProgressBarProps {
+type ProgressBarProps = {
   secondsRemaining: number;
   progress: number;
   mode: Mode;
   pomodoroCount: number;
   isPaused: boolean;
   isMuted?: boolean;
-}
+};
 
 export const ProgressBar = ({
   secondsRemaining,

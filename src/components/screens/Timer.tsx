@@ -5,14 +5,14 @@ import { ProgressBar, FooterBar } from "@ui";
 import { config, ONE_MINUTE, getNextSessionType, notifyUser } from "@utils";
 import type { Mode } from "@types";
 
-interface TimerProps {
+type TimerProps = {
   focus: number;
   shortBreak: number;
   longBreak: number;
   initialSecondsRemaining?: number;
   initialMode?: Mode;
   initialPomodoroCount?: number;
-}
+};
 
 export const Timer = ({
   focus,

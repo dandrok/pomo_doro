@@ -2,11 +2,11 @@ import { Box, Text } from "ink";
 import type { DailyStats } from "@types";
 import { formatTime } from "@utils";
 
-interface DailyBarChartProps {
+type DailyBarChartProps = {
   data: DailyStats[];
   barWidth?: number;
   dailyGoalSeconds?: number;
-}
+};
 
 const DEFAULT_BAR_WIDTH = 20;
 const DEFAULT_DAILY_GOAL = 4 * 3600; // 4 hours

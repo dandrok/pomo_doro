@@ -38,16 +38,16 @@ export type Screen =
 export type MenuItems = { label: string; value: Screen };
 export type TimeItems = { label: string; value: number };
 
-export interface Preset {
+export type Preset = {
   label: string;
   focus: number;
   shortBreak: number;
   longBreak: number;
-}
+};
 
-export interface TimeSelectItem {
+export type TimeSelectItem = {
   label: string;
   value: string;
-}
+};
 
 export type InkColor = LiteralUnion<ForegroundColorName, string>;

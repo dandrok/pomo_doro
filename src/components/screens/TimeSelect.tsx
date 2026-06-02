@@ -3,9 +3,9 @@ import { Layout } from "@ui";
 import { timeSelectItems } from "@utils";
 import type { TimeSelectItem } from "@types";
 
-interface TimeSelectProps {
+type TimeSelectProps = {
   onSelect: (item: TimeSelectItem) => void;
-}
+};
 
 export const TimeSelect = ({ onSelect }: TimeSelectProps) => {
   return (

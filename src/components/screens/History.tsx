@@ -3,9 +3,9 @@ import { useHistory } from "@hooks";
 import { formatTime } from "@utils";
 import { DailyBarChart, Layout } from "@ui";
 
-interface HistoryProps {
+type HistoryProps = {
   onBack: () => void;
-}
+};
 
 export const History = ({ onBack }: HistoryProps) => {
   const { history, totals } = useHistory();

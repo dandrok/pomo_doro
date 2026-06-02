@@ -7,7 +7,7 @@ import { About } from "./About";
 import { Resume } from "./Resume";
 import type { Screen, MenuItems, TimeSelectItem } from "@types";
 
-interface RouterProps {
+type RouterProps = {
   screen: Screen;
   setScreen: (screen: Screen) => void;
   setSessionConfig: (
@@ -19,7 +19,7 @@ interface RouterProps {
   ) => void;
   startHandleSelect: (item: MenuItems) => void;
   timeHandlerSelect: (item: TimeSelectItem) => void;
-}
+};
 
 export const Router = ({
   screen,

@@ -3,9 +3,9 @@ import { Layout } from "@ui";
 import { menuItems } from "@utils";
 import type { MenuItems } from "@types";
 
-interface MainMenuProps {
+type MainMenuProps = {
   onSelect: (item: MenuItems) => void;
-}
+};
 
 export const MainMenu = ({ onSelect }: MainMenuProps) => {
   return (

@@ -1,13 +1,13 @@
 import { Box, Text } from "ink";
 
-export interface Control {
+export type Control = {
   key: string;
   label: string;
-}
+};
 
-interface FooterBarProps {
+type FooterBarProps = {
   controls: Control[];
-}
+};
 
 export const FooterBar = ({ controls }: FooterBarProps) => {
   return (

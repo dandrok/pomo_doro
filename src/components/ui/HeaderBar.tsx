@@ -1,8 +1,8 @@
 import { Box, Text } from "ink";
 
-interface HeaderBarProps {
+type HeaderBarProps = {
   title: string;
-}
+};
 
 export const HeaderBar = ({ title }: HeaderBarProps) => {
   return (

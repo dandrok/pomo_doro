@@ -54,6 +54,7 @@ npm run dev
 | :---------- | :----------------------------------------------------------------- |
 | `p`         | Pause timer                                                        |
 | `r`         | Resume timer                                                       |
+| `m`         | Toggle mute (silence OS notifications and audio alerts)            |
 | `q`         | Quit application (when timer is not running)                       |
 | `b` / `Esc` | Go back to previous menu (from History, Preset, or Wizard screens) |
 

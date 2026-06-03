@@ -66,13 +66,14 @@ npm run dev
 
 ### General & Timer Controls
 
-| Key         | Action                                                             |
-| :---------- | :----------------------------------------------------------------- |
-| `p`         | Pause timer                                                        |
-| `r`         | Resume timer                                                       |
-| `m`         | Toggle mute (silence OS notifications and audio alerts)            |
-| `q`         | Quit application (when timer is not running)                       |
-| `b` / `Esc` | Go back to previous menu (from History, Preset, or Wizard screens) |
+| Key         | Action                                                                         |
+| :---------- | :----------------------------------------------------------------------------- |
+| `p`         | Toggle pause / resume                                                          |
+| `r`         | Restart current timer from the beginning                                       |
+| `s`         | Skip current session (discards work session, skips break to start focus early) |
+| `m`         | Toggle mute (silence OS notifications and audio alerts)                        |
+| `q`         | Quit application                                                               |
+| `b` / `Esc` | Go back to previous menu (from History, Preset, or Wizard screens)             |
 
 ### Custom Preset Wizard Controls
 

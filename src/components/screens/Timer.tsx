@@ -1,8 +1,7 @@
-import { useEffect, useState, useCallback } from "react";
+import React from "react";
 import { useInput, useApp, Box } from "ink";
-import { useTimer, useHistory } from "@hooks";
+import { usePomodoroSession } from "@hooks";
 import { ProgressBar, FooterBar } from "@ui";
-import { config, ONE_MINUTE, getNextSessionType, notifyUser } from "@utils";
 import type { Mode } from "@types";
 
 type TimerProps = {
@@ -23,104 +22,33 @@ export const Timer = ({
   initialPomodoroCount = 0,
 }: TimerProps) => {
   const { exit } = useApp();
-  const [mode, setMode] = useState<Mode>(initialMode);
-  const [pomodoroCount, setPomodoroCount] = useState(initialPomodoroCount);
-  const [isMuted, setIsMuted] = useState(() => config.get("isMuted") ?? false);
-  const { addFocusSecond, completeSession } = useHistory();
 
-  const handleTimeUp = useCallback(() => {
-    const nextMode = getNextSessionType(mode, pomodoroCount);
-    setMode(nextMode);
-
-    if (mode === "work") {
-      const nextCount = pomodoroCount + 1;
-      setPomodoroCount(nextCount);
-      completeSession();
-
-      const duration = nextMode === "longBreak" ? longBreak : shortBreak;
-      reset(duration * ONE_MINUTE);
-
-      const breakType = nextMode === "longBreak" ? "long break" : "short break";
-      notifyUser(
-        "Pomo Doro - Work Done!",
-        `Focus session complete! Take a ${breakType}.`,
-      );
-    } else {
-      reset(focus * ONE_MINUTE);
-      notifyUser(
-        "Pomo Doro - Break Finished!",
-        "Break is over. Time to focus!",
-      );
-    }
-  }, [mode, pomodoroCount, focus, shortBreak, longBreak, completeSession]);
-
-  const { secondsRemaining, progress, isPaused, pause, resume, reset } =
-    useTimer({
-      initialSeconds: focus * ONE_MINUTE,
-      initialSecondsRemaining: initialSecondsRemaining,
-      onTimeUp: handleTimeUp,
-    });
-
-  const handleSkip = useCallback(() => {
-    if (mode === "work") {
-      setMode("shortBreak");
-      reset(shortBreak * ONE_MINUTE);
-      notifyUser(
-        "Pomo Doro - Work Skipped",
-        "Focus session skipped. Taking a short break.",
-      );
-    } else {
-      setMode("work");
-      reset(focus * ONE_MINUTE);
-      notifyUser("Pomo Doro - Break Skipped", "Break skipped. Time to focus!");
-    }
-  }, [mode, focus, shortBreak, reset]);
-
-  const handleRestart = useCallback(() => {
-    const duration =
-      mode === "work" ? focus : mode === "shortBreak" ? shortBreak : longBreak;
-    reset(duration * ONE_MINUTE);
-  }, [mode, focus, shortBreak, longBreak, reset]);
-
-  // Persist current session state
-  useEffect(() => {
-    config.set("activeSession", {
-      timeOut: secondsRemaining,
-      mode,
-      time: focus, // legacy fallback for backward compatibility
-      focus,
-      shortBreak,
-      longBreak,
-      pomodoroCount,
-    });
-    config.set("pomodoroCount", pomodoroCount);
-
-    // Update Focus Time (only for work mode)
-    if (mode === "work" && !isPaused) {
-      addFocusSecond();
-    }
-  }, [
+  const {
     secondsRemaining,
+    progress,
+    isPaused,
     mode,
+    pomodoroCount,
+    isMuted,
+    togglePause,
+    skip,
+    restart,
+    toggleMute,
+  } = usePomodoroSession({
     focus,
     shortBreak,
     longBreak,
-    pomodoroCount,
-    isPaused,
-    addFocusSecond,
-  ]);
+    initialSecondsRemaining,
+    initialMode,
+    initialPomodoroCount,
+  });
 
   useInput((input) => {
-    if (input === "p") pause();
-    if (input === "r") resume();
+    if (input === "p") togglePause();
+    if (input === "r") restart();
     if (input === "q") exit();
-    if (input === "s") handleSkip();
-    if (input === "x") handleRestart();
-    if (input === "m") {
-      const nextMuted = !isMuted;
-      setIsMuted(nextMuted);
-      config.set("isMuted", nextMuted);
-    }
+    if (input === "s") skip();
+    if (input === "m") toggleMute();
   });
 
   return (
@@ -135,10 +63,9 @@ export const Timer = ({
       />
       <FooterBar
         controls={[
-          { key: "p", label: "pause" },
-          { key: "r", label: "resume" },
+          { key: "p", label: isPaused ? "resume" : "pause" },
+          { key: "r", label: "restart" },
           { key: "s", label: "skip" },
-          { key: "x", label: "restart" },
           { key: "m", label: isMuted ? "unmute" : "mute" },
           { key: "q", label: "quit" },
         ]}

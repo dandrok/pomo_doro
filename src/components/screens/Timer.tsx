@@ -61,6 +61,27 @@ export const Timer = ({
       onTimeUp: handleTimeUp,
     });
 
+  const handleSkip = useCallback(() => {
+    if (mode === "work") {
+      setMode("shortBreak");
+      reset(shortBreak * ONE_MINUTE);
+      notifyUser(
+        "Pomo Doro - Work Skipped",
+        "Focus session skipped. Taking a short break.",
+      );
+    } else {
+      setMode("work");
+      reset(focus * ONE_MINUTE);
+      notifyUser("Pomo Doro - Break Skipped", "Break skipped. Time to focus!");
+    }
+  }, [mode, focus, shortBreak, reset]);
+
+  const handleRestart = useCallback(() => {
+    const duration =
+      mode === "work" ? focus : mode === "shortBreak" ? shortBreak : longBreak;
+    reset(duration * ONE_MINUTE);
+  }, [mode, focus, shortBreak, longBreak, reset]);
+
   // Persist current session state
   useEffect(() => {
     config.set("activeSession", {
@@ -93,6 +114,8 @@ export const Timer = ({
     if (input === "p") pause();
     if (input === "r") resume();
     if (input === "q") exit();
+    if (input === "s") handleSkip();
+    if (input === "x") handleRestart();
     if (input === "m") {
       const nextMuted = !isMuted;
       setIsMuted(nextMuted);
@@ -114,6 +137,8 @@ export const Timer = ({
         controls={[
           { key: "p", label: "pause" },
           { key: "r", label: "resume" },
+          { key: "s", label: "skip" },
+          { key: "x", label: "restart" },
           { key: "m", label: isMuted ? "unmute" : "mute" },
           { key: "q", label: "quit" },
         ]}

@@ -91,9 +91,9 @@ The project follows a clean, modular architecture supported by TypeScript path a
 - `src/app.tsx`: Main app container.
 - `src/types.ts`: Centralized TypeScript definitions. Mapped via `@types`.
 - `src/components/`: Reusable React components. Mapped via `@screens` and `@ui`:
-  - `screens/`: High-level views (e.g., `MainMenu`, `Router`, `Timer`, `CustomPresetWizard`, `History`).
+  - `screens/`: High-level views (e.g., `MainMenu`, `TimeSelect`, `CustomPresetWizard`, `History`, `Timer`, `About`, `Resume`, `Router`).
   - `ui/`: Structure and display elements (e.g., `Layout`, `ProgressBar`, `DailyBarChart`, `HeaderBar`, `FooterBar`).
-- `src/hooks/`: Custom React hooks (e.g., `useTimer`, `useHistory`). Mapped via `@hooks`.
+- `src/hooks/`: Custom React hooks (e.g., `useTimer`, `useHistory`, `usePomodoroSession`). Mapped via `@hooks`.
 - `src/utils/`: Utilities, configs, and side-effects. Mapped via `@utils`:
   - `config.ts`: Conf-based settings & history persistence.
   - `constants.ts`: Timer presets, icons, and color rules.

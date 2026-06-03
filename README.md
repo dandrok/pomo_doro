@@ -24,11 +24,27 @@ You can install Pomo Doro globally and run it from anywhere in your terminal:
 npm install -g pomo-doro-tui
 ```
 
-After installation, simply run:
+After installation, run `pomo` to start the interactive menu, or launch a custom session directly using command-line options:
 
 ```bash
+# Start with interactive menu
 pomo
+
+# Start immediately with a 50-minute work session and a 10-minute break
+pomo --work 50 --break 10
 ```
+
+#### CLI Options
+
+| Option                   | Alias | Description                                                          |
+| :----------------------- | :---- | :------------------------------------------------------------------- |
+| `--work <minutes>`       | `-w`  | Set custom focus session duration (minutes)                          |
+| `--break <minutes>`      | `-b`  | Set custom short break duration (minutes)                            |
+| `--long-break <minutes>` | `-l`  | Set custom long break duration (minutes, defaults to 3x short break) |
+| `--help`                 | `-h`  | Show help details                                                    |
+
+> [!NOTE]
+> The `--work` (or `-w`) option is required if you want to customize break durations via the command line. When you use CLI arguments to start a timer, the main menu is bypassed, and the session begins immediately.
 
 ### Local Development
 
@@ -83,6 +99,7 @@ The project follows a clean, modular architecture supported by TypeScript path a
   - `helpers.ts`: Pure string and time formatters.
   - `historyLogic.ts`: Aggregation logic for analytics.
   - `notifications.ts`: Desktop notification & audio controller.
+  - `cliParser.ts`: Command-line arguments parser and validator.
 
 ## Development
 

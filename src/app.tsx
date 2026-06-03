@@ -4,13 +4,23 @@ import { Timer, Router } from "@screens";
 import { PRESETS } from "@utils";
 import type { MenuItems, Screen, TimeSelectItem } from "@types";
 
-export const App = () => {
+type AppProps = {
+  initialSessionConfig?:
+    | {
+        focus: number;
+        shortBreak: number;
+        longBreak: number;
+      }
+    | undefined;
+};
+
+export const App = ({ initialSessionConfig }: AppProps) => {
   const [screen, setScreen] = useState<Screen>("menu");
   const [sessionConfig, setSessionConfig] = useState<{
     focus: number;
     shortBreak: number;
     longBreak: number;
-  } | null>(null);
+  } | null>(initialSessionConfig ?? null);
   const { exit } = useApp();
 
   useEffect(() => {

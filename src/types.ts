@@ -11,12 +11,22 @@ export type Session = {
   shortBreak: number; // short break time in minutes
   longBreak: number; // long break time in minutes
   pomodoroCount: number;
+  tag?: string | undefined;
+  description?: string | undefined;
+};
+
+export type TagBreakdown = {
+  [tagName: string]: {
+    focusSeconds: number;
+    completedPomodoros: number;
+  };
 };
 
 export type DailyStats = {
   date: string; // "YYYY-MM-DD"
   totalFocusSeconds: number; // Cumulative work time
   completedPomodoros: number; // Natural completions
+  tags?: TagBreakdown;
 };
 
 export type ConfigSchema = {
@@ -24,12 +34,14 @@ export type ConfigSchema = {
   activeSession?: Session;
   history: DailyStats[];
   isMuted?: boolean;
+  recentTags?: string[];
 };
 
 export type Screen =
   | "menu"
   | "time-select"
   | "custom-wizard"
+  | "task-setup"
   | "exit"
   | "resume"
   | "history"

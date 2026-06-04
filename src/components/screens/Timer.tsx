@@ -8,15 +8,19 @@ type TimerProps = {
   focus: number;
   shortBreak: number;
   longBreak: number;
-  initialSecondsRemaining?: number;
-  initialMode?: Mode;
-  initialPomodoroCount?: number;
+  tag?: string | undefined;
+  description?: string | undefined;
+  initialSecondsRemaining?: number | undefined;
+  initialMode?: Mode | undefined;
+  initialPomodoroCount?: number | undefined;
 };
 
 export const Timer = ({
   focus,
   shortBreak,
   longBreak,
+  tag,
+  description,
   initialSecondsRemaining,
   initialMode = "work",
   initialPomodoroCount = 0,
@@ -38,6 +42,8 @@ export const Timer = ({
     focus,
     shortBreak,
     longBreak,
+    tag,
+    description,
     initialSecondsRemaining,
     initialMode,
     initialPomodoroCount,
@@ -60,6 +66,8 @@ export const Timer = ({
         pomodoroCount={pomodoroCount}
         isPaused={isPaused}
         isMuted={isMuted}
+        tag={tag}
+        description={description}
       />
       <FooterBar
         controls={[

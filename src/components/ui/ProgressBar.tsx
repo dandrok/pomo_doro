@@ -11,7 +11,9 @@ type ProgressBarProps = {
   mode: Mode;
   pomodoroCount: number;
   isPaused: boolean;
-  isMuted?: boolean;
+  isMuted?: boolean | undefined;
+  tag?: string | undefined;
+  description?: string | undefined;
 };
 
 export const ProgressBar = ({
@@ -21,6 +23,8 @@ export const ProgressBar = ({
   pomodoroCount,
   isPaused,
   isMuted = false,
+  tag,
+  description,
 }: ProgressBarProps) => {
   const progressSafe = Math.max(0, Math.min(1, progress));
   const percentage = Math.floor(progressSafe * 100);
@@ -39,10 +43,21 @@ export const ProgressBar = ({
           </Text>
         </Box>
       )}
-      <Box justifyContent="space-between">
-        <Box gap={1}>
-          <Text color={textColor[mode]}>{modeIcons[mode]}</Text>
-          <Text>{mode}</Text>
+      <Box justifyContent="space-between" alignItems="flex-start">
+        <Box flexDirection="column" gap={0}>
+          <Box gap={1}>
+            <Text color={textColor[mode]}>{modeIcons[mode]}</Text>
+            <Text bold>{mode.toUpperCase()}</Text>
+          </Box>
+          {tag && (
+            <Box gap={1} marginTop={1}>
+              <Text color="cyanBright" bold>
+                Tag:
+              </Text>
+              <Text color="cyanBright">{tag}</Text>
+              {description ? <Text color="gray">— {description}</Text> : null}
+            </Box>
+          )}
         </Box>
         <Box gap={2}>
           {isMuted && (

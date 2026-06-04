@@ -18,10 +18,40 @@ export const useHistory = () => {
       for (let i = 6; i >= 0; i--) {
         const d = new Date();
         d.setDate(d.getDate() - i);
+
+        const totalFocusSeconds = Math.floor(Math.random() * 7200) + 1800;
+        const completedPomodoros = Math.floor(Math.random() * 5) + 1;
+
+        // Split stats between Coding and Review tags
+        const codingPomos = Math.floor(Math.random() * completedPomodoros);
+        const codingSecs = Math.floor(
+          (codingPomos / completedPomodoros) * totalFocusSeconds,
+        );
+        const reviewPomos = completedPomodoros - codingPomos;
+        const reviewSecs = totalFocusSeconds - codingSecs;
+
+        const tags: Record<
+          string,
+          { focusSeconds: number; completedPomodoros: number }
+        > = {};
+        if (codingSecs > 0 || codingPomos > 0) {
+          tags["Coding"] = {
+            focusSeconds: codingSecs,
+            completedPomodoros: codingPomos,
+          };
+        }
+        if (reviewSecs > 0 || reviewPomos > 0) {
+          tags["Review"] = {
+            focusSeconds: reviewSecs,
+            completedPomodoros: reviewPomos,
+          };
+        }
+
         mockHistory.push({
           date: d.toISOString().split("T")[0]!,
-          totalFocusSeconds: Math.floor(Math.random() * 7200) + 1800,
-          completedPomodoros: Math.floor(Math.random() * 5) + 1,
+          totalFocusSeconds,
+          completedPomodoros,
+          tags,
         });
       }
       config.set("history", mockHistory);
@@ -41,9 +71,9 @@ export const useHistory = () => {
     setHistory(newHistory);
   }, []);
 
-  const addFocusSecond = useCallback(() => {
+  const addFocusSecond = useCallback((tag?: string) => {
     const today = new Date().toISOString().split("T")[0]!;
-    const updated = updateFocusTime(historyRef.current, today);
+    const updated = updateFocusTime(historyRef.current, today, tag);
 
     // Performance optimization: We only set React state (triggers re-render)
     // but we'll use a separate effect to sync to disk less frequently if needed.
@@ -51,11 +81,14 @@ export const useHistory = () => {
     setHistory(updated);
   }, []);
 
-  const completeSession = useCallback(() => {
-    const today = new Date().toISOString().split("T")[0]!;
-    const updated = incrementPomodoroCount(historyRef.current, today);
-    saveToDisk(updated);
-  }, [saveToDisk]);
+  const completeSession = useCallback(
+    (tag?: string) => {
+      const today = new Date().toISOString().split("T")[0]!;
+      const updated = incrementPomodoroCount(historyRef.current, today, tag);
+      saveToDisk(updated);
+    },
+    [saveToDisk],
+  );
 
   // Sync to disk every 30 seconds to prevent data loss while avoiding excessive writes
   useEffect(() => {

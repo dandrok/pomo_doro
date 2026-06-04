@@ -8,6 +8,8 @@ type UsePomodoroSessionProps = {
   focus: number;
   shortBreak: number;
   longBreak: number;
+  tag?: string | undefined;
+  description?: string | undefined;
   initialSecondsRemaining?: number | undefined;
   initialMode?: Mode | undefined;
   initialPomodoroCount?: number | undefined;
@@ -17,6 +19,8 @@ export const usePomodoroSession = ({
   focus,
   shortBreak,
   longBreak,
+  tag,
+  description,
   initialSecondsRemaining,
   initialMode = "work",
   initialPomodoroCount = 0,
@@ -33,7 +37,7 @@ export const usePomodoroSession = ({
     if (mode === "work") {
       const nextCount = pomodoroCount + 1;
       setPomodoroCount(nextCount);
-      completeSession();
+      completeSession(tag);
 
       const duration = nextMode === "longBreak" ? longBreak : shortBreak;
       reset(duration * ONE_MINUTE);
@@ -50,7 +54,7 @@ export const usePomodoroSession = ({
         "Break is over. Time to focus!",
       );
     }
-  }, [mode, pomodoroCount, focus, shortBreak, longBreak, completeSession]);
+  }, [mode, pomodoroCount, focus, shortBreak, longBreak, completeSession, tag]);
 
   const { secondsRemaining, progress, isPaused, pause, resume, reset } =
     useTimer({
@@ -104,12 +108,14 @@ export const usePomodoroSession = ({
       shortBreak,
       longBreak,
       pomodoroCount,
+      tag,
+      description,
     });
     config.set("pomodoroCount", pomodoroCount);
 
     // Update Focus Time (only for work mode)
     if (mode === "work" && !isPaused) {
-      addFocusSecond();
+      addFocusSecond(tag);
     }
   }, [
     secondsRemaining,
@@ -120,6 +126,8 @@ export const usePomodoroSession = ({
     pomodoroCount,
     isPaused,
     addFocusSecond,
+    tag,
+    description,
   ]);
 
   return {

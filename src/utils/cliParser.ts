@@ -3,11 +3,15 @@ import { SHORT_BREAK_TIME, LONG_BREAK_TIME } from "./constants";
 
 export type ParsedArgs = {
   help: boolean;
-  sessionConfig?: {
-    focus: number;
-    shortBreak: number;
-    longBreak: number;
-  };
+  sessionConfig?:
+    | {
+        focus: number;
+        shortBreak: number;
+        longBreak: number;
+        tag?: string | undefined;
+        description?: string | undefined;
+      }
+    | undefined;
 };
 
 export const parseCliArgs = (args: string[]): ParsedArgs => {
@@ -15,6 +19,8 @@ export const parseCliArgs = (args: string[]): ParsedArgs => {
     work: { type: "string", short: "w" },
     break: { type: "string", short: "b" },
     "long-break": { type: "string", short: "l" },
+    tag: { type: "string", short: "t" },
+    description: { type: "string", short: "d" },
     help: { type: "boolean", short: "h" },
   } as const;
 
@@ -39,10 +45,19 @@ export const parseCliArgs = (args: string[]): ParsedArgs => {
   const focus = parseNum(values.work, "work");
   const shortBreak = parseNum(values.break, "break");
   const longBreak = parseNum(values["long-break"], "long-break");
+  const tag = values.tag;
+  const description = values.description;
 
   if (focus === undefined) {
-    if (shortBreak !== undefined || longBreak !== undefined) {
-      throw new Error("--work option is required when specifying break times.");
+    if (
+      shortBreak !== undefined ||
+      longBreak !== undefined ||
+      tag !== undefined ||
+      description !== undefined
+    ) {
+      throw new Error(
+        "--work option is required when specifying custom session configurations.",
+      );
     }
     return { help: false };
   }
@@ -53,6 +68,8 @@ export const parseCliArgs = (args: string[]): ParsedArgs => {
       focus,
       shortBreak: shortBreak ?? SHORT_BREAK_TIME,
       longBreak: longBreak ?? (shortBreak ? shortBreak * 3 : LONG_BREAK_TIME),
+      tag,
+      description,
     },
   };
 };

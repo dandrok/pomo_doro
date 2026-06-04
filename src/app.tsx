@@ -20,7 +20,16 @@ export const App = ({ initialSessionConfig }: AppProps) => {
     focus: number;
     shortBreak: number;
     longBreak: number;
+    tag?: string;
+    description?: string;
   } | null>(initialSessionConfig ?? null);
+
+  const [pendingSessionConfig, setPendingSessionConfig] = useState<{
+    focus: number;
+    shortBreak: number;
+    longBreak: number;
+  } | null>(null);
+
   const { exit } = useApp();
 
   useEffect(() => {
@@ -30,8 +39,13 @@ export const App = ({ initialSessionConfig }: AppProps) => {
   }, [screen, exit]);
 
   useInput((input, key) => {
-    // If timer is running, let Timer handle its own keys
-    if (sessionConfig !== null || screen === "resume") {
+    // If timer is running or in task-setup/wizard where typing is active, let them handle keys
+    if (
+      sessionConfig !== null ||
+      screen === "resume" ||
+      screen === "task-setup" ||
+      screen === "custom-wizard"
+    ) {
       return;
     }
 
@@ -41,7 +55,7 @@ export const App = ({ initialSessionConfig }: AppProps) => {
     }
 
     if (screen === "time-select") {
-      if (input === "b" || key.escape) {
+      if (key.escape) {
         setScreen("menu");
       }
     }
@@ -58,15 +72,37 @@ export const App = ({ initialSessionConfig }: AppProps) => {
         const focusVal = parseFloat(match[1]!);
         const preset = PRESETS.find((p) => p.focus === focusVal);
         if (preset) {
-          setSessionConfig({
+          setPendingSessionConfig({
             focus: preset.focus,
             shortBreak: preset.shortBreak,
             longBreak: preset.longBreak,
           });
-          setScreen("menu");
+          setScreen("task-setup");
         }
       }
     }
+  };
+
+  const onSessionSetupStart = (
+    focus: number,
+    shortBreak: number,
+    longBreak: number,
+    tag: string,
+    description: string,
+  ) => {
+    setSessionConfig({
+      focus,
+      shortBreak,
+      longBreak,
+      tag,
+      description,
+    });
+    setPendingSessionConfig(null);
+  };
+
+  const onSessionSetupCancel = () => {
+    setPendingSessionConfig(null);
+    setScreen("time-select");
   };
 
   if (sessionConfig !== null) {
@@ -75,6 +111,8 @@ export const App = ({ initialSessionConfig }: AppProps) => {
         focus={sessionConfig.focus}
         shortBreak={sessionConfig.shortBreak}
         longBreak={sessionConfig.longBreak}
+        tag={sessionConfig.tag}
+        description={sessionConfig.description}
         initialPomodoroCount={0}
       />
     );
@@ -84,7 +122,9 @@ export const App = ({ initialSessionConfig }: AppProps) => {
     <Router
       screen={screen}
       setScreen={setScreen}
-      setSessionConfig={setSessionConfig}
+      pendingSessionConfig={pendingSessionConfig}
+      onSessionSetupStart={onSessionSetupStart}
+      onSessionSetupCancel={onSessionSetupCancel}
       startHandleSelect={startHandleSelect}
       timeHandlerSelect={timeHandlerSelect}
     />

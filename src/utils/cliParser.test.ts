@@ -20,6 +20,8 @@ describe("cliParser", () => {
         focus: 45,
         shortBreak: SHORT_BREAK_TIME,
         longBreak: LONG_BREAK_TIME,
+        tag: undefined,
+        description: undefined,
       },
     });
   });
@@ -31,27 +33,47 @@ describe("cliParser", () => {
         focus: 50,
         shortBreak: 10,
         longBreak: 30,
+        tag: undefined,
+        description: undefined,
       },
     });
   });
 
-  it("should parse all flags, including explicit long break", () => {
-    expect(parseCliArgs(["-w", "50", "-b", "10", "-l", "20"])).toEqual({
+  it("should parse all flags, including explicit long break, tag and description", () => {
+    expect(
+      parseCliArgs([
+        "-w",
+        "50",
+        "-b",
+        "10",
+        "-l",
+        "20",
+        "-t",
+        "refactoring",
+        "-d",
+        "fixing bugs",
+      ]),
+    ).toEqual({
       help: false,
       sessionConfig: {
         focus: 50,
         shortBreak: 10,
         longBreak: 20,
+        tag: "refactoring",
+        description: "fixing bugs",
       },
     });
   });
 
-  it("should throw validation error if break flags are passed without work flag", () => {
+  it("should throw validation error if custom session configurations are passed without work flag", () => {
     expect(() => parseCliArgs(["-b", "10"])).toThrow(
-      "--work option is required when specifying break times.",
+      "--work option is required when specifying custom session configurations.",
     );
     expect(() => parseCliArgs(["-l", "20"])).toThrow(
-      "--work option is required when specifying break times.",
+      "--work option is required when specifying custom session configurations.",
+    );
+    expect(() => parseCliArgs(["-t", "coding"])).toThrow(
+      "--work option is required when specifying custom session configurations.",
     );
   });
 

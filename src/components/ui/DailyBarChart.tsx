@@ -29,23 +29,27 @@ export const DailyBarChart = ({
       <Box marginBottom={1}>
         <Text underline>Last 7 Days (Focus Time)</Text>
       </Box>
+      <Box gap={1} flexDirection="column">
+        {data.map((day) => {
+          const progress = Math.min(
+            1,
+            day.totalFocusSeconds / dailyGoalSeconds,
+          );
+          const doneReps = Math.floor(progress * barWidth);
 
-      {data.map((day) => {
-        const progress = Math.min(1, day.totalFocusSeconds / dailyGoalSeconds);
-        const doneReps = Math.floor(progress * barWidth);
-
-        return (
-          <Box key={day.date} gap={1}>
-            <Text color="gray">{day.date}</Text>
-            <Text color="cyan">
-              {"█".repeat(doneReps)}
-              <Text color="gray">{"░".repeat(barWidth - doneReps)}</Text>
-            </Text>
-            <Text bold>{formatTime(day.totalFocusSeconds)}</Text>
-            <Text dimColor>({day.completedPomodoros} sessions)</Text>
-          </Box>
-        );
-      })}
+          return (
+            <Box key={day.date} gap={1} flexWrap="wrap">
+              <Text color="gray">{day.date}</Text>
+              <Text color="cyan">
+                {"█".repeat(doneReps)}
+                <Text color="gray">{"░".repeat(barWidth - doneReps)}</Text>
+              </Text>
+              <Text bold>{formatTime(day.totalFocusSeconds)}</Text>
+              <Text dimColor>({day.completedPomodoros} sessions)</Text>
+            </Box>
+          );
+        })}
+      </Box>
     </Box>
   );
 };

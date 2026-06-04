@@ -14,7 +14,7 @@ type AboutProps = {
 
 export const About = ({ onBack }: AboutProps) => {
   useInput((input, key) => {
-    if (input === "b" || key.escape) {
+    if (key.escape) {
       onBack();
     }
   });
@@ -23,7 +23,7 @@ export const About = ({ onBack }: AboutProps) => {
     <Layout
       title="About Pomo Doro"
       footerControls={[
-        { key: "b", label: "back to menu" },
+        { key: "esc", label: "back to menu" },
         { key: "q", label: "quit" },
       ]}
     >

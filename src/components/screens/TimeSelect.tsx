@@ -12,7 +12,7 @@ export const TimeSelect = ({ onSelect }: TimeSelectProps) => {
     <Layout
       title="Select Duration"
       footerControls={[
-        { key: "b", label: "back to menu" },
+        { key: "esc", label: "back to menu" },
         { key: "q", label: "quit" },
       ]}
     >

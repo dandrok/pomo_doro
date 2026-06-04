@@ -89,3 +89,18 @@ export const timeSelectItems: TimeSelectItem[] = [
     value: "custom",
   },
 ];
+
+export const DEFAULT_TAGS = [
+  "General",
+  "Coding",
+  "Review",
+  "Design",
+  "Learning",
+  "Admin",
+];
+
+export const DURATION_LIMITS = {
+  focus: { min: 1, max: IS_TEST_MODE ? 300 : 180 },
+  shortBreak: { min: 1, max: IS_TEST_MODE ? 120 : 60 },
+  longBreak: { min: 1, max: IS_TEST_MODE ? 300 : 120 },
+} as const;

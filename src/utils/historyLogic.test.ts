@@ -3,6 +3,7 @@ import {
   updateFocusTime,
   incrementPomodoroCount,
   calculateTotals,
+  calculateTagTotals,
 } from "./historyLogic";
 import type { DailyStats } from "@types";
 
@@ -11,26 +12,37 @@ describe("historyLogic", () => {
     it("should create a new entry if the date doesn't exist", () => {
       const history: DailyStats[] = [];
       const date = "2026-05-16";
-      const result = updateFocusTime(history, date);
+      const result = updateFocusTime(history, date, "coding");
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
         date: "2026-05-16",
         totalFocusSeconds: 1,
         completedPomodoros: 0,
+        tags: {
+          coding: { focusSeconds: 1, completedPomodoros: 0 },
+        },
       });
     });
 
     it("should increment focus time if the date already exists", () => {
       const history: DailyStats[] = [
-        { date: "2026-05-16", totalFocusSeconds: 10, completedPomodoros: 1 },
+        {
+          date: "2026-05-16",
+          totalFocusSeconds: 10,
+          completedPomodoros: 1,
+          tags: {
+            coding: { focusSeconds: 10, completedPomodoros: 1 },
+          },
+        },
       ];
       const date = "2026-05-16";
-      const result = updateFocusTime(history, date);
+      const result = updateFocusTime(history, date, "coding");
 
       expect(result).toHaveLength(1);
       expect(result[0]?.totalFocusSeconds).toBe(11);
       expect(result[0]?.completedPomodoros).toBe(1);
+      expect(result[0]?.tags?.["coding"]?.focusSeconds).toBe(11);
     });
 
     it("should not affect other dates", () => {
@@ -50,26 +62,37 @@ describe("historyLogic", () => {
     it("should create a new entry with 1 completion if the date doesn't exist", () => {
       const history: DailyStats[] = [];
       const date = "2026-05-16";
-      const result = incrementPomodoroCount(history, date);
+      const result = incrementPomodoroCount(history, date, "review");
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
         date: "2026-05-16",
         totalFocusSeconds: 0,
         completedPomodoros: 1,
+        tags: {
+          review: { focusSeconds: 0, completedPomodoros: 1 },
+        },
       });
     });
 
     it("should increment completion count if the date already exists", () => {
       const history: DailyStats[] = [
-        { date: "2026-05-16", totalFocusSeconds: 10, completedPomodoros: 1 },
+        {
+          date: "2026-05-16",
+          totalFocusSeconds: 10,
+          completedPomodoros: 1,
+          tags: {
+            review: { focusSeconds: 0, completedPomodoros: 1 },
+          },
+        },
       ];
       const date = "2026-05-16";
-      const result = incrementPomodoroCount(history, date);
+      const result = incrementPomodoroCount(history, date, "review");
 
       expect(result).toHaveLength(1);
       expect(result[0]?.completedPomodoros).toBe(2);
       expect(result[0]?.totalFocusSeconds).toBe(10);
+      expect(result[0]?.tags?.["review"]?.completedPomodoros).toBe(2);
     });
   });
 
@@ -86,6 +109,35 @@ describe("historyLogic", () => {
       ];
       const result = calculateTotals(history);
       expect(result).toEqual({ totalFocusSeconds: 5400, totalCompleted: 3 });
+    });
+  });
+
+  describe("calculateTagTotals", () => {
+    it("should aggregate and sort tags correctly", () => {
+      const history: DailyStats[] = [
+        {
+          date: "2026-05-15",
+          totalFocusSeconds: 3600,
+          completedPomodoros: 2,
+          tags: {
+            coding: { focusSeconds: 2400, completedPomodoros: 1 },
+            review: { focusSeconds: 1200, completedPomodoros: 1 },
+          },
+        },
+        {
+          date: "2026-05-16",
+          totalFocusSeconds: 1800,
+          completedPomodoros: 1,
+          tags: {
+            coding: { focusSeconds: 1800, completedPomodoros: 1 },
+          },
+        },
+      ];
+      const result = calculateTagTotals(history);
+      expect(result).toEqual([
+        { tag: "coding", focusSeconds: 4200, completedPomodoros: 2 },
+        { tag: "review", focusSeconds: 1200, completedPomodoros: 1 },
+      ]);
     });
   });
 });

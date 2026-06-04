@@ -1,7 +1,7 @@
 import { Text } from "ink";
 import { MainMenu } from "./MainMenu";
 import { TimeSelect } from "./TimeSelect";
-import { CustomPresetWizard } from "./CustomPresetWizard";
+import { SessionSetup } from "./SessionSetup";
 import { History } from "./History";
 import { About } from "./About";
 import { Resume } from "./Resume";
@@ -10,13 +10,19 @@ import type { Screen, MenuItems, TimeSelectItem } from "@types";
 type RouterProps = {
   screen: Screen;
   setScreen: (screen: Screen) => void;
-  setSessionConfig: (
-    config: {
-      focus: number;
-      shortBreak: number;
-      longBreak: number;
-    } | null,
+  pendingSessionConfig: {
+    focus: number;
+    shortBreak: number;
+    longBreak: number;
+  } | null;
+  onSessionSetupStart: (
+    focus: number,
+    shortBreak: number,
+    longBreak: number,
+    tag: string,
+    description: string,
   ) => void;
+  onSessionSetupCancel: VoidFunction;
   startHandleSelect: (item: MenuItems) => void;
   timeHandlerSelect: (item: TimeSelectItem) => void;
 };
@@ -24,7 +30,9 @@ type RouterProps = {
 export const Router = ({
   screen,
   setScreen,
-  setSessionConfig,
+  pendingSessionConfig,
+  onSessionSetupStart,
+  onSessionSetupCancel,
   startHandleSelect,
   timeHandlerSelect,
 }: RouterProps) => {
@@ -32,14 +40,23 @@ export const Router = ({
     menu: () => <MainMenu onSelect={startHandleSelect} />,
     "time-select": () => <TimeSelect onSelect={timeHandlerSelect} />,
     "custom-wizard": () => (
-      <CustomPresetWizard
-        onStart={(focus, shortBreak, longBreak) => {
-          setSessionConfig({ focus, shortBreak, longBreak });
-          setScreen("menu");
-        }}
-        onCancel={() => {
-          setScreen("time-select");
-        }}
+      <SessionSetup
+        initialFocus={25}
+        initialShortBreak={5}
+        initialLongBreak={15}
+        startFocusedOnStartButton={false}
+        onStart={onSessionSetupStart}
+        onCancel={onSessionSetupCancel}
+      />
+    ),
+    "task-setup": () => (
+      <SessionSetup
+        initialFocus={pendingSessionConfig?.focus ?? 25}
+        initialShortBreak={pendingSessionConfig?.shortBreak ?? 5}
+        initialLongBreak={pendingSessionConfig?.longBreak ?? 15}
+        startFocusedOnStartButton={true}
+        onStart={onSessionSetupStart}
+        onCancel={onSessionSetupCancel}
       />
     ),
     resume: () => <Resume />,

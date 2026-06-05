@@ -22,10 +22,7 @@ export const About = ({ onBack }: AboutProps) => {
   return (
     <Layout
       title="About Pomo Doro"
-      footerControls={[
-        { key: "esc", label: "back to menu" },
-        { key: "q", label: "quit" },
-      ]}
+      footerControls={[{ key: "esc", label: "back to menu" }]}
     >
       <Box flexDirection="column" marginBottom={1}>
         <Text>

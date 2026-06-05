@@ -1,20 +1,26 @@
-import { Box, Text } from "ink";
+import { Box, Text, useInput } from "ink";
 import { Timer } from "./Timer";
 import { config, IS_TEST_MODE } from "@utils";
 
-export const Resume = () => {
+type ResumeProps = {
+  onBack: () => void;
+};
+
+export const Resume = ({ onBack }: ResumeProps) => {
   const session = config.get("activeSession");
 
   if (
     !session ||
     (typeof session.focus !== "number" && typeof session.time !== "number")
   ) {
+    useInput((input, key) => {
+      if (key.escape) onBack();
+    });
+
     return (
       <Box flexDirection="column" padding={1}>
         <Text color="red">No valid active session found.</Text>
-        <Text color="gray">
-          Press any key to return to menu (not implemented) or restart the app.
-        </Text>
+        <Text color="gray">Press ESC to return to menu.</Text>
       </Box>
     );
   }
@@ -31,6 +37,7 @@ export const Resume = () => {
       initialSecondsRemaining={session.timeOut}
       initialMode={session.mode}
       initialPomodoroCount={session.pomodoroCount}
+      onBack={onBack}
     />
   );
 };

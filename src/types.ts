@@ -35,6 +35,7 @@ export type ConfigSchema = {
   history: DailyStats[];
   isMuted?: boolean;
   recentTags?: string[];
+  dailyGoal?: number;
 };
 
 export type Screen =
@@ -45,6 +46,7 @@ export type Screen =
   | "exit"
   | "resume"
   | "history"
+  | "settings"
   | "about";
 
 export type MenuItems = { label: string; value: Screen };

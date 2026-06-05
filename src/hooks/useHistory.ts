@@ -102,12 +102,19 @@ export const useHistory = () => {
   }, []);
 
   const totals = calculateTotals(history);
+  const todayDate = new Date().toISOString().split("T")[0]!;
+  const todayStats = history.find((h) => h.date === todayDate) || {
+    date: todayDate,
+    totalFocusSeconds: 0,
+    completedPomodoros: 0,
+  };
 
   return {
     history,
     addFocusSecond,
     completeSession,
     totals,
+    todayStats,
     saveToDisk,
   };
 };

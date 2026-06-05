@@ -8,7 +8,8 @@ https://github.com/user-attachments/assets/a78c5aa7-417d-4f7e-967d-2158804bc5e7
 
 - **TUI Interface**: Clean terminal UI with big text and progress bars.
 - **Smart & Customizable Sessions**: Cycle between Work and Breaks automatically with built-in presets, or create custom intervals using the interactive setup wizard.
-- **Productivity Dashboard**: Track your total focus time and see a 7-day history chart.
+- **Productivity Dashboard & Daily Goals**: Track your total focus time, set daily Pomodoro goals, and see a 7-day history chart.
+- **Interactive Settings Menu**: Dynamically configure your daily goals and toggle OS notifications on the fly.
 - **Modular Architecture**: Built with custom React hooks and decoupled components.
 - **OS Notifications & Audio Alerts**: Native desktop notifications and sound alerts when sessions complete (supports Linux, macOS, and Windows).
 - **Persistence**: Remembers your progress and allows you to resume sessions.
@@ -43,6 +44,7 @@ pomo --work 50 --break 10
 | `--long-break <minutes>` | `-l`  | Set custom long break duration (minutes, defaults to 3x short break) |
 | `--tag <string>`         | `-t`  | Set the tag/category name                                            |
 | `--description <string>` | `-d`  | Set an optional description for the session                          |
+| `--goal <number>`        | `-g`  | Set your Daily Pomodoro Goal                                         |
 | `--help`                 | `-h`  | Show help details                                                    |
 
 > [!NOTE]
@@ -74,10 +76,10 @@ npm run dev
 | `r`   | Restart current timer from the beginning                                       |
 | `s`   | Skip current session (discards work session, skips break to start focus early) |
 | `m`   | Toggle mute (silence OS notifications and audio alerts)                        |
-| `q`   | Quit application                                                               |
-| `Esc` | Go back to previous menu (from History, Preset, or Wizard screens)             |
+| `Esc` | Go back to previous menu, or safely pause/exit the current timer to the menu   |
+| `Ctrl+C`| Force quit application                                                         |
 
-### Custom Preset Wizard Controls
+### Custom Preset & Settings Controls
 
 | Key              | Action                                                                              |
 | :--------------- | :---------------------------------------------------------------------------------- |
@@ -94,7 +96,7 @@ The project follows a clean, modular architecture supported by TypeScript path a
 - `src/app.tsx`: Main app container.
 - `src/types.ts`: Centralized TypeScript definitions. Mapped via `@types`.
 - `src/components/`: Reusable React components. Mapped via `@screens` and `@ui`:
-  - `screens/`: High-level views (e.g., `MainMenu`, `TimeSelect`, `SessionSetup`, `History`, `Timer`, `About`, `Resume`, `Router`).
+  - `screens/`: High-level views (e.g., `MainMenu`, `TimeSelect`, `SessionSetup`, `History`, `Settings`, `Timer`, `About`, `Resume`, `Router`).
   - `ui/`: Structure and display elements (e.g., `Layout`, `ProgressBar`, `DailyBarChart`, `HeaderBar`, `FooterBar`, `FormRow`).
 - `src/hooks/`: Custom React hooks (e.g., `useTimer`, `useHistory`, `usePomodoroSession`, `useSessionSetup`). Mapped via `@hooks`.
 - `src/utils/`: Utilities, configs, and side-effects. Mapped via `@utils`:

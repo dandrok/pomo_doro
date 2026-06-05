@@ -49,11 +49,6 @@ export const App = ({ initialSessionConfig }: AppProps) => {
       return;
     }
 
-    if (input === "q") {
-      setScreen("exit");
-      return;
-    }
-
     if (screen === "time-select") {
       if (key.escape) {
         setScreen("menu");
@@ -114,6 +109,10 @@ export const App = ({ initialSessionConfig }: AppProps) => {
         tag={sessionConfig.tag}
         description={sessionConfig.description}
         initialPomodoroCount={0}
+        onBack={() => {
+          setSessionConfig(null);
+          setScreen("menu");
+        }}
       />
     );
   }

@@ -4,6 +4,7 @@ import { TimeSelect } from "./TimeSelect";
 import { SessionSetup } from "./SessionSetup";
 import { History } from "./History";
 import { About } from "./About";
+import { Settings } from "./Settings";
 import { Resume } from "./Resume";
 import type { Screen, MenuItems, TimeSelectItem } from "@types";
 
@@ -59,8 +60,9 @@ export const Router = ({
         onCancel={onSessionSetupCancel}
       />
     ),
-    resume: () => <Resume />,
+    resume: () => <Resume onBack={() => setScreen("menu")} />,
     history: () => <History onBack={() => setScreen("menu")} />,
+    settings: () => <Settings onBack={() => setScreen("menu")} />,
     about: () => <About onBack={() => setScreen("menu")} />,
     exit: () => <Text>have a nice day and stay focus!</Text>,
   };

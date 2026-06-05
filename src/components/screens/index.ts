@@ -6,3 +6,4 @@ export * from "./Router";
 export * from "./TimeSelect";
 export * from "./Timer";
 export * from "./SessionSetup";
+export * from "./Settings";

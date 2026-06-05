@@ -30,17 +30,19 @@ export const useTimer = ({
     if (isPaused || secondsRemaining <= 0) return;
 
     const timer = setTimeout(() => {
-      setSecondsRemaining((prev) => {
-        const next = prev - 1;
-        if (next === 0 && onTimeUp) {
-          onTimeUp();
-        }
-        return next;
-      });
+      setSecondsRemaining((prev) => Math.max(0, prev - 1));
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [isPaused, secondsRemaining, onTimeUp]);
+  }, [isPaused, secondsRemaining]);
+
+  useEffect(() => {
+    if (secondsRemaining === 0 && !isPaused) {
+      if (onTimeUp) {
+        onTimeUp();
+      }
+    }
+  }, [secondsRemaining, isPaused, onTimeUp]);
 
   const progress = useMemo(() => {
     if (totalSeconds === 0) return 0;

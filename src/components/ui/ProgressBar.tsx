@@ -1,6 +1,13 @@
 import { Box, Text } from "ink";
 import BigText from "ink-big-text";
-import { padStr, textColor, modeIcons, ONE_MINUTE, IS_TEST_MODE } from "@utils";
+import {
+  padStr,
+  textColor,
+  modeIcons,
+  ONE_MINUTE,
+  IS_TEST_MODE,
+  config,
+} from "@utils";
 import type { Mode } from "@types";
 
 const LOADING_STEPS = 50;
@@ -10,6 +17,7 @@ type ProgressBarProps = {
   progress: number;
   mode: Mode;
   pomodoroCount: number;
+  dailyCompletedCount: number;
   isPaused: boolean;
   isMuted?: boolean | undefined;
   tag?: string | undefined;
@@ -21,6 +29,7 @@ export const ProgressBar = ({
   progress,
   mode,
   pomodoroCount,
+  dailyCompletedCount,
   isPaused,
   isMuted = false,
   tag,
@@ -29,6 +38,8 @@ export const ProgressBar = ({
   const progressSafe = Math.max(0, Math.min(1, progress));
   const percentage = Math.floor(progressSafe * 100);
   const doneReps = Math.floor(progressSafe * LOADING_STEPS);
+  const dailyGoal = config.get("dailyGoal") ?? 8;
+  const isGoalMet = dailyCompletedCount >= dailyGoal;
 
   const min = padStr(Math.floor(secondsRemaining / ONE_MINUTE));
   const sec = padStr(secondsRemaining % ONE_MINUTE);
@@ -76,8 +87,12 @@ export const ProgressBar = ({
           </Box>
         </Box>
       </Box>
-      <Box justifyContent="flex-end">
-        <Text>pomodoro_count: {pomodoroCount}</Text>
+      <Box justifyContent="space-between">
+        <Text color="gray">session count: {pomodoroCount}</Text>
+        <Text color={isGoalMet ? "greenBright" : "white"}>
+          Daily Goal: [ {dailyCompletedCount} / {dailyGoal} ]{" "}
+          {isGoalMet && "★"}
+        </Text>
       </Box>
       <Box flexDirection="column" flexBasis={"center"}>
         <Box>

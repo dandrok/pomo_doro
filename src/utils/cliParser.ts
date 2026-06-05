@@ -3,6 +3,7 @@ import { SHORT_BREAK_TIME, LONG_BREAK_TIME } from "./constants";
 
 export type ParsedArgs = {
   help: boolean;
+  goal?: number;
   sessionConfig?:
     | {
         focus: number;
@@ -21,6 +22,7 @@ export const parseCliArgs = (args: string[]): ParsedArgs => {
     "long-break": { type: "string", short: "l" },
     tag: { type: "string", short: "t" },
     description: { type: "string", short: "d" },
+    goal: { type: "string", short: "g" },
     help: { type: "boolean", short: "h" },
   } as const;
 
@@ -47,6 +49,7 @@ export const parseCliArgs = (args: string[]): ParsedArgs => {
   const longBreak = parseNum(values["long-break"], "long-break");
   const tag = values.tag;
   const description = values.description;
+  const goal = parseNum(values.goal, "goal");
 
   if (focus === undefined) {
     if (
@@ -59,10 +62,12 @@ export const parseCliArgs = (args: string[]): ParsedArgs => {
         "--work option is required when specifying custom session configurations.",
       );
     }
-    return { help: false };
+    const result: ParsedArgs = { help: false };
+    if (goal !== undefined) result.goal = goal;
+    return result;
   }
 
-  return {
+  const result: ParsedArgs = {
     help: false,
     sessionConfig: {
       focus,
@@ -72,4 +77,7 @@ export const parseCliArgs = (args: string[]): ParsedArgs => {
       description,
     },
   };
+
+  if (goal !== undefined) result.goal = goal;
+  return result;
 };

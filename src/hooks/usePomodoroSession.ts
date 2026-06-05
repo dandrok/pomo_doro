@@ -28,7 +28,7 @@ export const usePomodoroSession = ({
   const [mode, setMode] = useState<Mode>(initialMode);
   const [pomodoroCount, setPomodoroCount] = useState(initialPomodoroCount);
   const [isMuted, setIsMuted] = useState(() => config.get("isMuted") ?? false);
-  const { addFocusSecond, completeSession } = useHistory();
+  const { addFocusSecond, completeSession, todayStats } = useHistory();
 
   const handleTimeUp = useCallback(() => {
     const nextMode = getNextSessionType(mode, pomodoroCount);
@@ -56,9 +56,16 @@ export const usePomodoroSession = ({
     }
   }, [mode, pomodoroCount, focus, shortBreak, longBreak, completeSession, tag]);
 
+  const initialDuration =
+    initialMode === "work"
+      ? focus
+      : initialMode === "shortBreak"
+        ? shortBreak
+        : longBreak;
+
   const { secondsRemaining, progress, isPaused, pause, resume, reset } =
     useTimer({
-      initialSeconds: focus * ONE_MINUTE,
+      initialSeconds: initialDuration * ONE_MINUTE,
       initialSecondsRemaining: initialSecondsRemaining,
       onTimeUp: handleTimeUp,
     });
@@ -143,5 +150,6 @@ export const usePomodoroSession = ({
     skip: handleSkip,
     restart: handleRestart,
     toggleMute,
+    todayStats,
   };
 };

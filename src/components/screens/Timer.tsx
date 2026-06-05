@@ -1,5 +1,5 @@
 import React from "react";
-import { useInput, useApp, Box } from "ink";
+import { useInput, Box } from "ink";
 import { usePomodoroSession } from "@hooks";
 import { ProgressBar, FooterBar } from "@ui";
 import type { Mode } from "@types";
@@ -13,6 +13,7 @@ type TimerProps = {
   initialSecondsRemaining?: number | undefined;
   initialMode?: Mode | undefined;
   initialPomodoroCount?: number | undefined;
+  onBack?: () => void;
 };
 
 export const Timer = ({
@@ -24,9 +25,8 @@ export const Timer = ({
   initialSecondsRemaining,
   initialMode = "work",
   initialPomodoroCount = 0,
+  onBack,
 }: TimerProps) => {
-  const { exit } = useApp();
-
   const {
     secondsRemaining,
     progress,
@@ -38,6 +38,7 @@ export const Timer = ({
     skip,
     restart,
     toggleMute,
+    todayStats,
   } = usePomodoroSession({
     focus,
     shortBreak,
@@ -49,12 +50,12 @@ export const Timer = ({
     initialPomodoroCount,
   });
 
-  useInput((input) => {
+  useInput((input, key) => {
     if (input === "p") togglePause();
     if (input === "r") restart();
-    if (input === "q") exit();
     if (input === "s") skip();
     if (input === "m") toggleMute();
+    if (key.escape && onBack) onBack();
   });
 
   return (
@@ -64,6 +65,7 @@ export const Timer = ({
         progress={progress}
         mode={mode}
         pomodoroCount={pomodoroCount}
+        dailyCompletedCount={todayStats.completedPomodoros}
         isPaused={isPaused}
         isMuted={isMuted}
         tag={tag}
@@ -75,7 +77,7 @@ export const Timer = ({
           { key: "r", label: "restart" },
           { key: "s", label: "skip" },
           { key: "m", label: isMuted ? "unmute" : "mute" },
-          { key: "q", label: "quit" },
+          { key: "esc", label: "menu" },
         ]}
       />
     </Box>

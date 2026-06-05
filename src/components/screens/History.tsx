@@ -21,10 +21,7 @@ export const History = ({ onBack }: HistoryProps) => {
   return (
     <Layout
       title="Productivity Dashboard"
-      footerControls={[
-        { key: "esc", label: "back to menu" },
-        { key: "q", label: "quit" },
-      ]}
+      footerControls={[{ key: "esc", label: "back to menu" }]}
     >
       <Box flexDirection="row" gap={4}>
         {/* Left Column: Stats & Bar Chart */}

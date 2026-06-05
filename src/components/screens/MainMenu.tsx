@@ -9,7 +9,7 @@ type MainMenuProps = {
 
 export const MainMenu = ({ onSelect }: MainMenuProps) => {
   return (
-    <Layout title="Pomo Doro" footerControls={[{ key: "q", label: "quit" }]}>
+    <Layout title="Pomo Doro">
       <SelectInput items={menuItems} onSelect={onSelect} />
     </Layout>
   );

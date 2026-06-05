@@ -54,8 +54,16 @@ export const menuItems: MenuItems[] = [
     value: "history",
   },
   {
+    label: "Settings",
+    value: "settings",
+  },
+  {
     label: "About",
     value: "about",
+  },
+  {
+    label: "Exit",
+    value: "exit",
   },
 ];
 

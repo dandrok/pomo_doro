@@ -90,8 +90,7 @@ export const ProgressBar = ({
       <Box justifyContent="space-between">
         <Text color="gray">session count: {pomodoroCount}</Text>
         <Text color={isGoalMet ? "greenBright" : "white"}>
-          Daily Goal: [ {dailyCompletedCount} / {dailyGoal} ]{" "}
-          {isGoalMet && "★"}
+          Daily Goal: [ {dailyCompletedCount} / {dailyGoal} ] {isGoalMet && "★"}
         </Text>
       </Box>
       <Box flexDirection="column" flexBasis={"center"}>

@@ -70,14 +70,14 @@ npm run dev
 
 ### General & Timer Controls
 
-| Key   | Action                                                                         |
-| :---- | :----------------------------------------------------------------------------- |
-| `p`   | Toggle pause / resume                                                          |
-| `r`   | Restart current timer from the beginning                                       |
-| `s`   | Skip current session (discards work session, skips break to start focus early) |
-| `m`   | Toggle mute (silence OS notifications and audio alerts)                        |
-| `Esc` | Go back to previous menu, or safely pause/exit the current timer to the menu   |
-| `Ctrl+C`| Force quit application                                                         |
+| Key      | Action                                                                         |
+| :------- | :----------------------------------------------------------------------------- |
+| `p`      | Toggle pause / resume                                                          |
+| `r`      | Restart current timer from the beginning                                       |
+| `s`      | Skip current session (discards work session, skips break to start focus early) |
+| `m`      | Toggle mute (silence OS notifications and audio alerts)                        |
+| `Esc`    | Go back to previous menu, or safely pause/exit the current timer to the menu   |
+| `Ctrl+C` | Force quit application                                                         |
 
 ### Custom Preset & Settings Controls
 

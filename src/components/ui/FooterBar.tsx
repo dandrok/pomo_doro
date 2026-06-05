@@ -15,7 +15,7 @@ export const FooterBar = ({ controls }: FooterBarProps) => {
       <Box marginTop={1} gap={1}>
         {controls.map((control) => (
           <Text key={control.key} color="gray">
-            [{control.key}] {control.label}
+            <Text color={"greenBright"}>[{control.key}]</Text> {control.label}
           </Text>
         ))}
       </Box>

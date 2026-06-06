@@ -73,22 +73,15 @@ export const useHistory = () => {
 
   const addFocusSecond = useCallback((tag?: string) => {
     const today = new Date().toISOString().split("T")[0]!;
-    const updated = updateFocusTime(historyRef.current, today, tag);
-
-    // Performance optimization: We only set React state (triggers re-render)
-    // but we'll use a separate effect to sync to disk less frequently if needed.
-    // For now, let's keep it simple but separate the logic.
-    setHistory(updated);
+    setHistory((prev) => updateFocusTime(prev, today, tag));
   }, []);
 
-  const completeSession = useCallback(
-    (tag?: string) => {
-      const today = new Date().toISOString().split("T")[0]!;
-      const updated = incrementPomodoroCount(historyRef.current, today, tag);
-      saveToDisk(updated);
-    },
-    [saveToDisk],
-  );
+  const completeSession = useCallback((tag?: string) => {
+    const today = new Date().toISOString().split("T")[0]!;
+    const updated = incrementPomodoroCount(historyRef.current, today, tag);
+    setHistory(updated);
+    config.set("history", updated);
+  }, []);
 
   // Sync to disk every 30 seconds to prevent data loss while avoiding excessive writes
   useEffect(() => {

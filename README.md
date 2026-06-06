@@ -1,14 +1,13 @@
 # Pomo Doro
 
 A sleek, modular Pomodoro timer for your terminal, built with React, Ink, and TypeScript.
-
-https://github.com/user-attachments/assets/a78c5aa7-417d-4f7e-967d-2158804bc5e7
+![Pomo Doro Demo](./assets/demo.gif)
 
 ## Features
 
 - **TUI Interface**: Clean terminal UI with big text and progress bars.
 - **Smart & Customizable Sessions**: Cycle between Work and Breaks automatically with built-in presets, or create custom intervals using the interactive setup wizard.
-- **Productivity Dashboard & Daily Goals**: Track your total focus time, set daily Pomodoro goals, and see a 7-day history chart.
+- **Productivity Dashboard & Daily Goals**: Track your total focus time, set daily Pomodoro goals, configure your daily focus time goal, and see a 7-day history chart.
 - **Interactive Settings Menu**: Dynamically configure your daily goals and toggle OS notifications on the fly.
 - **Modular Architecture**: Built with custom React hooks and decoupled components.
 - **OS Notifications & Audio Alerts**: Native desktop notifications and sound alerts when sessions complete (supports Linux, macOS, and Windows).

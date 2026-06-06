@@ -22,7 +22,7 @@ export const FormRow = ({
     <Box marginY={0} height={1}>
       <Text color={isActive ? "cyan" : "system"} bold={isActive}>
         {isActive ? " ❯ " : "   "}
-        {label.padEnd(22)}
+        {label.padEnd(30)}
       </Text>
       <Box width={30} justifyContent="flex-start">
         {isFocused ? (

@@ -1,6 +1,6 @@
 import { Box, Text, useInput } from "ink";
 import { useHistory } from "@hooks";
-import { formatTime, calculateTagTotals } from "@utils";
+import { formatTime, calculateTagTotals, config, IS_TEST_MODE } from "@utils";
 import { DailyBarChart, Layout } from "@ui";
 
 type HistoryProps = {
@@ -11,6 +11,8 @@ export const History = ({ onBack }: HistoryProps) => {
   const { history, totals } = useHistory();
   const last7Days = [...history].slice(-7).reverse();
   const tagTotals = calculateTagTotals(history);
+  const dailyFocusGoalHours = config.get("dailyFocusGoal") ?? 4;
+  const goalMultiplier = IS_TEST_MODE ? 1 : 3600;
 
   useInput((input, key) => {
     if (key.escape) {
@@ -37,7 +39,11 @@ export const History = ({ onBack }: HistoryProps) => {
             </Text>
           </Box>
 
-          <DailyBarChart data={last7Days} barWidth={15} />
+          <DailyBarChart
+            data={last7Days}
+            barWidth={15}
+            dailyGoalSeconds={dailyFocusGoalHours * goalMultiplier}
+          />
         </Box>
 
         {/* Right Column: Tag Breakdown */}

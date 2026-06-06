@@ -36,6 +36,8 @@ export type ConfigSchema = {
   isMuted?: boolean;
   recentTags?: string[];
   dailyGoal?: number;
+  dailyFocusGoal?: number;
+  goalDisplayMode?: "sessions" | "time" | "both" | "hidden";
 };
 
 export type Screen =

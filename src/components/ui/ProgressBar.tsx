@@ -18,6 +18,8 @@ type ProgressBarProps = {
   mode: Mode;
   pomodoroCount: number;
   dailyCompletedCount: number;
+  dailyFocusSeconds: number;
+  goalDisplayMode: "sessions" | "time" | "both" | "hidden";
   isPaused: boolean;
   isMuted?: boolean | undefined;
   tag?: string | undefined;
@@ -30,6 +32,8 @@ export const ProgressBar = ({
   mode,
   pomodoroCount,
   dailyCompletedCount,
+  dailyFocusSeconds,
+  goalDisplayMode,
   isPaused,
   isMuted = false,
   tag,
@@ -39,7 +43,56 @@ export const ProgressBar = ({
   const percentage = Math.floor(progressSafe * 100);
   const doneReps = Math.floor(progressSafe * LOADING_STEPS);
   const dailyGoal = config.get("dailyGoal") ?? 8;
-  const isGoalMet = dailyCompletedCount >= dailyGoal;
+  const dailyFocusGoalHours = config.get("dailyFocusGoal") ?? 4;
+  const goalMultiplier = IS_TEST_MODE ? 1 : 3600;
+  const dailyFocusGoalSeconds = dailyFocusGoalHours * goalMultiplier;
+
+  const isSessionGoalMet = dailyCompletedCount >= dailyGoal;
+  const isTimeGoalMet = dailyFocusSeconds >= dailyFocusGoalSeconds;
+
+  const formatGoalTime = (secs: number) => {
+    if (IS_TEST_MODE) return `${secs}s`;
+    const hrs = Math.floor(secs / 3600);
+    const mins = Math.floor((secs % 3600) / 60);
+    if (hrs > 0 && mins > 0) return `${hrs}h ${mins}m`;
+    if (hrs > 0) return `${hrs}h`;
+    return `${mins}m`;
+  };
+
+  const renderGoal = () => {
+    if (goalDisplayMode === "sessions") {
+      return (
+        <Text color={isSessionGoalMet ? "greenBright" : "white"}>
+          Daily Goal: [ {dailyCompletedCount} / {dailyGoal} ]{" "}
+          {isSessionGoalMet && "★"}
+        </Text>
+      );
+    }
+    if (goalDisplayMode === "time") {
+      return (
+        <Text color={isTimeGoalMet ? "greenBright" : "white"}>
+          Focus Goal: [ {formatGoalTime(dailyFocusSeconds)} /{" "}
+          {formatGoalTime(dailyFocusGoalSeconds)} ] {isTimeGoalMet && "★"}
+        </Text>
+      );
+    }
+    if (goalDisplayMode === "hidden") {
+      return null;
+    }
+
+    return (
+      <Text>
+        <Text color={isSessionGoalMet ? "greenBright" : "white"}>
+          [{dailyCompletedCount}/{dailyGoal} sess] {isSessionGoalMet && "★"}
+        </Text>
+        <Text color="gray">{" | "}</Text>
+        <Text color={isTimeGoalMet ? "greenBright" : "white"}>
+          [{formatGoalTime(dailyFocusSeconds)}/
+          {formatGoalTime(dailyFocusGoalSeconds)} time] {isTimeGoalMet && "★"}
+        </Text>
+      </Text>
+    );
+  };
 
   const min = padStr(Math.floor(secondsRemaining / ONE_MINUTE));
   const sec = padStr(secondsRemaining % ONE_MINUTE);
@@ -89,9 +142,7 @@ export const ProgressBar = ({
       </Box>
       <Box justifyContent="space-between">
         <Text color="gray">session count: {pomodoroCount}</Text>
-        <Text color={isGoalMet ? "greenBright" : "white"}>
-          Daily Goal: [ {dailyCompletedCount} / {dailyGoal} ] {isGoalMet && "★"}
-        </Text>
+        {renderGoal()}
       </Box>
       <Box flexDirection="column" flexBasis={"center"}>
         <Box>

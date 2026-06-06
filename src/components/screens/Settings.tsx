@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Text, useInput } from "ink";
 import { Layout, FormRow } from "@ui";
-import { config } from "@utils";
+import { config, IS_TEST_MODE } from "@utils";
 
 type SettingsProps = {
   onBack: () => void;
@@ -11,14 +11,18 @@ export const Settings = ({ onBack }: SettingsProps) => {
   const [dailyGoal, setDailyGoal] = useState(
     () => config.get("dailyGoal") ?? 8,
   );
+  const [dailyFocusGoal, setDailyFocusGoal] = useState(
+    () => config.get("dailyFocusGoal") ?? 4,
+  );
   const [isMuted, setIsMuted] = useState(() => config.get("isMuted") ?? false);
   const [activeIdx, setActiveIdx] = useState(0);
 
-  const fields = ["dailyGoal", "isMuted", "save"] as const;
+  const fields = ["dailyGoal", "dailyFocusGoal", "isMuted", "save"] as const;
   const activeField = fields[activeIdx];
 
   const handleSave = () => {
     config.set("dailyGoal", dailyGoal);
+    config.set("dailyFocusGoal", dailyFocusGoal);
     config.set("isMuted", isMuted);
     onBack();
   };
@@ -51,6 +55,8 @@ export const Settings = ({ onBack }: SettingsProps) => {
     if (key.leftArrow) {
       if (activeField === "dailyGoal") {
         setDailyGoal((prev) => Math.max(1, prev - 1));
+      } else if (activeField === "dailyFocusGoal") {
+        setDailyFocusGoal((prev) => Math.max(0.5, prev - 0.5));
       } else if (activeField === "isMuted") {
         setIsMuted((prev) => !prev);
       }
@@ -60,6 +66,8 @@ export const Settings = ({ onBack }: SettingsProps) => {
     if (key.rightArrow) {
       if (activeField === "dailyGoal") {
         setDailyGoal((prev) => Math.min(50, prev + 1));
+      } else if (activeField === "dailyFocusGoal") {
+        setDailyFocusGoal((prev) => Math.min(24, prev + 0.5));
       } else if (activeField === "isMuted") {
         setIsMuted((prev) => !prev);
       }
@@ -82,6 +90,16 @@ export const Settings = ({ onBack }: SettingsProps) => {
           label="Daily Pomodoro Goal"
           value={dailyGoal.toString()}
           isActive={activeField === "dailyGoal"}
+          showArrows={true}
+        />
+        <FormRow
+          label={
+            IS_TEST_MODE
+              ? "Daily Focus Goal (Seconds)"
+              : "Daily Focus Goal (Hours)"
+          }
+          value={dailyFocusGoal.toString()}
+          isActive={activeField === "dailyFocusGoal"}
           showArrows={true}
         />
         <FormRow

@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { useInput, Box } from "ink";
 import { usePomodoroSession } from "@hooks";
 import { ProgressBar, FooterBar } from "@ui";
+import { config } from "@utils";
 import type { Mode } from "@types";
 
 type TimerProps = {
@@ -50,11 +51,39 @@ export const Timer = ({
     initialPomodoroCount,
   });
 
+  const [goalDisplayMode, setGoalDisplayMode] = useState<
+    "sessions" | "time" | "both" | "hidden"
+  >(
+    () =>
+      (config.get("goalDisplayMode") as
+        | "sessions"
+        | "time"
+        | "both"
+        | "hidden"
+        | undefined) ?? "sessions",
+  );
+
+  const toggleGoalDisplay = () => {
+    setGoalDisplayMode((prev) => {
+      const next =
+        prev === "sessions"
+          ? "time"
+          : prev === "time"
+            ? "both"
+            : prev === "both"
+              ? "hidden"
+              : "sessions";
+      config.set("goalDisplayMode", next);
+      return next;
+    });
+  };
+
   useInput((input, key) => {
     if (input === "p") togglePause();
     if (input === "r") restart();
     if (input === "s") skip();
     if (input === "m") toggleMute();
+    if (input === "g") toggleGoalDisplay();
     if (key.escape && onBack) onBack();
   });
 
@@ -66,6 +95,8 @@ export const Timer = ({
         mode={mode}
         pomodoroCount={pomodoroCount}
         dailyCompletedCount={todayStats.completedPomodoros}
+        dailyFocusSeconds={todayStats.totalFocusSeconds}
+        goalDisplayMode={goalDisplayMode}
         isPaused={isPaused}
         isMuted={isMuted}
         tag={tag}
@@ -77,6 +108,7 @@ export const Timer = ({
           { key: "r", label: "restart" },
           { key: "s", label: "skip" },
           { key: "m", label: isMuted ? "unmute" : "mute" },
+          { key: "g", label: "goal view" },
           { key: "esc", label: "menu" },
         ]}
       />

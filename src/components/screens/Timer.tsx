@@ -3,7 +3,7 @@ import { useInput, Box } from "ink";
 import { usePomodoroSession } from "@hooks";
 import { ProgressBar, FooterBar } from "@ui";
 import { config } from "@utils";
-import type { Mode } from "@types";
+import type { Mode, GoalDisplayMode } from "@types";
 
 type TimerProps = {
   focus: number;
@@ -51,16 +51,10 @@ export const Timer = ({
     initialPomodoroCount,
   });
 
-  const [goalDisplayMode, setGoalDisplayMode] = useState<
-    "sessions" | "time" | "both" | "hidden"
-  >(
+  const [goalDisplayMode, setGoalDisplayMode] = useState<GoalDisplayMode>(
     () =>
-      (config.get("goalDisplayMode") as
-        | "sessions"
-        | "time"
-        | "both"
-        | "hidden"
-        | undefined) ?? "sessions",
+      (config.get("goalDisplayMode") as GoalDisplayMode | undefined) ??
+      "sessions",
   );
 
   const toggleGoalDisplay = () => {

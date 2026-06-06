@@ -29,6 +29,8 @@ export type DailyStats = {
   tags?: TagBreakdown;
 };
 
+export type GoalDisplayMode = "sessions" | "time" | "both" | "hidden";
+
 export type ConfigSchema = {
   pomodoroCount: number;
   activeSession?: Session;
@@ -37,7 +39,7 @@ export type ConfigSchema = {
   recentTags?: string[];
   dailyGoal?: number;
   dailyFocusGoal?: number;
-  goalDisplayMode?: "sessions" | "time" | "both" | "hidden";
+  goalDisplayMode?: GoalDisplayMode;
 };
 
 export type Screen =

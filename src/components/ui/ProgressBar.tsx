@@ -8,7 +8,7 @@ import {
   IS_TEST_MODE,
   config,
 } from "@utils";
-import type { Mode } from "@types";
+import type { Mode, GoalDisplayMode } from "@types";
 
 const LOADING_STEPS = 50;
 
@@ -19,7 +19,7 @@ type ProgressBarProps = {
   pomodoroCount: number;
   dailyCompletedCount: number;
   dailyFocusSeconds: number;
-  goalDisplayMode: "sessions" | "time" | "both" | "hidden";
+  goalDisplayMode: GoalDisplayMode;
   isPaused: boolean;
   isMuted?: boolean | undefined;
   tag?: string | undefined;
@@ -76,22 +76,25 @@ export const ProgressBar = ({
         </Text>
       );
     }
+    if (goalDisplayMode === "both") {
+      return (
+        <Text>
+          <Text color={isSessionGoalMet ? "greenBright" : "white"}>
+            [{dailyCompletedCount}/{dailyGoal} sess] {isSessionGoalMet && "★"}
+          </Text>
+          <Text color="gray">{" | "}</Text>
+          <Text color={isTimeGoalMet ? "greenBright" : "white"}>
+            [{formatGoalTime(dailyFocusSeconds)}/
+            {formatGoalTime(dailyFocusGoalSeconds)} time] {isTimeGoalMet && "★"}
+          </Text>
+        </Text>
+      );
+    }
     if (goalDisplayMode === "hidden") {
       return null;
     }
 
-    return (
-      <Text>
-        <Text color={isSessionGoalMet ? "greenBright" : "white"}>
-          [{dailyCompletedCount}/{dailyGoal} sess] {isSessionGoalMet && "★"}
-        </Text>
-        <Text color="gray">{" | "}</Text>
-        <Text color={isTimeGoalMet ? "greenBright" : "white"}>
-          [{formatGoalTime(dailyFocusSeconds)}/
-          {formatGoalTime(dailyFocusGoalSeconds)} time] {isTimeGoalMet && "★"}
-        </Text>
-      </Text>
-    );
+    return null;
   };
 
   const min = padStr(Math.floor(secondsRemaining / ONE_MINUTE));

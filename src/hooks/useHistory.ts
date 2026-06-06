@@ -78,11 +78,9 @@ export const useHistory = () => {
 
   const completeSession = useCallback((tag?: string) => {
     const today = new Date().toISOString().split("T")[0]!;
-    setHistory((prev) => {
-      const updated = incrementPomodoroCount(prev, today, tag);
-      config.set("history", updated);
-      return updated;
-    });
+    const updated = incrementPomodoroCount(historyRef.current, today, tag);
+    setHistory(updated);
+    config.set("history", updated);
   }, []);
 
   // Sync to disk every 30 seconds to prevent data loss while avoiding excessive writes

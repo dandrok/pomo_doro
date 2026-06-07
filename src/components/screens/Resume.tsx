@@ -34,6 +34,8 @@ export const Resume = ({ onBack }: ResumeProps) => {
       focus={focus}
       shortBreak={shortBreak}
       longBreak={longBreak}
+      tag={session.tag}
+      description={session.description}
       initialSecondsRemaining={session.timeOut}
       initialMode={session.mode}
       initialPomodoroCount={session.pomodoroCount}

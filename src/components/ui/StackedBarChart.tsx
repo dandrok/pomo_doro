@@ -18,6 +18,11 @@ export const StackedBarChart = ({
   barWidth = 30,
   legend,
 }: StackedBarChartProps) => {
+  const safeBarWidth = Math.max(
+    0,
+    Number.isFinite(barWidth) ? Math.floor(barWidth) : 0,
+  );
+
   if (data.length === 0) {
     return (
       <Text color="gray" italic>
@@ -29,13 +34,13 @@ export const StackedBarChart = ({
   const totalValue = data.reduce((sum, d) => sum + d.value, 0);
 
   if (totalValue === 0) {
-    return <Text color="gray">{"░".repeat(barWidth)}</Text>;
+    return <Text color="gray">{"░".repeat(safeBarWidth)}</Text>;
   }
 
   // Calculate widths for each segment based on percentage
-  let remainingWidth = barWidth;
+  let remainingWidth = safeBarWidth;
   const segments = data.map((d, i) => {
-    const exactWidth = (d.value / totalValue) * barWidth;
+    const exactWidth = (d.value / totalValue) * safeBarWidth;
     let width = Math.round(exactWidth);
 
     // For the last element, take all remaining width to ensure it matches barWidth exactly.

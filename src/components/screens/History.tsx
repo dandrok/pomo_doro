@@ -46,7 +46,7 @@ export const History = ({ onBack }: HistoryProps) => {
     };
   }, [stdout]);
 
-  const isNarrow = columns < 85;
+  const isNarrow = columns <= 85;
 
   // Group tags into rows of 2 for the legend grid
   const legendRows = [];

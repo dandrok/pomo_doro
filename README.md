@@ -7,7 +7,7 @@ A sleek, modular Pomodoro timer for your terminal, built with React, Ink, and Ty
 
 - **TUI Interface**: Clean terminal UI with big text and progress bars.
 - **Smart & Customizable Sessions**: Cycle between Work and Breaks automatically with built-in presets, or create custom intervals using the interactive setup wizard.
-- **Productivity Dashboard & Daily Goals**: Track your total focus time, set daily Pomodoro goals, configure your daily focus time goal, and see a 7-day history chart.
+- **Productivity Dashboard & Daily Goals**: Track your total focus time, set daily Pomodoro goals, configure your daily focus time goal, and see a 15-week history chart.
 - **Interactive Settings Menu**: Dynamically configure your daily goals and toggle OS notifications on the fly.
 - **Analytics Dashboard**: GitHub-style activity heatmaps, horizontal stacked bar charts, and productivity tracking over 15 weeks.
 - **Responsive Layout**: Gracefully adapts between side-by-side and vertical stacked layouts depending on terminal window size.

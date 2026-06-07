@@ -29,6 +29,8 @@ export const ActivityHeatmap = ({
   weeks = DEFAULT_WEEKS,
   dailyGoalSeconds = DEFAULT_DAILY_GOAL,
 }: ActivityHeatmapProps) => {
+  const normalizedDailyGoal = Math.max(1, Math.floor(dailyGoalSeconds));
+
   // Map data for fast lookup by date string
   const dataMap = new Map(data.map((d) => [d.date, d.totalFocusSeconds]));
 
@@ -87,7 +89,7 @@ export const ActivityHeatmap = ({
               {row.map((cell) => {
                 const { char, color } = getIntensity(
                   cell.seconds,
-                  dailyGoalSeconds,
+                  normalizedDailyGoal,
                 );
                 // We add a space after each block to make it look like a grid
                 return (

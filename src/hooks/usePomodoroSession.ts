@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useTimer } from "./useTimer";
 import { useHistory } from "./useHistory";
 import { config, ONE_MINUTE, getNextSessionType, notifyUser } from "@utils";
@@ -28,7 +28,30 @@ export const usePomodoroSession = ({
   const [mode, setMode] = useState<Mode>(initialMode);
   const [pomodoroCount, setPomodoroCount] = useState(initialPomodoroCount);
   const [isMuted, setIsMuted] = useState(() => config.get("isMuted") ?? false);
+  const [isAutoTransition, setIsAutoTransition] = useState(
+    () => config.get("autoTransition") ?? true,
+  );
   const { addFocusSecond, completeSession, todayStats } = useHistory();
+
+  const handleTimeUpRef = useRef<(() => void) | null>(null);
+
+  const initialDuration =
+    initialMode === "work"
+      ? focus
+      : initialMode === "shortBreak"
+        ? shortBreak
+        : longBreak;
+
+  const onTimeUp = useCallback(() => {
+    handleTimeUpRef.current?.();
+  }, []);
+
+  const { secondsRemaining, progress, isPaused, pause, resume, reset } =
+    useTimer({
+      initialSeconds: initialDuration * ONE_MINUTE,
+      initialSecondsRemaining: initialSecondsRemaining,
+      onTimeUp,
+    });
 
   const handleTimeUp = useCallback(() => {
     const nextMode = getNextSessionType(mode, pomodoroCount);
@@ -40,7 +63,7 @@ export const usePomodoroSession = ({
       completeSession(tag);
 
       const duration = nextMode === "longBreak" ? longBreak : shortBreak;
-      reset(duration * ONE_MINUTE);
+      reset(duration * ONE_MINUTE, !isAutoTransition);
 
       const breakType = nextMode === "longBreak" ? "long break" : "short break";
       notifyUser(
@@ -48,42 +71,40 @@ export const usePomodoroSession = ({
         `Focus session complete! Take a ${breakType}.`,
       );
     } else {
-      reset(focus * ONE_MINUTE);
+      reset(focus * ONE_MINUTE, !isAutoTransition);
       notifyUser(
         "Pomo Doro - Break Finished!",
         "Break is over. Time to focus!",
       );
     }
-  }, [mode, pomodoroCount, focus, shortBreak, longBreak, completeSession, tag]);
+  }, [
+    mode,
+    pomodoroCount,
+    focus,
+    shortBreak,
+    longBreak,
+    completeSession,
+    tag,
+    isAutoTransition,
+    reset,
+  ]);
 
-  const initialDuration =
-    initialMode === "work"
-      ? focus
-      : initialMode === "shortBreak"
-        ? shortBreak
-        : longBreak;
-
-  const { secondsRemaining, progress, isPaused, pause, resume, reset } =
-    useTimer({
-      initialSeconds: initialDuration * ONE_MINUTE,
-      initialSecondsRemaining: initialSecondsRemaining,
-      onTimeUp: handleTimeUp,
-    });
+  handleTimeUpRef.current = handleTimeUp;
 
   const handleSkip = useCallback(() => {
     if (mode === "work") {
       setMode("shortBreak");
-      reset(shortBreak * ONE_MINUTE);
+      reset(shortBreak * ONE_MINUTE, !isAutoTransition);
       notifyUser(
         "Pomo Doro - Work Skipped",
         "Focus session skipped. Taking a short break.",
       );
     } else {
       setMode("work");
-      reset(focus * ONE_MINUTE);
+      reset(focus * ONE_MINUTE, !isAutoTransition);
       notifyUser("Pomo Doro - Break Skipped", "Break skipped. Time to focus!");
     }
-  }, [mode, focus, shortBreak, reset]);
+  }, [mode, focus, shortBreak, reset, isAutoTransition]);
 
   const handleRestart = useCallback(() => {
     const duration =
@@ -96,6 +117,12 @@ export const usePomodoroSession = ({
     setIsMuted(nextMuted);
     config.set("isMuted", nextMuted);
   }, [isMuted]);
+
+  const toggleAutoTransition = useCallback(() => {
+    const nextAuto = !isAutoTransition;
+    setIsAutoTransition(nextAuto);
+    config.set("autoTransition", nextAuto);
+  }, [isAutoTransition]);
 
   const togglePause = useCallback(() => {
     if (isPaused) {
@@ -144,12 +171,14 @@ export const usePomodoroSession = ({
     mode,
     pomodoroCount,
     isMuted,
+    isAutoTransition,
     pause,
     resume,
     togglePause,
     skip: handleSkip,
     restart: handleRestart,
     toggleMute,
+    toggleAutoTransition,
     todayStats,
   };
 };

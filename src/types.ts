@@ -36,6 +36,7 @@ export type ConfigSchema = {
   activeSession?: Session;
   history: DailyStats[];
   isMuted?: boolean;
+  autoTransition?: boolean;
   recentTags?: string[];
   dailyGoal?: number;
   dailyFocusGoal?: number;

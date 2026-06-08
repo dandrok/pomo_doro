@@ -20,11 +20,14 @@ export const useTimer = ({
   const pause = useCallback(() => setIsPaused(true), []);
   const resume = useCallback(() => setIsPaused(false), []);
 
-  const reset = useCallback((newTotalSeconds: number) => {
-    setTotalSeconds(newTotalSeconds);
-    setSecondsRemaining(newTotalSeconds);
-    setIsPaused(false);
-  }, []);
+  const reset = useCallback(
+    (newTotalSeconds: number, startPaused: boolean = false) => {
+      setTotalSeconds(newTotalSeconds);
+      setSecondsRemaining(newTotalSeconds);
+      setIsPaused(startPaused);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (isPaused || secondsRemaining <= 0) return;

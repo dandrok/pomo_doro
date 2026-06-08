@@ -138,7 +138,11 @@ export const ProgressBar = ({
               {isPaused ? "⏸" : "▶"}
             </Text>
             <Text color={isPaused ? "yellow" : "green"}>
-              {isPaused ? "PAUSED" : "RUNNING"}
+              {isPaused
+                ? progress === 0
+                  ? "WAITING TO START"
+                  : "PAUSED"
+                : "RUNNING"}
             </Text>
           </Box>
         </Box>
@@ -161,6 +165,13 @@ export const ProgressBar = ({
             <Text> {percentage}%</Text>
           </Text>
         </Box>
+        {isPaused && progress === 0 && (
+          <Box marginTop={1} justifyContent="center">
+            <Text color="yellowBright" bold inverse>
+              {" ▶ PRESS 'P' TO START SESSION "}
+            </Text>
+          </Box>
+        )}
       </Box>
     </Box>
   );

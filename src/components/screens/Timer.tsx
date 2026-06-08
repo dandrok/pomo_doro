@@ -35,10 +35,12 @@ export const Timer = ({
     mode,
     pomodoroCount,
     isMuted,
+    isAutoTransition,
     togglePause,
     skip,
     restart,
     toggleMute,
+    toggleAutoTransition,
     todayStats,
   } = usePomodoroSession({
     focus,
@@ -77,6 +79,7 @@ export const Timer = ({
     if (input === "r") restart();
     if (input === "s") skip();
     if (input === "m") toggleMute();
+    if (input === "a") toggleAutoTransition();
     if (input === "g") toggleGoalDisplay();
     if (key.escape && onBack) onBack();
   });
@@ -101,6 +104,7 @@ export const Timer = ({
           { key: "p", label: isPaused ? "resume" : "pause" },
           { key: "r", label: "restart" },
           { key: "s", label: "skip" },
+          { key: "a", label: isAutoTransition ? "auto" : "manual" },
           { key: "m", label: isMuted ? "unmute" : "mute" },
           { key: "g", label: "goal view" },
           { key: "esc", label: "menu" },

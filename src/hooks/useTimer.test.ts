@@ -104,6 +104,18 @@ describe("useTimer", () => {
     expect(result.current.isPaused).toBe(false);
   });
 
+  it("should reset to a new total duration and start paused", () => {
+    const { result } = renderHook(() => useTimer({ initialSeconds: 10 }));
+
+    act(() => {
+      result.current.reset(20, true);
+    });
+    expect(result.current.secondsRemaining).toBe(20);
+    expect(result.current.totalSeconds).toBe(20);
+    expect(result.current.progress).toBe(0);
+    expect(result.current.isPaused).toBe(true);
+  });
+
   it("should trigger onTimeUp when timer reaches zero", () => {
     const onTimeUp = vi.fn();
     renderHook(() => useTimer({ initialSeconds: 3, onTimeUp }));

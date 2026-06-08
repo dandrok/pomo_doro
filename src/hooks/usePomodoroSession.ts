@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useTimer } from "./useTimer";
 import { useHistory } from "./useHistory";
 import { config, ONE_MINUTE, getNextSessionType, notifyUser } from "@utils";
@@ -33,6 +33,26 @@ export const usePomodoroSession = ({
   );
   const { addFocusSecond, completeSession, todayStats } = useHistory();
 
+  const handleTimeUpRef = useRef<(() => void) | null>(null);
+
+  const initialDuration =
+    initialMode === "work"
+      ? focus
+      : initialMode === "shortBreak"
+        ? shortBreak
+        : longBreak;
+
+  const onTimeUp = useCallback(() => {
+    handleTimeUpRef.current?.();
+  }, []);
+
+  const { secondsRemaining, progress, isPaused, pause, resume, reset } =
+    useTimer({
+      initialSeconds: initialDuration * ONE_MINUTE,
+      initialSecondsRemaining: initialSecondsRemaining,
+      onTimeUp,
+    });
+
   const handleTimeUp = useCallback(() => {
     const nextMode = getNextSessionType(mode, pomodoroCount);
     setMode(nextMode);
@@ -66,21 +86,10 @@ export const usePomodoroSession = ({
     completeSession,
     tag,
     isAutoTransition,
+    reset,
   ]);
 
-  const initialDuration =
-    initialMode === "work"
-      ? focus
-      : initialMode === "shortBreak"
-        ? shortBreak
-        : longBreak;
-
-  const { secondsRemaining, progress, isPaused, pause, resume, reset } =
-    useTimer({
-      initialSeconds: initialDuration * ONE_MINUTE,
-      initialSecondsRemaining: initialSecondsRemaining,
-      onTimeUp: handleTimeUp,
-    });
+  handleTimeUpRef.current = handleTimeUp;
 
   const handleSkip = useCallback(() => {
     if (mode === "work") {

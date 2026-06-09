@@ -2,24 +2,26 @@ import React, { useState } from "react";
 import { Box, Text, useInput } from "ink";
 import { config, THEMES } from "@utils";
 import { ProgressBar } from "@ui";
+import type { FontId, ThemeId } from "@types";
 
 type AppearanceProps = {
   onBack: () => void;
 };
 
-const FONTS = [
+const FONTS: FontId[] = [
   "block",
   "simpleBlock",
   "simple3d",
+  "3d",
   "chrome",
   "slick",
   "grid",
   "tiny",
-] as const;
+];
 
-type FontType = (typeof FONTS)[number];
+type FontType = FontId;
 
-const THEME_KEYS = Object.keys(THEMES);
+const THEME_KEYS = Object.keys(THEMES) as ThemeId[];
 
 export const Appearance = ({ onBack }: AppearanceProps) => {
   const [fontIdx, setFontIdx] = useState<number>(() => {
@@ -29,7 +31,7 @@ export const Appearance = ({ onBack }: AppearanceProps) => {
   });
 
   const [themeIdx, setThemeIdx] = useState<number>(() => {
-    const savedTheme = config.get("timerTheme") as string;
+    const savedTheme = config.get("timerTheme") as ThemeId;
     const idx = THEME_KEYS.indexOf(savedTheme);
     return idx !== -1 ? idx : 0;
   });

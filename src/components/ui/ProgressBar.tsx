@@ -9,7 +9,7 @@ import {
   THEMES,
   FONT_CHARS,
 } from "@utils";
-import type { Mode, GoalDisplayMode } from "@types";
+import type { Mode, GoalDisplayMode, FontId, ThemeId } from "@types";
 
 const LOADING_STEPS = 50;
 
@@ -25,8 +25,8 @@ type ProgressBarProps = {
   isMuted?: boolean | undefined;
   tag?: string | undefined;
   description?: string | undefined;
-  fontOverride?: string;
-  themeOverride?: string;
+  fontOverride?: FontId;
+  themeOverride?: ThemeId;
 };
 
 export const ProgressBar = ({
@@ -47,7 +47,7 @@ export const ProgressBar = ({
   const activeTheme =
     themeOverride && THEMES[themeOverride]
       ? THEMES[themeOverride]!
-      : THEMES[(config.get("timerTheme") as string) || "default"] ||
+      : THEMES[(config.get("timerTheme") as ThemeId) || "default"] ||
         THEMES["default"]!;
   const modeColor = activeTheme[mode];
   const progressSafe = Math.max(0, Math.min(1, progress));
@@ -187,12 +187,12 @@ export const ProgressBar = ({
             [
             <Text>
               {FONT_CHARS[
-                fontOverride || (config.get("timerFont") as string) || "block"
+                fontOverride || (config.get("timerFont") as FontId) || "block"
               ]?.filled.repeat(doneReps) || "█".repeat(doneReps)}
             </Text>
             <Text>
               {FONT_CHARS[
-                fontOverride || (config.get("timerFont") as string) || "block"
+                fontOverride || (config.get("timerFont") as FontId) || "block"
               ]?.empty.repeat(LOADING_STEPS - doneReps) ||
                 "░".repeat(LOADING_STEPS - doneReps)}
             </Text>

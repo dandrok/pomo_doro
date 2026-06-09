@@ -2,13 +2,14 @@ import { Box, Text } from "ink";
 import BigText from "ink-big-text";
 import {
   padStr,
-  textColor,
   modeIcons,
   ONE_MINUTE,
   IS_TEST_MODE,
   config,
+  THEMES,
+  FONT_CHARS,
 } from "@utils";
-import type { Mode, GoalDisplayMode } from "@types";
+import type { Mode, GoalDisplayMode, FontId, ThemeId } from "@types";
 
 const LOADING_STEPS = 50;
 
@@ -24,6 +25,8 @@ type ProgressBarProps = {
   isMuted?: boolean | undefined;
   tag?: string | undefined;
   description?: string | undefined;
+  fontOverride?: FontId;
+  themeOverride?: ThemeId;
 };
 
 export const ProgressBar = ({
@@ -38,7 +41,15 @@ export const ProgressBar = ({
   isMuted = false,
   tag,
   description,
+  fontOverride,
+  themeOverride,
 }: ProgressBarProps) => {
+  const activeTheme =
+    themeOverride && THEMES[themeOverride]
+      ? THEMES[themeOverride]!
+      : THEMES[(config.get("timerTheme") as ThemeId) || "default"] ||
+        THEMES["default"]!;
+  const modeColor = activeTheme[mode];
   const progressSafe = Math.max(0, Math.min(1, progress));
   const percentage = Math.floor(progressSafe * 100);
   const doneReps = Math.floor(progressSafe * LOADING_STEPS);
@@ -62,7 +73,7 @@ export const ProgressBar = ({
   const renderGoal = () => {
     if (goalDisplayMode === "sessions") {
       return (
-        <Text color={isSessionGoalMet ? "greenBright" : "white"}>
+        <Text color={isSessionGoalMet ? activeTheme.success : activeTheme.text}>
           Daily Goal: [ {dailyCompletedCount} / {dailyGoal} ]{" "}
           {isSessionGoalMet && "★"}
         </Text>
@@ -70,7 +81,7 @@ export const ProgressBar = ({
     }
     if (goalDisplayMode === "time") {
       return (
-        <Text color={isTimeGoalMet ? "greenBright" : "white"}>
+        <Text color={isTimeGoalMet ? activeTheme.success : activeTheme.text}>
           Focus Goal: [ {formatGoalTime(dailyFocusSeconds)} /{" "}
           {formatGoalTime(dailyFocusGoalSeconds)} ] {isTimeGoalMet && "★"}
         </Text>
@@ -79,11 +90,13 @@ export const ProgressBar = ({
     if (goalDisplayMode === "both") {
       return (
         <Text>
-          <Text color={isSessionGoalMet ? "greenBright" : "white"}>
+          <Text
+            color={isSessionGoalMet ? activeTheme.success : activeTheme.text}
+          >
             [{dailyCompletedCount}/{dailyGoal} sess] {isSessionGoalMet && "★"}
           </Text>
-          <Text color="gray">{" | "}</Text>
-          <Text color={isTimeGoalMet ? "greenBright" : "white"}>
+          <Text color={activeTheme.muted}>{" | "}</Text>
+          <Text color={isTimeGoalMet ? activeTheme.success : activeTheme.text}>
             [{formatGoalTime(dailyFocusSeconds)}/
             {formatGoalTime(dailyFocusGoalSeconds)} time] {isTimeGoalMet && "★"}
           </Text>
@@ -113,31 +126,35 @@ export const ProgressBar = ({
       <Box justifyContent="space-between" alignItems="flex-start">
         <Box flexDirection="column" gap={0}>
           <Box gap={1}>
-            <Text color={textColor[mode]}>{modeIcons[mode]}</Text>
-            <Text bold>{mode.toUpperCase()}</Text>
+            <Text color={modeColor}>{modeIcons[mode]}</Text>
+            <Text bold color={activeTheme.text}>
+              {mode.toUpperCase()}
+            </Text>
           </Box>
           {tag && (
             <Box gap={1} marginTop={1}>
-              <Text color="cyanBright" bold>
+              <Text color={activeTheme.secondary} bold>
                 Tag:
               </Text>
-              <Text color="cyanBright">{tag}</Text>
-              {description ? <Text color="gray">— {description}</Text> : null}
+              <Text color={activeTheme.secondary}>{tag}</Text>
+              {description ? (
+                <Text color={activeTheme.muted}>— {description}</Text>
+              ) : null}
             </Box>
           )}
         </Box>
         <Box gap={2}>
           {isMuted && (
             <Box gap={1}>
-              <Text color="red">{"\u{1F507}\u{FE0E}"}</Text>
-              <Text color="red">MUTED</Text>
+              <Text color={activeTheme.error}>{"\u{1F507}\u{FE0E}"}</Text>
+              <Text color={activeTheme.error}>MUTED</Text>
             </Box>
           )}
           <Box gap={1}>
-            <Text color={isPaused ? "yellow" : "green"}>
+            <Text color={isPaused ? activeTheme.primary : activeTheme.success}>
               {isPaused ? "⏸" : "▶"}
             </Text>
-            <Text color={isPaused ? "yellow" : "green"}>
+            <Text color={isPaused ? activeTheme.primary : activeTheme.success}>
               {isPaused
                 ? progress === 0
                   ? "WAITING TO START"
@@ -148,26 +165,43 @@ export const ProgressBar = ({
         </Box>
       </Box>
       <Box justifyContent="space-between">
-        <Text color="gray">session count: {pomodoroCount}</Text>
+        <Text color={activeTheme.muted}>session count: {pomodoroCount}</Text>
         {renderGoal()}
       </Box>
       <Box flexDirection="column" flexBasis={"center"}>
         <Box>
           <BigText
             text={`${min} : ${sec}`}
-            colors={[textColor[mode], textColor[mode]]}
+            font={
+              (fontOverride as React.ComponentProps<typeof BigText>["font"]) ??
+              (config.get("timerFont") as React.ComponentProps<
+                typeof BigText
+              >["font"]) ??
+              "block"
+            }
+            colors={[modeColor]}
           />
         </Box>
         <Box>
           <Text>
-            [<Text>{"█".repeat(doneReps)}</Text>
-            <Text>{"░".repeat(LOADING_STEPS - doneReps)}</Text>]
-            <Text> {percentage}%</Text>
+            [
+            <Text>
+              {FONT_CHARS[
+                fontOverride || (config.get("timerFont") as FontId) || "block"
+              ]?.filled.repeat(doneReps) || "█".repeat(doneReps)}
+            </Text>
+            <Text>
+              {FONT_CHARS[
+                fontOverride || (config.get("timerFont") as FontId) || "block"
+              ]?.empty.repeat(LOADING_STEPS - doneReps) ||
+                "░".repeat(LOADING_STEPS - doneReps)}
+            </Text>
+            ]<Text> {percentage}%</Text>
           </Text>
         </Box>
         {isPaused && progress === 0 && (
           <Box marginTop={1} justifyContent="center">
-            <Text color="yellowBright" bold inverse>
+            <Text color={activeTheme.primary} bold inverse>
               {" ▶ PRESS 'P' TO START SESSION "}
             </Text>
           </Box>

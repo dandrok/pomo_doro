@@ -1,5 +1,4 @@
-import SelectInput from "ink-select-input";
-import { Layout } from "@ui";
+import { Layout, ThemeSelect } from "@ui";
 import { timeSelectItems } from "@utils";
 import type { TimeSelectItem } from "@types";
 
@@ -13,7 +12,7 @@ export const TimeSelect = ({ onSelect }: TimeSelectProps) => {
       title="Select Duration"
       footerControls={[{ key: "esc", label: "back to menu" }]}
     >
-      <SelectInput items={timeSelectItems} onSelect={onSelect} />
+      <ThemeSelect items={timeSelectItems} onSelect={onSelect} />
     </Layout>
   );
 };

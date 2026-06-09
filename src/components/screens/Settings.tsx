@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { Box, Text, useInput } from "ink";
 import { Layout, FormRow } from "@ui";
 import { config, IS_TEST_MODE } from "@utils";
+import { useTheme } from "@hooks";
 
 type SettingsProps = {
   onBack: () => void;
+  onNavigateAppearance?: () => void;
 };
 
-export const Settings = ({ onBack }: SettingsProps) => {
+export const Settings = ({ onBack, onNavigateAppearance }: SettingsProps) => {
   const [dailyGoal, setDailyGoal] = useState(
     () => config.get("dailyGoal") ?? 8,
   );
@@ -16,8 +18,15 @@ export const Settings = ({ onBack }: SettingsProps) => {
   );
   const [isMuted, setIsMuted] = useState(() => config.get("isMuted") ?? false);
   const [activeIdx, setActiveIdx] = useState(0);
+  const theme = useTheme();
 
-  const fields = ["dailyGoal", "dailyFocusGoal", "isMuted", "save"] as const;
+  const fields = [
+    "dailyGoal",
+    "dailyFocusGoal",
+    "isMuted",
+    "appearance",
+    "save",
+  ] as const;
   const activeField = fields[activeIdx];
 
   const handleSave = () => {
@@ -46,6 +55,8 @@ export const Settings = ({ onBack }: SettingsProps) => {
     if (key.return) {
       if (activeField === "save") {
         handleSave();
+      } else if (activeField === "appearance") {
+        if (onNavigateAppearance) onNavigateAppearance();
       } else {
         setActiveIdx((prev) => (prev === fields.length - 1 ? 0 : prev + 1));
       }
@@ -108,12 +119,18 @@ export const Settings = ({ onBack }: SettingsProps) => {
           isActive={activeField === "isMuted"}
           showArrows={true}
         />
+        <FormRow
+          label="Appearance Customizer"
+          value="[ Enter ]"
+          isActive={activeField === "appearance"}
+          showArrows={false}
+        />
       </Box>
 
       <Box flexDirection="column" marginTop={1} gap={0}>
         <Box marginY={0} height={1}>
           <Text
-            color={activeField === "save" ? "greenBright" : "system"}
+            color={activeField === "save" ? theme.primary : theme.text}
             bold={activeField === "save"}
           >
             {activeField === "save" ? ` ❯ Save Settings` : `   Save Settings`}

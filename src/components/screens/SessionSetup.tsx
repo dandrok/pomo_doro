@@ -3,6 +3,7 @@ import { Box, Text } from "ink";
 import { IS_TEST_MODE } from "@utils";
 import { Layout, FormRow } from "@ui";
 import { useSessionSetup, Field } from "@hooks";
+import { useTheme } from "@hooks";
 
 type SessionSetupProps = {
   initialFocus: number;
@@ -27,6 +28,7 @@ export const SessionSetup = (props: SessionSetupProps) => {
     descriptionText,
     isCustomTagSelected,
   } = useSessionSetup(props);
+  const theme = useTheme();
 
   const unit = IS_TEST_MODE ? "sec" : "min";
 
@@ -35,7 +37,7 @@ export const SessionSetup = (props: SessionSetupProps) => {
       field: "focus" as Field,
       label: "Focus Time",
       value: `${durations.focus} ${unit}`,
-      color: "greenBright",
+      color: theme.work,
       showArrows: true,
       isFocused: false,
     },
@@ -43,7 +45,7 @@ export const SessionSetup = (props: SessionSetupProps) => {
       field: "shortBreak" as Field,
       label: "Short Break",
       value: `${durations.shortBreak} ${unit}`,
-      color: "cyanBright",
+      color: theme.shortBreak,
       showArrows: true,
       isFocused: false,
     },
@@ -51,7 +53,7 @@ export const SessionSetup = (props: SessionSetupProps) => {
       field: "longBreak" as Field,
       label: "Long Break",
       value: `${durations.longBreak} ${unit}`,
-      color: "magentaBright",
+      color: theme.longBreak,
       showArrows: true,
       isFocused: false,
     },
@@ -59,7 +61,7 @@ export const SessionSetup = (props: SessionSetupProps) => {
       field: "tag" as Field,
       label: "Tag / Category",
       value: displayTag,
-      color: "cyanBright",
+      color: theme.secondary,
       showArrows: !isCustomTagSelected,
       isFocused: isCustomTagSelected,
     },
@@ -67,7 +69,7 @@ export const SessionSetup = (props: SessionSetupProps) => {
       field: "description" as Field,
       label: "Description",
       value: descriptionText || "Optional comment...",
-      color: "magentaBright",
+      color: theme.muted,
       showArrows: false,
       isFocused: true,
     },
@@ -103,7 +105,7 @@ export const SessionSetup = (props: SessionSetupProps) => {
       <Box flexDirection="column" marginTop={1} gap={0}>
         <Box marginY={0} height={1}>
           <Text
-            color={isStartActive ? "greenBright" : "system"}
+            color={isStartActive ? theme.primary : theme.text}
             bold={isStartActive}
           >
             {isStartActive ? ` ❯ Start Session` : `   Start Session`}

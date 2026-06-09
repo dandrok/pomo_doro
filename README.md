@@ -11,6 +11,7 @@ A sleek, modular Pomodoro timer for your terminal, built with React, Ink, and Ty
 - **Productivity Dashboard & Daily Goals**: Track your total focus time, set daily Pomodoro goals, configure your daily focus time goal, and see a 15-week history chart.
 - **Interactive Settings Menu**: Dynamically configure your daily goals and toggle OS notifications on the fly.
 - **Analytics Dashboard**: GitHub-style activity heatmaps, horizontal stacked bar charts, and productivity tracking over 15 weeks.
+- **Appearance Customizer**: Change the clock's font style and color theme in real-time using a dedicated, interactive preview screen.
 - **Responsive Layout**: Gracefully adapts between side-by-side and vertical stacked layouts depending on terminal window size.
 - **System Integration**: Cross-platform system notifications with sound alerts using `node-notifier` and `play-sound` (supports Linux, macOS, and Windows).
 - **Persistence**: Remembers your progress and allows you to resume sessions.
@@ -98,7 +99,7 @@ The project follows a clean, modular architecture supported by TypeScript path a
 - `src/app.tsx`: Main app container.
 - `src/types.ts`: Centralized TypeScript definitions. Mapped via `@types`.
 - `src/components/`: Reusable React components. Mapped via `@screens` and `@ui`:
-  - `screens/`: High-level views (e.g., `MainMenu`, `TimeSelect`, `SessionSetup`, `History`, `Settings`, `Timer`, `About`, `Resume`, `Router`).
+  - `screens/`: High-level views (e.g., `MainMenu`, `TimeSelect`, `SessionSetup`, `History`, `Settings`, `Appearance`, `Timer`, `About`, `Resume`, `Router`).
   - `ui/`: Structure and display elements (e.g., `Layout`, `ProgressBar`, `ActivityHeatmap`, `StackedBarChart`, `HeaderBar`, `FooterBar`, `FormRow`).
 - `src/hooks/`: Custom React hooks (e.g., `useTimer`, `useHistory`, `usePomodoroSession`, `useSessionSetup`). Mapped via `@hooks`.
 - `src/utils/`: Utilities, configs, and side-effects. Mapped via `@utils`:

@@ -112,3 +112,102 @@ export const DURATION_LIMITS = {
   shortBreak: { min: 1, max: IS_TEST_MODE ? 120 : 60 },
   longBreak: { min: 1, max: IS_TEST_MODE ? 300 : 120 },
 } as const;
+
+export type ThemePalette = {
+  label: string;
+  primary: InkColor; // Highlights, borders, active items
+  secondary: InkColor; // Secondary accents, inactive items
+  text: InkColor; // Default text color
+  muted: InkColor; // Dimmed text
+  success: InkColor; // Success indicators
+  error: InkColor; // Error indicators or muted states
+  work: InkColor; // Focus timer color
+  shortBreak: InkColor; // Short break timer color
+  longBreak: InkColor; // Long break timer color
+};
+
+export const THEMES: Record<string, ThemePalette> = {
+  default: {
+    label: "Default",
+    primary: "greenBright",
+    secondary: "cyanBright",
+    text: "white",
+    muted: "gray",
+    success: "greenBright",
+    error: "red",
+    work: "system",
+    shortBreak: "cyanBright",
+    longBreak: "magentaBright",
+  },
+  retro: {
+    label: "Retro Terminal",
+    primary: "yellow",
+    secondary: "yellow",
+    text: "yellow",
+    muted: "yellow",
+    success: "yellow",
+    error: "yellow",
+    work: "yellow",
+    shortBreak: "yellowBright",
+    longBreak: "yellowBright",
+  },
+  hacker: {
+    label: "Hacker",
+    primary: "green",
+    secondary: "greenBright",
+    text: "green",
+    muted: "green",
+    success: "greenBright",
+    error: "greenBright",
+    work: "green",
+    shortBreak: "greenBright",
+    longBreak: "greenBright",
+  },
+  cyberpunk: {
+    label: "Cyberpunk",
+    primary: "magentaBright",
+    secondary: "cyanBright",
+    text: "whiteBright",
+    muted: "gray",
+    success: "greenBright",
+    error: "redBright",
+    work: "yellowBright",
+    shortBreak: "cyanBright",
+    longBreak: "magentaBright",
+  },
+  ocean: {
+    label: "Ocean",
+    primary: "blueBright",
+    secondary: "cyanBright",
+    text: "cyan",
+    muted: "blue",
+    success: "greenBright",
+    error: "red",
+    work: "blue",
+    shortBreak: "cyanBright",
+    longBreak: "blueBright",
+  },
+  dracula: {
+    label: "Dracula",
+    primary: "magenta",
+    secondary: "cyan",
+    text: "white",
+    muted: "gray",
+    success: "green",
+    error: "red",
+    work: "green",
+    shortBreak: "cyan",
+    longBreak: "magenta",
+  },
+};
+
+export const FONT_CHARS: Record<string, { filled: string; empty: string }> = {
+  block: { filled: "█", empty: "░" },
+  simpleBlock: { filled: "■", empty: "□" },
+  simple3d: { filled: "▰", empty: "▱" },
+  chrome: { filled: "═", empty: "─" },
+  slick: { filled: "━", empty: "─" },
+  grid: { filled: "▦", empty: "▢" },
+  tiny: { filled: "▪", empty: "▫" },
+  "3d": { filled: "█", empty: "░" },
+};

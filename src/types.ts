@@ -31,6 +31,24 @@ export type DailyStats = {
 
 export type GoalDisplayMode = "sessions" | "time" | "both" | "hidden";
 
+export type FontId =
+  | "block"
+  | "simpleBlock"
+  | "simple3d"
+  | "3d"
+  | "chrome"
+  | "slick"
+  | "grid"
+  | "tiny";
+
+export type ThemeId =
+  | "default"
+  | "retro"
+  | "hacker"
+  | "cyberpunk"
+  | "ocean"
+  | "dracula";
+
 export type ConfigSchema = {
   pomodoroCount: number;
   activeSession?: Session;
@@ -41,6 +59,8 @@ export type ConfigSchema = {
   dailyGoal?: number;
   dailyFocusGoal?: number;
   goalDisplayMode?: GoalDisplayMode;
+  timerFont?: FontId;
+  timerTheme?: ThemeId;
 };
 
 export type Screen =
@@ -52,6 +72,7 @@ export type Screen =
   | "resume"
   | "history"
   | "settings"
+  | "appearance"
   | "about";
 
 export type MenuItems = { label: string; value: Screen };

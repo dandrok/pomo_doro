@@ -1,4 +1,5 @@
 import { Box, Text } from "ink";
+import { useTheme } from "@hooks";
 
 export type StackedBarData = {
   label: string;
@@ -18,6 +19,8 @@ export const StackedBarChart = ({
   barWidth = 30,
   legend,
 }: StackedBarChartProps) => {
+  const theme = useTheme();
+
   const safeBarWidth = Math.max(
     0,
     Number.isFinite(barWidth) ? Math.floor(barWidth) : 0,
@@ -25,7 +28,7 @@ export const StackedBarChart = ({
 
   if (data.length === 0) {
     return (
-      <Text color="gray" italic>
+      <Text color={theme.muted} italic>
         No data available
       </Text>
     );
@@ -34,7 +37,7 @@ export const StackedBarChart = ({
   const totalValue = data.reduce((sum, d) => sum + d.value, 0);
 
   if (totalValue === 0) {
-    return <Text color="gray">{"░".repeat(safeBarWidth)}</Text>;
+    return <Text color={theme.muted}>{"░".repeat(safeBarWidth)}</Text>;
   }
 
   // Calculate widths for each segment based on percentage

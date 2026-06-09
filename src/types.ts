@@ -41,6 +41,8 @@ export type ConfigSchema = {
   dailyGoal?: number;
   dailyFocusGoal?: number;
   goalDisplayMode?: GoalDisplayMode;
+  timerFont?: string;
+  timerTheme?: string;
 };
 
 export type Screen =
@@ -52,6 +54,7 @@ export type Screen =
   | "resume"
   | "history"
   | "settings"
+  | "appearance"
   | "about";
 
 export type MenuItems = { label: string; value: Screen };

@@ -1,6 +1,6 @@
 import { Box, Text, useInput, useStdout } from "ink";
 import { useState, useEffect } from "react";
-import { useHistory } from "@hooks";
+import { useHistory, useTheme } from "@hooks";
 import { formatTime, calculateTagTotals, config, IS_TEST_MODE } from "@utils";
 import {
   ActivityHeatmap,
@@ -19,13 +19,15 @@ export const History = ({ onBack }: HistoryProps) => {
   const dailyFocusGoalHours = config.get("dailyFocusGoal") ?? 4;
   const goalMultiplier = IS_TEST_MODE ? 1 : 3600;
 
+  const theme = useTheme();
+
   const colorPalette = [
-    "cyanBright",
-    "magentaBright",
-    "greenBright",
-    "yellowBright",
-    "blueBright",
-    "redBright",
+    theme.primary,
+    theme.work,
+    theme.shortBreak,
+    theme.longBreak,
+    theme.secondary,
+    theme.text,
   ];
   const charPalette = ["█", "▓", "▒", "░"];
   const barData: StackedBarData[] = tagTotals.map((t, index) => ({
@@ -71,11 +73,13 @@ export const History = ({ onBack }: HistoryProps) => {
           <Box flexDirection="column" marginBottom={1}>
             <Text>
               Total Focus Time:{" "}
-              <Text color="green">{formatTime(totals.totalFocusSeconds)}</Text>
+              <Text color={theme.success}>
+                {formatTime(totals.totalFocusSeconds)}
+              </Text>
             </Text>
             <Text>
               Completed Pomodoros:{" "}
-              <Text color="green">{totals.totalCompleted}</Text>
+              <Text color={theme.success}>{totals.totalCompleted}</Text>
             </Text>
           </Box>
 
@@ -89,10 +93,12 @@ export const History = ({ onBack }: HistoryProps) => {
         {/* Right Column: Tag Breakdown */}
         <Box flexDirection="column" width={isNarrow ? "100%" : 36}>
           <Box marginBottom={1}>
-            <Text underline>Tag Breakdown (Focus Time)</Text>
+            <Text underline color={theme.text}>
+              Tag Breakdown (Focus Time)
+            </Text>
           </Box>
           {barData.length === 0 ? (
-            <Text color="gray" italic>
+            <Text color={theme.muted} italic>
               No tags recorded yet.
             </Text>
           ) : (
@@ -123,11 +129,15 @@ export const History = ({ onBack }: HistoryProps) => {
                               <Text color={color} bold>
                                 {char} {t.tag}
                               </Text>
-                              <Text color="gray">({pct}%)</Text>
+                              <Text color={theme.muted}>({pct}%)</Text>
                             </Box>
                             <Box gap={1}>
-                              <Text>{formatTime(t.focusSeconds)}</Text>
-                              <Text color="gray">| {t.completedPomodoros}</Text>
+                              <Text color={theme.text}>
+                                {formatTime(t.focusSeconds)}
+                              </Text>
+                              <Text color={theme.muted}>
+                                | {t.completedPomodoros}
+                              </Text>
                             </Box>
                           </Box>
                         );

@@ -1,5 +1,4 @@
-import SelectInput from "ink-select-input";
-import { Layout } from "@ui";
+import { Layout, ThemeSelect } from "@ui";
 import { menuItems } from "@utils";
 import type { MenuItems } from "@types";
 
@@ -10,7 +9,7 @@ type MainMenuProps = {
 export const MainMenu = ({ onSelect }: MainMenuProps) => {
   return (
     <Layout title="Pomo Doro">
-      <SelectInput items={menuItems} onSelect={onSelect} />
+      <ThemeSelect items={menuItems} onSelect={onSelect} />
     </Layout>
   );
 };

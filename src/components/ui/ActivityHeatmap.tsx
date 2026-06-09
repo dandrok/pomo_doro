@@ -1,4 +1,5 @@
 import { Box, Text } from "ink";
+import { useTheme } from "@hooks";
 import type { DailyStats } from "@types";
 
 type ActivityHeatmapProps = {
@@ -29,6 +30,7 @@ export const ActivityHeatmap = ({
   weeks = DEFAULT_WEEKS,
   dailyGoalSeconds = DEFAULT_DAILY_GOAL,
 }: ActivityHeatmapProps) => {
+  const theme = useTheme();
   const normalizedDailyGoal = Math.max(1, Math.floor(dailyGoalSeconds));
 
   // Map data for fast lookup by date string
@@ -72,7 +74,9 @@ export const ActivityHeatmap = ({
   return (
     <Box flexDirection="column" marginBottom={1}>
       <Box marginBottom={1}>
-        <Text underline>Activity Heatmap (Last {weeks} Weeks)</Text>
+        <Text underline color={theme.text}>
+          Activity Heatmap (Last {weeks} Weeks)
+        </Text>
       </Box>
 
       {/* Grid container */}
@@ -81,7 +85,9 @@ export const ActivityHeatmap = ({
           <Box key={rowLabels[rIdx]} flexDirection="row" gap={1}>
             {/* Row Label */}
             <Box width={3}>
-              <Text color="gray">{rIdx % 2 === 0 ? rowLabels[rIdx] : ""}</Text>
+              <Text color={theme.muted}>
+                {rIdx % 2 === 0 ? rowLabels[rIdx] : ""}
+              </Text>
             </Box>
 
             {/* Cells */}
@@ -105,13 +111,13 @@ export const ActivityHeatmap = ({
 
       {/* Legend */}
       <Box flexDirection="row" marginTop={1} gap={2}>
-        <Text color="gray">Less</Text>
+        <Text color={theme.muted}>Less</Text>
         <Text color="#333333">■</Text>
         <Text color="#004400">■</Text>
         <Text color="#008800">■</Text>
         <Text color="#00cc00">■</Text>
         <Text color="#00ff00">■</Text>
-        <Text color="gray">More</Text>
+        <Text color={theme.muted}>More</Text>
       </Box>
     </Box>
   );

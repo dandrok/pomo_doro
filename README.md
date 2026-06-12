@@ -14,6 +14,7 @@ A sleek, modular Pomodoro timer for your terminal, built with React, Ink, and Ty
 - **Appearance Customizer**: Change the clock's font style and color theme in real-time using a dedicated, interactive preview screen.
 - **Responsive Layout**: Gracefully adapts between side-by-side and vertical stacked layouts depending on terminal window size.
 - **System Integration**: Cross-platform system notifications with sound alerts using `node-notifier` and `play-sound` (supports Linux, macOS, and Windows).
+- **Tmux & Status Bar Integration**: Automatically exports the active timer state to `~/.config/pomo-doro/current.txt` on every tick, perfect for embedding in `tmux`, `waybar`, or `polybar` modules.
 - **Persistence**: Remembers your progress and allows you to resume sessions.
 - **Development Sandbox**: Dedicated test mode with ultra-short timers for rapid testing.
 
@@ -90,6 +91,29 @@ npm run dev
 | `Left` / `Right` | Decrease / Increase the active duration value, or cycle between default/recent tags |
 | `Typing`         | Enter custom tags and descriptions on their respective fields                       |
 | `Enter`          | Advance to the next field, or start session (when on Start)                         |
+
+## Status Bar Integrations
+
+The timer automatically writes its live state to `~/.config/pomo-doro-nodejs/current.txt` so it can be ingested by any status bar or terminal prompt.
+
+### Tmux
+
+Add the following to your `~/.tmux.conf` (in either `status-right` or `status-left`):
+
+```tmux
+set -g status-interval 1
+set -g status-right "#(cat ~/.config/pomo-doro-nodejs/current.txt || echo '') | %a %Y-%m-%d %H:%M"
+```
+
+### Zsh (Starship)
+
+Add a custom module to your `~/.config/starship.toml`:
+
+```toml
+[custom.pomodoro]
+command = "cat ~/.config/pomo-doro-nodejs/current.txt 2>/dev/null"
+when = "test -f ~/.config/pomo-doro-nodejs/current.txt"
+```
 
 ## Project Structure
 

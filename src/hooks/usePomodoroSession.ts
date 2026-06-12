@@ -1,7 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import fs from "node:fs";
+import path from "node:path";
 import { useTimer } from "./useTimer";
 import { useHistory } from "./useHistory";
-import { config, ONE_MINUTE, getNextSessionType, notifyUser } from "@utils";
+import {
+  config,
+  ONE_MINUTE,
+  getNextSessionType,
+  notifyUser,
+  padStr,
+  modeIcons,
+} from "@utils";
 import type { Mode } from "@types";
 
 type UsePomodoroSessionProps = {
@@ -150,6 +159,19 @@ export const usePomodoroSession = ({
     // Update Focus Time (only for work mode)
     if (mode === "work" && !isPaused) {
       addFocusSecond(tag);
+    }
+
+    // Tmux / Status Bar Integration
+    try {
+      const configDir = path.dirname(config.path);
+      const statusFile = path.join(configDir, "current.txt");
+      const min = padStr(Math.floor(secondsRemaining / ONE_MINUTE));
+      const sec = padStr(secondsRemaining % ONE_MINUTE);
+      const icon = modeIcons[mode];
+      const statusText = `${icon} ${min}:${sec}`;
+      fs.writeFileSync(statusFile, statusText, "utf-8");
+    } catch {
+      // Silent fail to prevent timer crash
     }
   }, [
     secondsRemaining,

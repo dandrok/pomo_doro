@@ -162,17 +162,16 @@ export const usePomodoroSession = ({
     }
 
     // Tmux / Status Bar Integration
-    try {
-      const configDir = path.dirname(config.path);
-      const statusFile = path.join(configDir, "current.txt");
-      const min = padStr(Math.floor(secondsRemaining / ONE_MINUTE));
-      const sec = padStr(secondsRemaining % ONE_MINUTE);
-      const icon = modeIcons[mode];
-      const statusText = `${icon} ${min}:${sec}`;
-      fs.writeFileSync(statusFile, statusText, "utf-8");
-    } catch {
+    const configDir = path.dirname(config.path);
+    const statusFile = path.join(configDir, "current.txt");
+    const min = padStr(Math.floor(secondsRemaining / ONE_MINUTE));
+    const sec = padStr(secondsRemaining % ONE_MINUTE);
+    const icon = modeIcons[mode];
+    const statusText = `${icon} ${min}:${sec}`;
+
+    fs.promises.writeFile(statusFile, statusText, "utf-8").catch(() => {
       // Silent fail to prevent timer crash
-    }
+    });
   }, [
     secondsRemaining,
     mode,

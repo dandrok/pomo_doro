@@ -97,14 +97,18 @@ npm run dev
 The timer automatically writes its live state to `~/.config/pomo-doro-nodejs/current.txt` so it can be ingested by any status bar or terminal prompt.
 
 ### Tmux
+
 Add the following to your `~/.tmux.conf` (in either `status-right` or `status-left`):
+
 ```tmux
 set -g status-interval 1
 set -g status-right "#(cat ~/.config/pomo-doro-nodejs/current.txt || echo '') | %a %Y-%m-%d %H:%M"
 ```
 
 ### Zsh (Starship)
+
 Add a custom module to your `~/.config/starship.toml`:
+
 ```toml
 [custom.pomodoro]
 command = "cat ~/.config/pomo-doro-nodejs/current.txt 2>/dev/null"

@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import fs from "node:fs";
-import path from "node:path";
 import { useTimer } from "./useTimer";
 import { useHistory } from "./useHistory";
 import {
@@ -10,6 +9,7 @@ import {
   notifyUser,
   padStr,
   modeIcons,
+  statusFile,
 } from "@utils";
 import type { Mode } from "@types";
 
@@ -162,8 +162,6 @@ export const usePomodoroSession = ({
     }
 
     // Tmux / Status Bar Integration
-    const configDir = path.dirname(config.path);
-    const statusFile = path.join(configDir, "current.txt");
     const min = padStr(Math.floor(secondsRemaining / ONE_MINUTE));
     const sec = padStr(secondsRemaining % ONE_MINUTE);
     const icon = modeIcons[mode];

@@ -1,3 +1,4 @@
+import path from "node:path";
 import Conf from "conf";
 import type { ConfigSchema } from "@types";
 
@@ -11,3 +12,5 @@ export const config = new Conf<ConfigSchema>({
     isMuted: false,
   },
 });
+
+export const statusFile = path.join(path.dirname(config.path), "current.txt");

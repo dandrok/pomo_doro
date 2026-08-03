@@ -1,11 +1,12 @@
 import { Box, Text, useInput, useStdout } from "ink";
 import { useState, useEffect } from "react";
-import { useHistory, useTheme } from "@hooks";
+import { useHistory, useTheme, useHelp } from "@hooks";
 import { formatTime, calculateTagTotals, config, IS_TEST_MODE } from "@utils";
 import {
   ActivityHeatmap,
   Layout,
   StackedBarChart,
+  HELP_CONTROL,
   type StackedBarData,
 } from "@ui";
 
@@ -20,6 +21,7 @@ export const History = ({ onBack }: HistoryProps) => {
   const goalMultiplier = IS_TEST_MODE ? 1 : 3600;
 
   const theme = useTheme();
+  const { isHelpOpen, toggleHelp } = useHelp();
 
   const colorPalette = [
     theme.primary,
@@ -57,6 +59,11 @@ export const History = ({ onBack }: HistoryProps) => {
   }
 
   useInput((input, key) => {
+    if (isHelpOpen) return;
+    if (input === "h") {
+      toggleHelp();
+      return;
+    }
     if (key.escape) {
       onBack();
     }
@@ -65,7 +72,15 @@ export const History = ({ onBack }: HistoryProps) => {
   return (
     <Layout
       title="Productivity Dashboard"
-      footerControls={[{ key: "esc", label: "back to menu" }]}
+      isHelpOpen={isHelpOpen}
+      footerControls={[
+        {
+          key: "esc",
+          label: "back to menu",
+          description: "Returns to the main menu",
+        },
+        HELP_CONTROL,
+      ]}
     >
       <Box flexDirection={isNarrow ? "column" : "row"} gap={isNarrow ? 2 : 4}>
         {/* Left Column: Stats & Bar Chart */}

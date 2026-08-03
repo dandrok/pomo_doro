@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Box, Text, useInput } from "ink";
-import { Layout, FormRow } from "@ui";
+import { Layout, FormRow, HELP_CONTROL } from "@ui";
 import { config, IS_TEST_MODE } from "@utils";
-import { useTheme } from "@hooks";
+import { useTheme, useHelp } from "@hooks";
 
 type SettingsProps = {
   onBack: () => void;
@@ -19,6 +19,7 @@ export const Settings = ({ onBack, onNavigateAppearance }: SettingsProps) => {
   const [isMuted, setIsMuted] = useState(() => config.get("isMuted") ?? false);
   const [activeIdx, setActiveIdx] = useState(0);
   const theme = useTheme();
+  const { isHelpOpen, toggleHelp } = useHelp();
 
   const fields = [
     "dailyGoal",
@@ -37,6 +38,13 @@ export const Settings = ({ onBack, onNavigateAppearance }: SettingsProps) => {
   };
 
   useInput((input, key) => {
+    if (isHelpOpen) return;
+
+    if (input === "h") {
+      toggleHelp();
+      return;
+    }
+
     if (key.escape) {
       onBack();
       return;
@@ -89,11 +97,29 @@ export const Settings = ({ onBack, onNavigateAppearance }: SettingsProps) => {
   return (
     <Layout
       title="Settings"
+      isHelpOpen={isHelpOpen}
       footerControls={[
-        { key: "↑/↓", label: "navigate" },
-        { key: "◀/▶", label: "adjust value" },
-        { key: "enter", label: "save/advance" },
-        { key: "esc", label: "cancel" },
+        {
+          key: "↑/↓",
+          label: "navigate",
+          description: "Moves between the settings fields",
+        },
+        {
+          key: "◀/▶",
+          label: "adjust value",
+          description: "Adjusts the highlighted value",
+        },
+        {
+          key: "enter",
+          label: "save/advance",
+          description: "Saves your settings, or advances to the next field",
+        },
+        {
+          key: "esc",
+          label: "cancel",
+          description: "Cancels and returns to the main menu",
+        },
+        HELP_CONTROL,
       ]}
     >
       <Box flexDirection="column" marginBottom={1}>

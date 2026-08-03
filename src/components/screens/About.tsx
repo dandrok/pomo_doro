@@ -1,5 +1,6 @@
 import { Box, Text, useInput } from "ink";
-import { Layout } from "@ui";
+import { Layout, HELP_CONTROL } from "@ui";
+import { useHelp } from "@hooks";
 import {
   APP_VERSION,
   APP_AUTHOR,
@@ -13,7 +14,14 @@ type AboutProps = {
 };
 
 export const About = ({ onBack }: AboutProps) => {
+  const { isHelpOpen, toggleHelp } = useHelp();
+
   useInput((input, key) => {
+    if (isHelpOpen) return;
+    if (input === "h") {
+      toggleHelp();
+      return;
+    }
     if (key.escape) {
       onBack();
     }
@@ -22,7 +30,15 @@ export const About = ({ onBack }: AboutProps) => {
   return (
     <Layout
       title="About Pomo Doro"
-      footerControls={[{ key: "esc", label: "back to menu" }]}
+      isHelpOpen={isHelpOpen}
+      footerControls={[
+        {
+          key: "esc",
+          label: "back to menu",
+          description: "Returns to the main menu",
+        },
+        HELP_CONTROL,
+      ]}
     >
       <Box flexDirection="column" marginBottom={1}>
         <Text>

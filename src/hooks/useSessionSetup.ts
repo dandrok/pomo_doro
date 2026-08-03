@@ -3,12 +3,7 @@ import { useInput } from "ink";
 import { IS_TEST_MODE, config, DEFAULT_TAGS, DURATION_LIMITS } from "@utils";
 
 export type Field =
-  | "focus"
-  | "shortBreak"
-  | "longBreak"
-  | "tag"
-  | "description"
-  | "start";
+  "focus" | "shortBreak" | "longBreak" | "tag" | "description" | "start";
 
 export type DurationField = "focus" | "shortBreak" | "longBreak";
 
@@ -38,6 +33,7 @@ export type UseSessionSetupProps = {
     description: string,
   ) => void;
   onCancel: VoidFunction;
+  isHelpOpen?: boolean;
 };
 
 export const useSessionSetup = ({
@@ -47,6 +43,7 @@ export const useSessionSetup = ({
   startFocusedOnStartButton,
   onStart,
   onCancel,
+  isHelpOpen = false,
 }: UseSessionSetupProps) => {
   const [durations, setDurations] = useState<Record<DurationField, number>>({
     focus: IS_TEST_MODE ? Math.round(initialFocus * 60) : initialFocus,
@@ -113,6 +110,8 @@ export const useSessionSetup = ({
   };
 
   useInput((input, key) => {
+    if (isHelpOpen) return;
+
     // 1. Navigation
     if (key.upArrow) {
       setActiveIdx((prev) => (prev === 0 ? FIELDS.length - 1 : prev - 1));

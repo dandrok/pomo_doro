@@ -1,8 +1,8 @@
 import React from "react";
-import { Box, Text } from "ink";
+import { Box, Text, useInput } from "ink";
 import { IS_TEST_MODE } from "@utils";
-import { Layout, FormRow } from "@ui";
-import { useSessionSetup, Field } from "@hooks";
+import { Layout, FormRow, HELP_CONTROL } from "@ui";
+import { useSessionSetup, useHelp, Field } from "@hooks";
 import { useTheme } from "@hooks";
 
 type SessionSetupProps = {
@@ -21,16 +21,26 @@ type SessionSetupProps = {
 };
 
 export const SessionSetup = (props: SessionSetupProps) => {
+  const { isHelpOpen, toggleHelp } = useHelp();
   const {
     durations,
     activeField,
     displayTag,
     descriptionText,
     isCustomTagSelected,
-  } = useSessionSetup(props);
+  } = useSessionSetup({ ...props, isHelpOpen });
   const theme = useTheme();
 
   const unit = IS_TEST_MODE ? "sec" : "min";
+
+  const isTypingField =
+    activeField === "description" ||
+    (activeField === "tag" && isCustomTagSelected);
+
+  useInput((input) => {
+    if (isHelpOpen) return;
+    if (input === "h" && !isTypingField) toggleHelp();
+  });
 
   const rows = [
     {
@@ -80,12 +90,34 @@ export const SessionSetup = (props: SessionSetupProps) => {
   return (
     <Layout
       title="Session Setup"
+      isHelpOpen={isHelpOpen}
       footerControls={[
-        { key: "↑/↓", label: "navigate" },
-        { key: "◀/▶", label: "adjust values/tag" },
-        { key: "typing", label: "auto-inputs" },
-        { key: "enter", label: "start/advance" },
-        { key: "esc", label: "back" },
+        {
+          key: "↑/↓",
+          label: "navigate",
+          description: "Moves between the setup fields",
+        },
+        {
+          key: "◀/▶",
+          label: "adjust values/tag",
+          description: "Adjusts the highlighted value, or cycles between tags",
+        },
+        {
+          key: "typing",
+          label: "auto-inputs",
+          description: "Types a custom tag or description directly",
+        },
+        {
+          key: "enter",
+          label: "start/advance",
+          description: "Starts the session, or advances to the next field",
+        },
+        {
+          key: "esc",
+          label: "back",
+          description: "Cancels and returns to the previous screen",
+        },
+        HELP_CONTROL,
       ]}
     >
       <Box flexDirection="column" marginBottom={1}>

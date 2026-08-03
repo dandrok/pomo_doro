@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useInput, Box } from "ink";
-import { usePomodoroSession } from "@hooks";
-import { ProgressBar, FooterBar } from "@ui";
+import { usePomodoroSession, useHelp } from "@hooks";
+import { ProgressBar, FooterBar, HelpOverlay, HELP_CONTROL } from "@ui";
 import { config } from "@utils";
 import type { Mode, GoalDisplayMode } from "@types";
 
@@ -53,6 +53,8 @@ export const Timer = ({
     initialPomodoroCount,
   });
 
+  const { isHelpOpen, toggleHelp } = useHelp();
+
   const [goalDisplayMode, setGoalDisplayMode] = useState<GoalDisplayMode>(
     () =>
       (config.get("goalDisplayMode") as GoalDisplayMode | undefined) ??
@@ -75,6 +77,11 @@ export const Timer = ({
   };
 
   useInput((input, key) => {
+    if (isHelpOpen) return;
+    if (input === "h") {
+      toggleHelp();
+      return;
+    }
     if (input === "p") togglePause();
     if (input === "r") restart();
     if (input === "s") skip();
@@ -84,32 +91,65 @@ export const Timer = ({
     if (key.escape && onBack) onBack();
   });
 
+  const controls = [
+    {
+      key: "p",
+      label: isPaused ? "resume" : "pause",
+      description: "Pauses or resumes the current timer",
+    },
+    {
+      key: "r",
+      label: "restart",
+      description: "Restarts the current timer from the beginning",
+    },
+    {
+      key: "s",
+      label: "skip",
+      description: "Skips the current session and moves to the next one",
+    },
+    {
+      key: "a",
+      label: isAutoTransition ? "auto" : "manual",
+      description: "Toggles automatic or manual transitions between sessions",
+    },
+    {
+      key: "m",
+      label: isMuted ? "unmute" : "mute",
+      description: "Mutes or unmutes sound and desktop notifications",
+    },
+    {
+      key: "g",
+      label: "goal view",
+      description: "Cycles how the daily goal is displayed",
+    },
+    {
+      key: "esc",
+      label: "menu",
+      description: "Safely pauses the session and returns to the main menu",
+    },
+    HELP_CONTROL,
+  ];
+
   return (
     <Box flexDirection="column" gap={1} padding={1}>
-      <ProgressBar
-        secondsRemaining={secondsRemaining}
-        progress={progress}
-        mode={mode}
-        pomodoroCount={pomodoroCount}
-        dailyCompletedCount={todayStats.completedPomodoros}
-        dailyFocusSeconds={todayStats.totalFocusSeconds}
-        goalDisplayMode={goalDisplayMode}
-        isPaused={isPaused}
-        isMuted={isMuted}
-        tag={tag}
-        description={description}
-      />
-      <FooterBar
-        controls={[
-          { key: "p", label: isPaused ? "resume" : "pause" },
-          { key: "r", label: "restart" },
-          { key: "s", label: "skip" },
-          { key: "a", label: isAutoTransition ? "auto" : "manual" },
-          { key: "m", label: isMuted ? "unmute" : "mute" },
-          { key: "g", label: "goal view" },
-          { key: "esc", label: "menu" },
-        ]}
-      />
+      {isHelpOpen ? (
+        <HelpOverlay controls={controls} />
+      ) : (
+        <ProgressBar
+          secondsRemaining={secondsRemaining}
+          progress={progress}
+          mode={mode}
+          pomodoroCount={pomodoroCount}
+          dailyCompletedCount={todayStats.completedPomodoros}
+          dailyFocusSeconds={todayStats.totalFocusSeconds}
+          goalDisplayMode={goalDisplayMode}
+          isPaused={isPaused}
+          isMuted={isMuted}
+          tag={tag}
+          description={description}
+        />
+      )}
+      <FooterBar controls={controls} />
     </Box>
   );
 };

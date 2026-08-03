@@ -10,7 +10,13 @@ export const TimeSelect = ({ onSelect }: TimeSelectProps) => {
   return (
     <Layout
       title="Select Duration"
-      footerControls={[{ key: "esc", label: "back to menu" }]}
+      footerControls={[
+        {
+          key: "esc",
+          label: "back to menu",
+          description: "Returns to the main menu",
+        },
+      ]}
     >
       <ThemeSelect items={timeSelectItems} onSelect={onSelect} />
     </Layout>

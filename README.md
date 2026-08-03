@@ -12,7 +12,8 @@ A sleek, modular Pomodoro timer for your terminal, built with React, Ink, and Ty
 - **Interactive Settings Menu**: Dynamically configure your daily goals and toggle OS notifications on the fly.
 - **Analytics Dashboard**: GitHub-style activity heatmaps, horizontal stacked bar charts, and productivity tracking over 15 weeks.
 - **Appearance Customizer**: Change the clock's font style and color theme in real-time using a dedicated, interactive preview screen.
-- **Responsive Layout**: Gracefully adapts between side-by-side and vertical stacked layouts depending on terminal window size.
+- **Contextual Help Overlay**: On screens with a footer control bar (Timer, Settings, Session Setup, About, History), press `h` to open a bordered help panel listing every available key alongside an arrow (`──▶`) pointing to what it does, without interrupting the running timer.
+- **Responsive Layout**: Gracefully adapts between side-by-side and vertical stacked layouts depending on terminal window size. The footer control bar itself collapses to bare `[key]` shortcuts (dropping labels) below ~70 columns to avoid crowding.
 - **System Integration**: Cross-platform system notifications with sound alerts using `node-notifier` and `play-sound` (supports Linux, macOS, and Windows).
 - **Tmux & Status Bar Integration**: Automatically exports the active timer state to `~/.config/pomo-doro/current.txt` on every tick, perfect for embedding in `tmux`, `waybar`, or `polybar` modules.
 - **Persistence**: Remembers your progress and allows you to resume sessions.
@@ -80,6 +81,7 @@ npm run dev
 | `r`      | Restart current timer from the beginning                                       |
 | `s`      | Skip current session (discards work session, skips break to start focus early) |
 | `m`      | Toggle mute (silence OS notifications and audio alerts)                        |
+| `h`      | Show the help overlay listing what every key on the current screen does        |
 | `Esc`    | Go back to previous menu, or safely pause/exit the current timer to the menu   |
 | `Ctrl+C` | Force quit application                                                         |
 
@@ -124,8 +126,8 @@ The project follows a clean, modular architecture supported by TypeScript path a
 - `src/types.ts`: Centralized TypeScript definitions. Mapped via `@types`.
 - `src/components/`: Reusable React components. Mapped via `@screens` and `@ui`:
   - `screens/`: High-level views (e.g., `MainMenu`, `TimeSelect`, `SessionSetup`, `History`, `Settings`, `Appearance`, `Timer`, `About`, `Resume`, `Router`).
-  - `ui/`: Structure and display elements (e.g., `Layout`, `ProgressBar`, `ActivityHeatmap`, `StackedBarChart`, `HeaderBar`, `FooterBar`, `FormRow`).
-- `src/hooks/`: Custom React hooks (e.g., `useTimer`, `useHistory`, `usePomodoroSession`, `useSessionSetup`). Mapped via `@hooks`.
+  - `ui/`: Structure and display elements (e.g., `Layout`, `ProgressBar`, `ActivityHeatmap`, `StackedBarChart`, `HeaderBar`, `FooterBar`, `HelpOverlay`, `FormRow`).
+- `src/hooks/`: Custom React hooks (e.g., `useTimer`, `useHistory`, `usePomodoroSession`, `useSessionSetup`, `useHelp`). Mapped via `@hooks`.
 - `src/utils/`: Utilities, configs, and side-effects. Mapped via `@utils`:
   - `config.ts`: Conf-based settings & history persistence.
   - `constants.ts`: Timer presets, icons, and color rules.

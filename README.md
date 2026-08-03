@@ -12,7 +12,7 @@ A sleek, modular Pomodoro timer for your terminal, built with React, Ink, and Ty
 - **Interactive Settings Menu**: Dynamically configure your daily goals and toggle OS notifications on the fly.
 - **Analytics Dashboard**: GitHub-style activity heatmaps, horizontal stacked bar charts, and productivity tracking over 15 weeks.
 - **Appearance Customizer**: Change the clock's font style and color theme in real-time using a dedicated, interactive preview screen.
-- **Contextual Help Overlay**: Press `h` on any screen to open a bordered help panel listing every available key alongside an arrow (`──▶`) pointing to what it does, without interrupting the running timer.
+- **Contextual Help Overlay**: On screens with a footer control bar (Timer, Settings, Session Setup, About, History), press `h` to open a bordered help panel listing every available key alongside an arrow (`──▶`) pointing to what it does, without interrupting the running timer.
 - **Responsive Layout**: Gracefully adapts between side-by-side and vertical stacked layouts depending on terminal window size. The footer control bar itself collapses to bare `[key]` shortcuts (dropping labels) below ~70 columns to avoid crowding.
 - **System Integration**: Cross-platform system notifications with sound alerts using `node-notifier` and `play-sound` (supports Linux, macOS, and Windows).
 - **Tmux & Status Bar Integration**: Automatically exports the active timer state to `~/.config/pomo-doro/current.txt` on every tick, perfect for embedding in `tmux`, `waybar`, or `polybar` modules.

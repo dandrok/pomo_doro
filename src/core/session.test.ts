@@ -280,6 +280,25 @@ describe("Session", () => {
     expect(fs.existsSync(paths.statusFile)).toBe(false);
   });
 
+  it("does not hold the event loop open when the Ink app owns it", () => {
+    // This one shipped: with the timers referenced, the process could not exit
+    // after Ink unmounted, so the app hung on Exit still holding the socket -
+    // and process.on("exit"), where ownership is released, never fired.
+    const tui = start({ owner: "tui" });
+    expect((tui as unknown as { ticker: NodeJS.Timeout }).ticker.hasRef()).toBe(
+      false,
+    );
+    tui.stop();
+
+    // The headless owner is the opposite: its timers are the only reason the
+    // process exists, so unreferencing them would make `pomo start` exit at once.
+    const headless = start({ owner: "headless" });
+    expect(
+      (headless as unknown as { ticker: NodeJS.Timeout }).ticker.hasRef(),
+    ).toBe(true);
+    headless.stop();
+  });
+
   it("cannot be restarted after stopping", () => {
     const session = start();
     vi.advanceTimersByTime(2000);

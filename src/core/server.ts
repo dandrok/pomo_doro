@@ -213,6 +213,10 @@ export const serve = (
     socket.on("error", () => socket.destroy());
   });
 
+  // Same reasoning as the session timers: a listening socket is an active
+  // handle, and the Ink app must be able to exit while still owning one.
+  if (session.owner === "tui") server.unref();
+
   const onSignal = () => shutdown(server, session, 0);
   if (handleInterrupt) process.once("SIGINT", onSignal);
   process.once("SIGTERM", onSignal);

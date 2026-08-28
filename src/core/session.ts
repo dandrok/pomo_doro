@@ -136,6 +136,17 @@ export class Session {
       this.flushHistory();
       this.saveResumable();
     }, HISTORY_FLUSH_MS);
+
+    // A headless owner exists only to run this clock, so its timers are the
+    // reason the process stays up. The Ink app is the opposite: its own UI
+    // keeps the loop alive, and these timers must not outlive it. Left
+    // referenced, they hold the event loop open after Ink unmounts, so the
+    // app never exits and process.on("exit") - where ownership is released -
+    // never fires.
+    if (this.owner === "tui") {
+      this.ticker.unref();
+      this.flusher.unref();
+    }
     this.saveResumable();
     this.persist();
     return this;

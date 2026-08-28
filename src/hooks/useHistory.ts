@@ -8,7 +8,17 @@ import {
   IS_TEST_MODE,
 } from "@utils";
 
-export const useHistory = () => {
+export type UseHistoryOptions = {
+  /**
+   * Whether to write the in-memory copy back to disk on a timer and on
+   * unmount. Off by default: the session engine is the only writer of history
+   * now, and a read-only screen flushing its own stale snapshot would erase
+   * focus seconds accrued while it was open.
+   */
+  persist?: boolean;
+};
+
+export const useHistory = ({ persist = false }: UseHistoryOptions = {}) => {
   const [history, setHistory] = useState<DailyStats[]>(() => {
     const saved = config.get("history") || [];
 
@@ -85,6 +95,8 @@ export const useHistory = () => {
 
   // Sync to disk every 30 seconds to prevent data loss while avoiding excessive writes
   useEffect(() => {
+    if (!persist) return;
+
     const interval = setInterval(() => {
       config.set("history", historyRef.current);
     }, 30000);
@@ -92,7 +104,7 @@ export const useHistory = () => {
       clearInterval(interval);
       config.set("history", historyRef.current); // Final sync on unmount
     };
-  }, []);
+  }, [persist]);
 
   const totals = calculateTotals(history);
   const todayDate = new Date().toISOString().split("T")[0]!;

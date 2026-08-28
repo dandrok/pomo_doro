@@ -61,9 +61,9 @@ describe("useHistory", () => {
     expect(config.set).toHaveBeenCalledWith("history", expect.any(Array));
   });
 
-  it("should sync to disk periodically", () => {
+  it("should sync to disk periodically when persistence is enabled", () => {
     vi.mocked(config.get).mockReturnValue([]);
-    const { result } = renderHook(() => useHistory());
+    const { result } = renderHook(() => useHistory({ persist: true }));
 
     act(() => {
       result.current.addFocusSecond();
@@ -78,5 +78,25 @@ describe("useHistory", () => {
     });
 
     expect(config.set).toHaveBeenCalledWith("history", expect.any(Array));
+  });
+
+  it("should not write history back to disk by default", () => {
+    vi.mocked(config.get).mockReturnValue([]);
+    const { result, unmount } = renderHook(() => useHistory());
+
+    act(() => {
+      result.current.addFocusSecond();
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(60000);
+    });
+
+    // A read-only screen must never flush its own snapshot: the session engine
+    // owns history, and this copy goes stale the moment the timer ticks.
+    expect(config.set).not.toHaveBeenCalled();
+
+    unmount();
+    expect(config.set).not.toHaveBeenCalled();
   });
 });

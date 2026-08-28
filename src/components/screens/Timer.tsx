@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useInput, Box } from "ink";
+import { useInput, Box, Text } from "ink";
 import { usePomodoroSession, useHelp } from "@hooks";
 import { ProgressBar, FooterBar, HelpOverlay, HELP_CONTROL } from "@ui";
 import { config } from "@utils";
@@ -14,6 +14,8 @@ type TimerProps = {
   initialSecondsRemaining?: number | undefined;
   initialMode?: Mode | undefined;
   initialPomodoroCount?: number | undefined;
+  /** End any running session and start this one instead. */
+  replaceExisting?: boolean | undefined;
   onBack?: () => void;
 };
 
@@ -26,6 +28,7 @@ export const Timer = ({
   initialSecondsRemaining,
   initialMode = "work",
   initialPomodoroCount = 0,
+  replaceExisting = false,
   onBack,
 }: TimerProps) => {
   const {
@@ -42,6 +45,7 @@ export const Timer = ({
     toggleMute,
     toggleAutoTransition,
     todayStats,
+    error,
   } = usePomodoroSession({
     focus,
     shortBreak,
@@ -51,6 +55,7 @@ export const Timer = ({
     initialSecondsRemaining,
     initialMode,
     initialPomodoroCount,
+    replaceExisting,
   });
 
   const { isHelpOpen, toggleHelp } = useHelp();
@@ -132,6 +137,11 @@ export const Timer = ({
 
   return (
     <Box flexDirection="column" gap={1} padding={1}>
+      {error ? (
+        // The clock could not be claimed - an unsafe socket directory, most
+        // likely. Saying so beats showing a countdown that will never move.
+        <Text color="red">{error}</Text>
+      ) : null}
       {isHelpOpen ? (
         <HelpOverlay controls={controls} />
       ) : (

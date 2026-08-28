@@ -25,6 +25,7 @@ export const TECHNOLOGIES = [
 export const IS_TEST_MODE = process.env["NODE_ENV"] === "test";
 
 export const ONE_MINUTE = 60;
+export const FOCUS_TIME = IS_TEST_MODE ? 0.1 : 25; // 6 seconds in test
 export const SHORT_BREAK_TIME = IS_TEST_MODE ? 0.05 : 5; // 3 seconds in test
 export const LONG_BREAK_TIME = IS_TEST_MODE ? 0.1 : 15; // 6 seconds in test
 

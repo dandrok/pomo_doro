@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useApp, useInput } from "ink";
 import { Timer, Router } from "@screens";
 import { PRESETS } from "@utils";
+import { readState } from "./core";
 import type { MenuItems, Screen, TimeSelectItem } from "@types";
 
 type AppProps = {
@@ -29,6 +30,15 @@ export const App = ({ initialSessionConfig }: AppProps) => {
     shortBreak: number;
     longBreak: number;
   } | null>(null);
+
+  // A session started elsewhere - another terminal, or the Omarchy bar widget -
+  // is what you almost certainly opened the app to look at, so go straight to
+  // it rather than making you find it through the menu.
+  const [liveSession, setLiveSession] = useState(() => {
+    if (initialSessionConfig) return null;
+    const state = readState();
+    return state?.running ? state : null;
+  });
 
   const { exit } = useApp();
 
@@ -99,6 +109,26 @@ export const App = ({ initialSessionConfig }: AppProps) => {
     setPendingSessionConfig(null);
     setScreen("time-select");
   };
+
+  if (liveSession !== null) {
+    return (
+      <Timer
+        focus={liveSession.focus}
+        shortBreak={liveSession.shortBreak}
+        longBreak={liveSession.longBreak}
+        tag={liveSession.tag}
+        description={liveSession.description}
+        initialMode={liveSession.mode}
+        initialSecondsRemaining={liveSession.secondsRemaining}
+        initialPomodoroCount={liveSession.pomodoroCount}
+        onBack={() => {
+          // Leaving the screen detaches this view; the session keeps running.
+          setLiveSession(null);
+          setScreen("menu");
+        }}
+      />
+    );
+  }
 
   if (sessionConfig !== null) {
     return (

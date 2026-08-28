@@ -1,16 +1,18 @@
-import { useState, useEffect, useCallback, useRef } from "react";
 import fs from "node:fs";
-import { useTimer } from "./useTimer";
-import { useHistory } from "./useHistory";
+import type net from "node:net";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { config, stateFile, ONE_MINUTE } from "@utils";
 import {
-  config,
-  ONE_MINUTE,
-  getNextSessionType,
-  notifyUser,
-  padStr,
-  modeIcons,
-  statusFile,
-} from "@utils";
+  Session,
+  claimOwnership,
+  serve,
+  releaseOwnership,
+  sendCommand,
+  readState,
+  idleState,
+  type CommandName,
+  type PomoState,
+} from "../core";
 import type { Mode } from "@types";
 
 type UsePomodoroSessionProps = {
@@ -24,180 +26,210 @@ type UsePomodoroSessionProps = {
   initialPomodoroCount?: number | undefined;
 };
 
-export const usePomodoroSession = ({
-  focus,
-  shortBreak,
-  longBreak,
-  tag,
-  description,
-  initialSecondsRemaining,
-  initialMode = "work",
-  initialPomodoroCount = 0,
-}: UsePomodoroSessionProps) => {
-  const [mode, setMode] = useState<Mode>(initialMode);
-  const [pomodoroCount, setPomodoroCount] = useState(initialPomodoroCount);
+/** How often an attached TUI re-reads the owner's state file. */
+const WATCH_INTERVAL_MS = 250;
+
+const seedState = (props: UsePomodoroSessionProps): PomoState => {
+  const mode = props.initialMode ?? "work";
+  const minutes =
+    mode === "work"
+      ? props.focus
+      : mode === "shortBreak"
+        ? props.shortBreak
+        : props.longBreak;
+  const total = minutes * ONE_MINUTE;
+
+  return {
+    ...idleState(),
+    running: true,
+    mode,
+    totalSeconds: total,
+    secondsRemaining: props.initialSecondsRemaining ?? total,
+    pomodoroCount: props.initialPomodoroCount ?? 0,
+    tag: props.tag,
+    description: props.description,
+    owner: "tui",
+    pid: process.pid,
+  };
+};
+
+/**
+ * The Timer screen's view of the pomodoro clock.
+ *
+ * On mount this either becomes the owner of the clock or attaches to one that
+ * already exists - started from another terminal, or from the Omarchy bar. An
+ * attached screen renders the owner's state file and sends its keypresses over
+ * the control socket, so the same session is visible and controllable from
+ * everywhere at once.
+ */
+export const usePomodoroSession = (props: UsePomodoroSessionProps) => {
+  const {
+    focus,
+    shortBreak,
+    longBreak,
+    tag,
+    description,
+    initialSecondsRemaining,
+    initialMode = "work",
+    initialPomodoroCount = 0,
+  } = props;
+
+  // A session already running elsewhere wins over the props: the screen should
+  // open on the live countdown, not restart it at full duration.
+  const [state, setState] = useState<PomoState>(() => {
+    const existing = readState();
+    return existing?.running ? existing : seedState(props);
+  });
+
   const [isMuted, setIsMuted] = useState(() => config.get("isMuted") ?? false);
   const [isAutoTransition, setIsAutoTransition] = useState(
     () => config.get("autoTransition") ?? true,
   );
-  const { addFocusSecond, completeSession, todayStats } = useHistory();
 
-  const handleTimeUpRef = useRef<(() => void) | null>(null);
+  const sessionRef = useRef<Session | null>(null);
+  const serverRef = useRef<net.Server | null>(null);
 
-  const initialDuration =
-    initialMode === "work"
-      ? focus
-      : initialMode === "shortBreak"
-        ? shortBreak
-        : longBreak;
+  useEffect(() => {
+    let cancelled = false;
+    let teardown = () => {};
 
-  const onTimeUp = useCallback(() => {
-    handleTimeUpRef.current?.();
+    void (async () => {
+      const server = await claimOwnership();
+
+      if (cancelled) {
+        if (server) releaseOwnership(server, null);
+        return;
+      }
+
+      if (server) {
+        const session = new Session({
+          focus,
+          shortBreak,
+          longBreak,
+          tag,
+          description,
+          mode: initialMode,
+          secondsRemaining: initialSecondsRemaining,
+          pomodoroCount: initialPomodoroCount,
+          owner: "tui",
+        });
+
+        // Ink owns Ctrl+C; exiting from under it would skip its terminal
+        // restore. The unmount cleanup below covers that path instead.
+        serve(server, session, { handleInterrupt: false });
+        const off = session.onChange(setState);
+        session.start();
+
+        sessionRef.current = session;
+        serverRef.current = server;
+
+        teardown = () => {
+          off();
+          releaseOwnership(server, session);
+          sessionRef.current = null;
+          serverRef.current = null;
+        };
+        return;
+      }
+
+      // Someone else owns the clock. Follow their state file rather than
+      // running a second timer that would double-count the day.
+      const sync = () => {
+        const next = readState();
+        if (next) setState(next);
+      };
+
+      sync();
+      // watchFile rather than watch: the owner writes atomically via rename, so
+      // a watcher bound to the original inode would go deaf after one update.
+      fs.watchFile(stateFile, { interval: WATCH_INTERVAL_MS }, sync);
+      teardown = () => fs.unwatchFile(stateFile, sync);
+    })();
+
+    return () => {
+      cancelled = true;
+      teardown();
+    };
+    // Deliberately mount-only: ownership is claimed once per Timer screen, and
+    // re-running this on a prop change would tear down a live session.
   }, []);
 
-  const { secondsRemaining, progress, isPaused, pause, resume, reset } =
-    useTimer({
-      initialSeconds: initialDuration * ONE_MINUTE,
-      initialSecondsRemaining: initialSecondsRemaining,
-      onTimeUp,
-    });
+  /** Route a command to the local session, or to the owner over the socket. */
+  const dispatch = useCallback((cmd: CommandName) => {
+    const session = sessionRef.current;
 
-  const handleTimeUp = useCallback(() => {
-    const nextMode = getNextSessionType(mode, pomodoroCount);
-    setMode(nextMode);
-
-    if (mode === "work") {
-      const nextCount = pomodoroCount + 1;
-      setPomodoroCount(nextCount);
-      completeSession(tag);
-
-      const duration = nextMode === "longBreak" ? longBreak : shortBreak;
-      reset(duration * ONE_MINUTE, !isAutoTransition);
-
-      const breakType = nextMode === "longBreak" ? "long break" : "short break";
-      notifyUser(
-        "Pomo Doro - Work Done!",
-        `Focus session complete! Take a ${breakType}.`,
-      );
-    } else {
-      reset(focus * ONE_MINUTE, !isAutoTransition);
-      notifyUser(
-        "Pomo Doro - Break Finished!",
-        "Break is over. Time to focus!",
-      );
+    if (!session) {
+      void sendCommand(cmd).then((response) => {
+        if (response?.ok) setState(response.state);
+      });
+      return;
     }
-  }, [
-    mode,
-    pomodoroCount,
-    focus,
-    shortBreak,
-    longBreak,
-    completeSession,
-    tag,
-    isAutoTransition,
-    reset,
-  ]);
 
-  handleTimeUpRef.current = handleTimeUp;
-
-  const handleSkip = useCallback(() => {
-    if (mode === "work") {
-      setMode("shortBreak");
-      reset(shortBreak * ONE_MINUTE, !isAutoTransition);
-      notifyUser(
-        "Pomo Doro - Work Skipped",
-        "Focus session skipped. Taking a short break.",
-      );
-    } else {
-      setMode("work");
-      reset(focus * ONE_MINUTE, !isAutoTransition);
-      notifyUser("Pomo Doro - Break Skipped", "Break skipped. Time to focus!");
+    switch (cmd) {
+      case "pause":
+        session.pause();
+        break;
+      case "resume":
+        session.resume();
+        break;
+      case "toggle":
+        session.toggle();
+        break;
+      case "skip":
+        session.skip();
+        break;
+      case "reset":
+        session.restart();
+        break;
+      default:
+        break;
     }
-  }, [mode, focus, shortBreak, reset, isAutoTransition]);
+  }, []);
 
-  const handleRestart = useCallback(() => {
-    const duration =
-      mode === "work" ? focus : mode === "shortBreak" ? shortBreak : longBreak;
-    reset(duration * ONE_MINUTE);
-  }, [mode, focus, shortBreak, longBreak, reset]);
+  const pause = useCallback(() => dispatch("pause"), [dispatch]);
+  const resume = useCallback(() => dispatch("resume"), [dispatch]);
+  const togglePause = useCallback(() => dispatch("toggle"), [dispatch]);
+  const skip = useCallback(() => dispatch("skip"), [dispatch]);
+  const restart = useCallback(() => dispatch("reset"), [dispatch]);
 
+  // Mute and auto-transition are settings rather than session state: the
+  // engine reads them fresh from config on every use, so writing them here
+  // reaches a headless owner without a round trip.
   const toggleMute = useCallback(() => {
-    const nextMuted = !isMuted;
-    setIsMuted(nextMuted);
-    config.set("isMuted", nextMuted);
-  }, [isMuted]);
+    setIsMuted((prev) => {
+      config.set("isMuted", !prev);
+      return !prev;
+    });
+  }, []);
 
   const toggleAutoTransition = useCallback(() => {
-    const nextAuto = !isAutoTransition;
-    setIsAutoTransition(nextAuto);
-    config.set("autoTransition", nextAuto);
-  }, [isAutoTransition]);
-
-  const togglePause = useCallback(() => {
-    if (isPaused) {
-      resume();
-    } else {
-      pause();
-    }
-  }, [isPaused, resume, pause]);
-
-  // Persist current session state
-  useEffect(() => {
-    config.set("activeSession", {
-      timeOut: secondsRemaining,
-      mode,
-      time: focus, // legacy fallback for backward compatibility
-      focus,
-      shortBreak,
-      longBreak,
-      pomodoroCount,
-      tag,
-      description,
+    setIsAutoTransition((prev) => {
+      config.set("autoTransition", !prev);
+      return !prev;
     });
-    config.set("pomodoroCount", pomodoroCount);
-
-    // Update Focus Time (only for work mode)
-    if (mode === "work" && !isPaused) {
-      addFocusSecond(tag);
-    }
-
-    // Tmux / Status Bar Integration
-    const min = padStr(Math.floor(secondsRemaining / ONE_MINUTE));
-    const sec = padStr(secondsRemaining % ONE_MINUTE);
-    const icon = modeIcons[mode];
-    const statusText = `${icon} ${min}:${sec}`;
-
-    fs.promises.writeFile(statusFile, statusText, "utf-8").catch(() => {
-      // Silent fail to prevent timer crash
-    });
-  }, [
-    secondsRemaining,
-    mode,
-    focus,
-    shortBreak,
-    longBreak,
-    pomodoroCount,
-    isPaused,
-    addFocusSecond,
-    tag,
-    description,
-  ]);
+  }, []);
 
   return {
-    secondsRemaining,
-    progress,
-    isPaused,
-    mode,
-    pomodoroCount,
+    secondsRemaining: state.secondsRemaining,
+    progress: state.progress,
+    isPaused: state.paused,
+    mode: state.mode,
+    pomodoroCount: state.pomodoroCount,
     isMuted,
     isAutoTransition,
     pause,
     resume,
     togglePause,
-    skip: handleSkip,
-    restart: handleRestart,
+    skip,
+    restart,
     toggleMute,
     toggleAutoTransition,
-    todayStats,
+    todayStats: {
+      date: state.history14[state.history14.length - 1]?.date ?? "",
+      totalFocusSeconds: state.today.focusSeconds,
+      completedPomodoros: state.today.completedPomodoros,
+    },
+    /** True while this screen is following a session owned by another process. */
+    isAttached: sessionRef.current === null,
   };
 };

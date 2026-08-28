@@ -32,15 +32,6 @@ const listen = (server: net.Server): Promise<void> =>
   });
 
 /**
- * Try to become the process that owns the clock.
- *
- * Returns a bound server on success, or null when another owner already holds
- * the socket - in which case the caller should attach as a client instead of
- * starting a second timer. A socket left behind by a killed process is
- * distinguished from a live one by probing it: a refused connection means the
- * file is stale and can be removed.
- */
-/**
  * Make sure the directory we are about to bind in is ours alone.
  *
  * mkdirSync's `mode` is masked by umask and, more importantly, does nothing at
@@ -76,6 +67,15 @@ const secureDir = (dir: string): void => {
   }
 };
 
+/**
+ * Try to become the process that owns the clock.
+ *
+ * Returns a bound server on success, or null when another owner already holds
+ * the socket - in which case the caller should attach as a client instead of
+ * starting a second timer. A socket left behind by a killed process is
+ * distinguished from a live one by probing it: a refused connection means the
+ * file is stale and can be removed.
+ */
 export const claimOwnership = async (): Promise<net.Server | null> => {
   if (!isWindows) {
     secureDir(path.dirname(socketPath));

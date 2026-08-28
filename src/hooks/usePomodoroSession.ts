@@ -198,7 +198,14 @@ export const usePomodoroSession = (props: UsePomodoroSessionProps) => {
       // watchFile rather than watch: the owner writes atomically via rename, so
       // a watcher bound to the original inode would go deaf after one update.
       fs.watchFile(stateFile, { interval: WATCH_INTERVAL_MS }, sync);
-      teardown = () => fs.unwatchFile(stateFile, sync);
+      teardown = () => {
+        // The owner path pauses on the way out, so this one does too: Escape
+        // is documented as parking the session, and it should not depend on
+        // which process happens to be holding the clock. Best-effort - the
+        // command is a socket round trip that cannot finish during exit.
+        void sendCommand("pause");
+        fs.unwatchFile(stateFile, sync);
+      };
     }
 
     return () => {

@@ -233,6 +233,41 @@ describe("Session", () => {
     session.stop();
   });
 
+  it("falls back to a sane duration rather than spinning on a zero-length phase", () => {
+    // Resume reads `focus` from config.json with `??`, which lets a stored 0
+    // through. Before the guard, tick() found secondsRemaining already at 0 and
+    // called handleTimeUp on every pass - a completed pomodoro every second.
+    const session = start({ focus: 0, shortBreak: 0, longBreak: 0 });
+
+    vi.advanceTimersByTime(5000);
+
+    expect(session.secondsRemaining).toBeGreaterThan(0);
+    expect(session.pomodoroCount).toBe(0);
+    expect(session.mode).toBe("work");
+
+    session.stop();
+  });
+
+  it("ignores a stored remaining time that is corrupt", () => {
+    const session = start({ secondsRemaining: -5 });
+    expect(session.secondsRemaining).toBe(60);
+    session.stop();
+  });
+
+  it("removes the legacy status file on stop", () => {
+    const session = start();
+    vi.advanceTimersByTime(1000);
+
+    return vi
+      .waitFor(() => expect(fs.existsSync(paths.statusFile)).toBe(true))
+      .then(() => {
+        session.stop();
+        // A countdown left behind would have tmux and starship showing a timer
+        // that stopped hours ago.
+        expect(fs.existsSync(paths.statusFile)).toBe(false);
+      });
+  });
+
   it("stops cleanly when called twice", () => {
     const session = start();
     session.stop();

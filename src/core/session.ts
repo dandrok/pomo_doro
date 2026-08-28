@@ -3,6 +3,9 @@ import {
   config,
   statusFile,
   ONE_MINUTE,
+  FOCUS_TIME,
+  SHORT_BREAK_TIME,
+  LONG_BREAK_TIME,
   getNextSessionType,
   updateFocusTime,
   incrementPomodoroCount,
@@ -21,6 +24,24 @@ import {
 } from "./state";
 
 export type SessionOwner = "tui" | "headless";
+
+/**
+ * A phase length has to be positive, or the clock never leaves zero: tick()
+ * would find secondsRemaining already at 0 and call handleTimeUp on every
+ * pass, counting a completed pomodoro a second for as long as it ran.
+ *
+ * Zero reaches here more easily than it looks. Resume reads `focus` straight
+ * out of config.json with `??`, which passes 0 through untouched, and
+ * `pomo start` inherits durations from the last stored session. So this
+ * guards the boundary rather than trusting either caller.
+ */
+const positiveMinutes = (
+  value: number | undefined,
+  fallback: number,
+): number =>
+  typeof value === "number" && Number.isFinite(value) && value > 0
+    ? value
+    : fallback;
 
 export type SessionInit = {
   focus: number;
@@ -68,15 +89,22 @@ export class Session {
 
   constructor(init: SessionInit) {
     this.owner = init.owner;
-    this.focus = init.focus;
-    this.shortBreak = init.shortBreak;
-    this.longBreak = init.longBreak;
+    this.focus = positiveMinutes(init.focus, FOCUS_TIME);
+    this.shortBreak = positiveMinutes(init.shortBreak, SHORT_BREAK_TIME);
+    this.longBreak = positiveMinutes(init.longBreak, LONG_BREAK_TIME);
     this.tag = init.tag;
     this.description = init.description;
 
     this.mode = init.mode ?? "work";
     this.totalSeconds = this.durationOf(this.mode) * ONE_MINUTE;
-    this.secondsRemaining = init.secondsRemaining ?? this.totalSeconds;
+    // A stored remaining time can be corrupt too; anything unusable restarts
+    // the phase rather than leaving the clock stuck at or below zero.
+    this.secondsRemaining =
+      typeof init.secondsRemaining === "number" &&
+      Number.isFinite(init.secondsRemaining) &&
+      init.secondsRemaining > 0
+        ? Math.min(init.secondsRemaining, this.totalSeconds)
+        : this.totalSeconds;
     this.pomodoroCount = init.pomodoroCount ?? 0;
 
     this.history = config.get("history") ?? [];
@@ -128,6 +156,18 @@ export class Session {
     // way back into a session after the app closes.
     this.saveResumable();
     writeIdleState(this.history);
+
+    // current.txt is a countdown, so leaving the last one behind would have
+    // tmux and starship showing a timer that stopped hours ago. Removing it
+    // rather than blanking it also lets starship's `test -f` hide the module.
+    // Sync, because stop() runs from a process exit handler where a promise
+    // would never settle; advisory, so a failure is not worth reporting.
+    try {
+      fs.unlinkSync(statusFile);
+    } catch {
+      // Already gone, or never written.
+    }
+
     this.emit();
   }
 
@@ -276,9 +316,13 @@ export class Session {
 
   /** Everything cheap enough to run every second. */
   private persist(): void {
+    // Built once and shared: snapshot() walks history to rebuild the 14-day
+    // window, and taking it twice also let the file and the listeners carry
+    // updatedAt timestamps a millisecond apart.
+    const state = this.snapshot();
     this.writeStatusFile();
-    writeState(this.snapshot());
-    this.emit();
+    writeState(state);
+    this.emit(state);
   }
 
   /** Legacy one-liner kept alive for existing tmux and starship setups. */
@@ -292,8 +336,7 @@ export class Session {
     });
   }
 
-  private emit(): void {
-    const state = this.snapshot();
+  private emit(state: PomoState = this.snapshot()): void {
     for (const listener of this.listeners) listener(state);
   }
 

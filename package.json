@@ -4,6 +4,14 @@
   "description": "pomodoro tui app",
   "license": "ISC",
   "author": "dandrok",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dandrok/pomo_doro.git"
+  },
+  "homepage": "https://github.com/dandrok/pomo_doro#readme",
+  "bugs": {
+    "url": "https://github.com/dandrok/pomo_doro/issues"
+  },
   "type": "module",
   "main": "dist/cli.js",
   "bin": {

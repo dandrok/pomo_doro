@@ -27,14 +27,24 @@ jobs:
     needs: test
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    permissions:
+      # Trusted publishing authenticates over OIDC instead of a token. Without
+      # id-token, no token is minted and the publish falls back to anonymous,
+      # which the registry answers with a 404 rather than a 401.
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 24
           registry-url: "https://registry.npmjs.org"
+      # OIDC publishing needs npm 11.5.1 or newer. Which npm ships with Node 24
+      # depends on the minor, so pin it here rather than leaving it to chance.
+      - run: npm install -g npm@latest
       - run: npm ci
       - run: npm run build
+      # No NODE_AUTH_TOKEN: the OIDC identity is the credential, and a stale
+      # token here would take precedence over it. Provenance is attached
+      # automatically on this path.
       - run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

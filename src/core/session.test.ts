@@ -44,6 +44,14 @@ describe("Session", () => {
   beforeEach(() => {
     store.clear();
     store.set("history", []);
+    // These tests share one directory, so a file left by the previous case
+    // would let an assertion pass on stale state rather than on what this
+    // test actually wrote.
+    try {
+      fs.unlinkSync(paths.statusFile);
+    } catch {
+      // Not there, which is the state we wanted.
+    }
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-08-28T09:00:00Z"));
   });
@@ -192,10 +200,10 @@ describe("Session", () => {
     const session = start();
 
     vi.advanceTimersByTime(1000);
-    // fs.promises.writeFile resolves on a microtask the fake clock does not run.
-    return vi
-      .waitFor(() => expect(readStatusFile()).toBe("◈ 00:59"))
-      .finally(() => session.stop());
+    // Written synchronously, so it is on disk the moment the tick returns.
+    expect(readStatusFile()).toBe("◈ 00:59");
+
+    session.stop();
   });
 
   it("blanks the published state on stop but keeps the session resumable", () => {
@@ -254,18 +262,22 @@ describe("Session", () => {
     session.stop();
   });
 
-  it("removes the legacy status file on stop", () => {
+  it("removes the legacy status file on stop, and it stays removed", async () => {
     const session = start();
     vi.advanceTimersByTime(1000);
+    expect(fs.existsSync(paths.statusFile)).toBe(true);
 
-    return vi
-      .waitFor(() => expect(fs.existsSync(paths.statusFile)).toBe(true))
-      .then(() => {
-        session.stop();
-        // A countdown left behind would have tmux and starship showing a timer
-        // that stopped hours ago.
-        expect(fs.existsSync(paths.statusFile)).toBe(false);
-      });
+    session.stop();
+    // A countdown left behind would have tmux and starship showing a timer
+    // that stopped hours ago.
+    expect(fs.existsSync(paths.statusFile)).toBe(false);
+
+    // The write used to be fire-and-forget, so one started on the last tick
+    // could resolve after the unlink and put the stale countdown straight
+    // back. Let every pending job run and confirm nothing reappears.
+    await vi.advanceTimersByTimeAsync(5000);
+    await Promise.resolve();
+    expect(fs.existsSync(paths.statusFile)).toBe(false);
   });
 
   it("stops cleanly when called twice", () => {

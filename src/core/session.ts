@@ -160,8 +160,10 @@ export class Session {
     // current.txt is a countdown, so leaving the last one behind would have
     // tmux and starship showing a timer that stopped hours ago. Removing it
     // rather than blanking it also lets starship's `test -f` hide the module.
-    // Sync, because stop() runs from a process exit handler where a promise
-    // would never settle; advisory, so a failure is not worth reporting.
+    // Safe to unlink now: `stopped` was set at the top of this method and
+    // writeStatusFile both checks it and writes synchronously, so no write can
+    // still be pending or start after this point. Advisory, so a failure is
+    // not worth reporting.
     try {
       fs.unlinkSync(statusFile);
     } catch {
@@ -325,15 +327,30 @@ export class Session {
     this.emit(state);
   }
 
-  /** Legacy one-liner kept alive for existing tmux and starship setups. */
+  /**
+   * Legacy one-liner kept alive for existing tmux and starship setups.
+   *
+   * Written synchronously, like writeState above it. An async write here could
+   * still be in flight when stop() unlinks the file and would then land after
+   * it, recreating the stale countdown stop() exists to remove. Serializing
+   * the two is not an option: stop() runs from a process exit handler, where a
+   * promise never settles.
+   */
   private writeStatusFile(): void {
+    if (this.stopped) return;
+
     const min = padStr(Math.floor(this.secondsRemaining / ONE_MINUTE));
     const sec = padStr(this.secondsRemaining % ONE_MINUTE);
-    const statusText = `${modeIcons[this.mode]} ${min}:${sec}`;
 
-    fs.promises.writeFile(statusFile, statusText, "utf-8").catch(() => {
-      // Silent fail to prevent timer crash
-    });
+    try {
+      fs.writeFileSync(
+        statusFile,
+        `${modeIcons[this.mode]} ${min}:${sec}`,
+        "utf-8",
+      );
+    } catch {
+      // Advisory file: a failure must never take the timer down.
+    }
   }
 
   private emit(state: PomoState = this.snapshot()): void {

@@ -144,6 +144,18 @@ describe("ownership and the control socket", () => {
     await expect(own()).resolves.toBeDefined();
   });
 
+  it("tightens a world-accessible socket directory before binding", async () => {
+    // The XDG_RUNTIME_DIR path is a private tmpfs, but the /tmp fallback is
+    // not: anyone can pre-create the directory there, and a socket inside a
+    // world-writable one is a socket anyone can send commands to.
+    fs.mkdirSync(paths.dir, { recursive: true });
+    fs.chmodSync(paths.dir, 0o755);
+
+    await own();
+
+    expect(fs.statSync(paths.dir).mode & 0o777).toBe(0o700);
+  });
+
   it("unlinks the socket and blanks the state on release", async () => {
     await own();
     expect(fs.existsSync(paths.socketPath)).toBe(true);

@@ -23,10 +23,15 @@ export const statusFile = path.join(configDir, "current.txt");
 export const stateFile = path.join(configDir, "state.json");
 
 /**
- * Control socket for whichever process currently owns the clock. Lives in
- * XDG_RUNTIME_DIR (a per-user 0700 tmpfs) so a stale socket cannot outlive the
- * login session; falls back to a uid-scoped directory under the system temp dir
- * when the variable is unset.
+ * Control socket for whichever process currently owns the clock.
+ *
+ * Lives in XDG_RUNTIME_DIR (a per-user 0700 tmpfs) so a stale socket cannot
+ * outlive the login session. When that is unset - over a bare SSH session, or
+ * in a container - it falls back to a uid-scoped directory under the system
+ * temp dir, which is world-writable and therefore not private by itself: the
+ * uid in the name only avoids collisions, it grants nothing. `claimOwnership`
+ * in src/core/server.ts is what makes the fallback safe, refusing to bind
+ * unless the directory is owned by this user with no group or other access.
  */
 export const socketPath = ((): string => {
   const name = IS_TEST_MODE ? "pomo-doro-test" : "pomo-doro";

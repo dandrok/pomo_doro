@@ -64,8 +64,30 @@ export const sendCommand = (
       resolve(value);
     };
 
-    socket.setTimeout(TIMEOUT_MS, () => settle(null));
-    socket.once("connect", () => socket.write(`${JSON.stringify({ cmd })}\n`));
+    // Once connected, an owner exists - so a timeout past that point is a
+    // hung session, not an absent one, and must not be reported as "nothing is
+    // running". Answering null there would send `status` to the stale state
+    // file and have `pause` claim there was no session to pause.
+    let connected = false;
+
+    socket.setTimeout(TIMEOUT_MS, () =>
+      settle(
+        connected
+          ? {
+              ok: false,
+              error:
+                "The running session stopped responding. Its process may be stuck; `pomo stop` will clear it.",
+            }
+          : null,
+      ),
+    );
+
+    socket.once("connect", () => {
+      connected = true;
+      socket.write(`${JSON.stringify({ cmd })}\n`);
+    });
+
+    // A connection error means no owner is listening.
     socket.once("error", () => settle(null));
 
     socket.on("data", (chunk) => {
@@ -84,6 +106,13 @@ export const sendCommand = (
     });
 
     // `stop` closes the connection from the far side; without a reply by then
-    // there is nothing more to wait for.
-    socket.once("close", () => settle(null));
+    // there is nothing more to wait for. A close after connecting still means
+    // an owner was there, so it reports a failed command rather than absence.
+    socket.once("close", () =>
+      settle(
+        connected
+          ? { ok: false, error: "The running session closed without replying." }
+          : null,
+      ),
+    );
   });

@@ -198,18 +198,39 @@ describe("Session", () => {
       .finally(() => session.stop());
   });
 
-  it("blanks the state and clears the resumable session on stop", () => {
+  it("blanks the published state on stop but keeps the session resumable", () => {
     const session = start();
 
     vi.advanceTimersByTime(2000);
-    expect(store.get("activeSession")).toBeDefined();
-
     session.stop();
 
-    expect(store.get("activeSession")).toBeUndefined();
     expect(readState()).toMatchObject({ running: false, owner: "none" });
     // Stopping must not lose the time already earned.
     expect(readState()?.today.focusSeconds).toBe(2);
+    // Nor where you got to: the Resume screen reads activeSession, and it is
+    // the only way back into a session once the app has closed.
+    expect(store.get("activeSession")).toMatchObject({
+      timeOut: 58,
+      mode: "work",
+      tag: "Coding",
+    });
+  });
+
+  it("keeps config writes off the per-tick path", () => {
+    const session = start();
+    const writes = vi.spyOn(store, "set");
+
+    vi.advanceTimersByTime(5000);
+
+    // conf re-serializes the whole file - history included - on every set, so
+    // ticking must not touch it. state.json carries the per-second detail.
+    expect(writes).not.toHaveBeenCalled();
+
+    session.pause();
+    expect(writes).toHaveBeenCalled();
+
+    writes.mockRestore();
+    session.stop();
   });
 
   it("stops cleanly when called twice", () => {

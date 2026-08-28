@@ -100,7 +100,11 @@ export class Session {
   start(): this {
     if (this.ticker) return this;
     this.ticker = setInterval(() => this.tick(), 1000);
-    this.flusher = setInterval(() => this.flushHistory(), HISTORY_FLUSH_MS);
+    this.flusher = setInterval(() => {
+      this.flushHistory();
+      this.saveResumable();
+    }, HISTORY_FLUSH_MS);
+    this.saveResumable();
     this.persist();
     return this;
   }
@@ -119,8 +123,10 @@ export class Session {
     this.flusher = null;
 
     this.flushHistory();
-    // A finished session must not keep offering itself on the Resume screen.
-    config.delete("activeSession");
+    // The resumable session is kept, not deleted. Ending the clock is not the
+    // same as discarding where you got to, and the Resume screen is the only
+    // way back into a session after the app closes.
+    this.saveResumable();
     writeIdleState(this.history);
     this.emit();
   }
@@ -134,11 +140,13 @@ export class Session {
 
   pause(): void {
     this.isPaused = true;
+    this.saveResumable();
     this.persist();
   }
 
   resume(): void {
     this.isPaused = false;
+    this.saveResumable();
     this.persist();
   }
 
@@ -150,6 +158,7 @@ export class Session {
   /** Restart the current phase from the top. */
   restart(): void {
     this.reset(this.durationOf(this.mode) * ONE_MINUTE);
+    this.saveResumable();
     this.persist();
   }
 
@@ -167,6 +176,7 @@ export class Session {
       this.reset(this.focus * ONE_MINUTE, !this.isAutoTransition);
       notifyUser("Pomo Doro - Break Skipped", "Break skipped. Time to focus!");
     }
+    this.saveResumable();
     this.persist();
   }
 
@@ -229,6 +239,7 @@ export class Session {
       );
     }
 
+    this.saveResumable();
     this.persist();
   }
 
@@ -238,7 +249,17 @@ export class Session {
     config.set("history", this.history);
   }
 
-  private persist(): void {
+  /**
+   * Write the resumable session and the counter into config.json.
+   *
+   * Deliberately off the per-tick path. `conf` re-serializes the whole config
+   * file on every `set`, history included, so doing this once a second meant
+   * rewriting all of it twice a second - a cost that grows with every day you
+   * have ever used the app. state.json still carries the same numbers every
+   * tick, so no external reader loses resolution; only the Resume screen's
+   * starting point can trail, and never by more than the flush interval.
+   */
+  private saveResumable(): void {
     config.set("activeSession", {
       timeOut: this.secondsRemaining,
       mode: this.mode,
@@ -251,7 +272,10 @@ export class Session {
       description: this.description,
     });
     config.set("pomodoroCount", this.pomodoroCount);
+  }
 
+  /** Everything cheap enough to run every second. */
+  private persist(): void {
     this.writeStatusFile();
     writeState(this.snapshot());
     this.emit();

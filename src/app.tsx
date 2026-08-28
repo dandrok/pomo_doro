@@ -136,6 +136,9 @@ export const App = ({ initialSessionConfig }: AppProps) => {
         focus={sessionConfig.focus}
         shortBreak={sessionConfig.shortBreak}
         longBreak={sessionConfig.longBreak}
+        // These durations were just chosen, so they take over from anything
+        // already running rather than attaching to it.
+        replaceExisting
         tag={sessionConfig.tag}
         description={sessionConfig.description}
         initialPomodoroCount={0}

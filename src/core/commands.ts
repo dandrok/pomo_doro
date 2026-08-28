@@ -15,7 +15,7 @@ import type { Mode } from "@types";
 import { probeOwner, sendCommand, type CommandName } from "./client";
 import { claimOwnership, serve, shutdown } from "./server";
 import { Session, type SessionInit } from "./session";
-import { readState, type PomoState } from "./state";
+import { idleState, readState, type PomoState } from "./state";
 
 export type StartOptions = {
   focus?: number | undefined;
@@ -63,10 +63,15 @@ const resolveDurations = (options: StartOptions): SessionInit => {
   return {
     focus: options.focus ?? last?.focus ?? FOCUS_TIME,
     shortBreak,
+    // An explicit --break derives the long break from it before the last
+    // session's value is consulted, so `pomo start -b 10` means the same thing
+    // here as it does through the TUI's parser in cliParser.ts. Without that
+    // ordering, a stored longBreak silently outranks the flag you just typed.
     longBreak:
       options.longBreak ??
-      last?.longBreak ??
-      (options.shortBreak ? options.shortBreak * 3 : LONG_BREAK_TIME),
+      (options.shortBreak
+        ? options.shortBreak * 3
+        : (last?.longBreak ?? LONG_BREAK_TIME)),
     tag: options.tag ?? last?.tag,
     description: options.description ?? last?.description,
     owner: "headless",
@@ -171,7 +176,11 @@ export const runControlCommand = async (
       const state = readState();
       console.log(
         asJson
-          ? JSON.stringify(state, null, 2)
+          ? // Never emit a bare `null`: a reader parsing this expects an object
+            // with the usual fields, and idleState() is the established shape for
+            // "nothing is running" - which is also what the state file holds once
+            // an owner has exited cleanly.
+            JSON.stringify(state ?? idleState(), null, 2)
           : state
             ? formatState(state)
             : "No session running.",

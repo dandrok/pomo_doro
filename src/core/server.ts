@@ -40,9 +40,45 @@ const listen = (server: net.Server): Promise<void> =>
  * distinguished from a live one by probing it: a refused connection means the
  * file is stale and can be removed.
  */
+/**
+ * Make sure the directory we are about to bind in is ours alone.
+ *
+ * mkdirSync's `mode` is masked by umask and, more importantly, does nothing at
+ * all to a directory that already exists. Under XDG_RUNTIME_DIR that is
+ * harmless - the kernel gives each user their own 0700 tmpfs - but the
+ * fallback lives in a world-writable /tmp, where anyone can pre-create the
+ * directory and then talk to the socket we put inside it.
+ */
+const secureDir = (dir: string): void => {
+  fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+
+  // Ownership is checked before anything is changed: chmod on a directory
+  // belonging to someone else fails with a bare EPERM, which says nothing
+  // about why we refused.
+  const stats = fs.lstatSync(dir);
+
+  if (!stats.isDirectory()) {
+    throw new Error(`${dir} exists but is not a directory.`);
+  }
+
+  const uid = process.getuid?.();
+  if (uid !== undefined && stats.uid !== uid) {
+    throw new Error(
+      `${dir} is owned by uid ${stats.uid}, not you. Refusing to put a control socket there.`,
+    );
+  }
+
+  // The directory is ours, so a loose mode is ours to tighten. mkdirSync's
+  // `mode` only applies to a directory it actually creates, and umask can
+  // loosen even that.
+  if (stats.mode & 0o077) {
+    fs.chmodSync(dir, 0o700);
+  }
+};
+
 export const claimOwnership = async (): Promise<net.Server | null> => {
   if (!isWindows) {
-    fs.mkdirSync(path.dirname(socketPath), { recursive: true, mode: 0o700 });
+    secureDir(path.dirname(socketPath));
   }
 
   const server = net.createServer();
@@ -104,6 +140,13 @@ export type ServeOptions = {
    * the shell without a cursor.
    */
   handleInterrupt?: boolean;
+  /**
+   * Whether a `stop` command ends the process. True for a headless owner,
+   * whose only reason to exist is the session. False for the Ink app, where
+   * `pomo stop` in another terminal should end the session without also
+   * closing the app someone is looking at.
+   */
+  exitOnStop?: boolean;
 };
 
 /**
@@ -113,7 +156,7 @@ export type ServeOptions = {
 export const serve = (
   server: net.Server,
   session: Session,
-  { handleInterrupt = true }: ServeOptions = {},
+  { handleInterrupt = true, exitOnStop = true }: ServeOptions = {},
 ): void => {
   server.on("connection", (socket) => {
     let buffer = "";
@@ -152,7 +195,11 @@ export const serve = (
 
         socket.write(`${JSON.stringify(response)}\n`);
 
-        if (shouldStop) {
+        if (shouldStop && !exitOnStop) {
+          // The Ink app stays up; it just stops being the owner.
+          socket.end();
+          releaseOwnership(server, session);
+        } else if (shouldStop) {
           // The session is already stopped; all that is left is to let the
           // reply drain before exiting. The timer is a fallback for a client
           // that destroys its end of the connection before the callback fires,
@@ -170,6 +217,13 @@ export const serve = (
   if (handleInterrupt) process.once("SIGINT", onSignal);
   process.once("SIGTERM", onSignal);
   process.once("SIGHUP", onSignal);
+
+  // The Ink app owns its session for as long as the process lives - leaving
+  // the Timer screen only detaches the view. So the release has to happen on
+  // the way out, or quitting the app would leave a socket nothing is listening
+  // on and a state file claiming a session is still running. Everything
+  // releaseOwnership does is synchronous, which is all an exit handler can do.
+  process.once("exit", () => releaseOwnership(server, session));
 };
 
 // Tracked per server, not per process: the Ink app can own, release, and own

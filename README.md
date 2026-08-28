@@ -116,7 +116,7 @@ Exactly one process runs the clock at a time. It claims that role by binding a
 unix socket in `$XDG_RUNTIME_DIR`, so whoever starts first owns the timer and
 everything else attaches to it:
 
-```
+```text
         owner (runs the clock, writes history)
         ├── pomo start   detached, no terminal
         └── pomo         terminal UI

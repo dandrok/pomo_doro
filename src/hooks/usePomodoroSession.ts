@@ -24,7 +24,23 @@ type UsePomodoroSessionProps = {
   initialSecondsRemaining?: number | undefined;
   initialMode?: Mode | undefined;
   initialPomodoroCount?: number | undefined;
+  /**
+   * End any session already running and start this one instead. Set when the
+   * user explicitly chose durations, where silently attaching to an older
+   * session would ignore what they just picked.
+   */
+  replaceExisting?: boolean | undefined;
 };
+
+/**
+ * The session this process owns, if any.
+ *
+ * Module scope rather than a ref, because the session deliberately outlives
+ * the Timer screen: leaving for the menu pauses it, it does not end it. So the
+ * next Timer needs to find it again, and a newly chosen session needs to be
+ * able to end it.
+ */
+let owned: { server: net.Server; session: Session } | null = null;
 
 /** How often an attached TUI re-reads the owner's state file. */
 const WATCH_INTERVAL_MS = 250;
@@ -72,11 +88,14 @@ export const usePomodoroSession = (props: UsePomodoroSessionProps) => {
     initialSecondsRemaining,
     initialMode = "work",
     initialPomodoroCount = 0,
+    replaceExisting = false,
   } = props;
 
-  // A session already running elsewhere wins over the props: the screen should
-  // open on the live countdown, not restart it at full duration.
   const [state, setState] = useState<PomoState>(() => {
+    // Durations the user just chose win over whatever is running; otherwise a
+    // session already going wins over the props, so the screen opens on the
+    // live countdown instead of restarting it at full duration.
+    if (replaceExisting) return seedState(props);
     const existing = readState();
     return existing?.running ? existing : seedState(props);
   });
@@ -86,6 +105,8 @@ export const usePomodoroSession = (props: UsePomodoroSessionProps) => {
     () => config.get("autoTransition") ?? true,
   );
 
+  const [error, setError] = useState<string | null>(null);
+
   const sessionRef = useRef<Session | null>(null);
   const serverRef = useRef<net.Server | null>(null);
 
@@ -94,6 +115,29 @@ export const usePomodoroSession = (props: UsePomodoroSessionProps) => {
     let teardown = () => {};
 
     void (async () => {
+      try {
+        await claimAndRun();
+      } catch (err) {
+        // claimOwnership refuses an unsafe socket directory by throwing. An
+        // unhandled rejection here would take the whole app down mid-render;
+        // falling back to a read-only view keeps the timer visible.
+        setError(err instanceof Error ? err.message : String(err));
+      }
+    })();
+
+    async function claimAndRun() {
+      if (replaceExisting) {
+        if (owned) {
+          releaseOwnership(owned.server, owned.session);
+          owned = null;
+        } else {
+          // Owned by another process - a headless session, or another
+          // terminal. Ask it to stop so the socket frees up; a no-op when
+          // nothing is listening.
+          await sendCommand("stop");
+        }
+      }
+
       const server = await claimOwnership();
 
       if (cancelled) {
@@ -114,18 +158,29 @@ export const usePomodoroSession = (props: UsePomodoroSessionProps) => {
           owner: "tui",
         });
 
-        // Ink owns Ctrl+C; exiting from under it would skip its terminal
-        // restore. The unmount cleanup below covers that path instead.
-        serve(server, session, { handleInterrupt: false });
+        // Ink owns Ctrl+C, and exiting from under it would skip its terminal
+        // restore; `pomo stop` from elsewhere should end the session without
+        // closing the app someone is looking at. Both leave the release to
+        // serve()'s exit handler.
+        serve(server, session, {
+          handleInterrupt: false,
+          exitOnStop: false,
+        });
         const off = session.onChange(setState);
         session.start();
 
         sessionRef.current = session;
         serverRef.current = server;
+        owned = { server, session };
 
         teardown = () => {
           off();
-          releaseOwnership(server, session);
+          // Leaving the Timer screen detaches this view; it does not end the
+          // session. The footer calls Escape "safely pauses the session and
+          // returns to the main menu", and ending it here would also blank the
+          // bar widget and lose the countdown behind a trip to the History
+          // screen. Ownership is released when the process exits, in serve().
+          session.pause();
           sessionRef.current = null;
           serverRef.current = null;
         };
@@ -144,7 +199,7 @@ export const usePomodoroSession = (props: UsePomodoroSessionProps) => {
       // a watcher bound to the original inode would go deaf after one update.
       fs.watchFile(stateFile, { interval: WATCH_INTERVAL_MS }, sync);
       teardown = () => fs.unwatchFile(stateFile, sync);
-    })();
+    }
 
     return () => {
       cancelled = true;
@@ -224,12 +279,12 @@ export const usePomodoroSession = (props: UsePomodoroSessionProps) => {
     restart,
     toggleMute,
     toggleAutoTransition,
+    /** Set when the clock could not be claimed at all; the view is read-only. */
+    error,
     todayStats: {
       date: state.history14[state.history14.length - 1]?.date ?? "",
       totalFocusSeconds: state.today.focusSeconds,
       completedPomodoros: state.today.completedPomodoros,
     },
-    /** True while this screen is following a session owned by another process. */
-    isAttached: sessionRef.current === null,
   };
 };

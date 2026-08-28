@@ -126,7 +126,11 @@ export class Session {
   // --- lifecycle ----------------------------------------------------------
 
   start(): this {
-    if (this.ticker) return this;
+    // Stopping is terminal. Restarting the intervals here would tick while
+    // snapshot() still reported running: false and writeStatusFile() stayed
+    // shut down - an invisible session that nonetheless kept crediting focus
+    // seconds to history. A new session means a new Session.
+    if (this.stopped || this.ticker) return this;
     this.ticker = setInterval(() => this.tick(), 1000);
     this.flusher = setInterval(() => {
       this.flushHistory();

@@ -280,6 +280,23 @@ describe("Session", () => {
     expect(fs.existsSync(paths.statusFile)).toBe(false);
   });
 
+  it("cannot be restarted after stopping", () => {
+    const session = start();
+    vi.advanceTimersByTime(2000);
+    const earned = readState()?.today.focusSeconds;
+
+    session.stop();
+    session.start();
+    vi.advanceTimersByTime(5000);
+
+    // A restarted session would tick while snapshot() reported running: false
+    // and current.txt stayed frozen - invisible everywhere, yet still adding
+    // to the day's focus time.
+    expect(readState()).toMatchObject({ running: false });
+    expect(readState()?.today.focusSeconds).toBe(earned);
+    expect(fs.existsSync(paths.statusFile)).toBe(false);
+  });
+
   it("stops cleanly when called twice", () => {
     const session = start();
     session.stop();

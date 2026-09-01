@@ -182,6 +182,7 @@ document. `running` is set to `false` on a clean exit — but a process killed
 outright cannot write that, so judge liveness by `updatedAt` instead: the
 owner rewrites this file every second, pauses included, and silence for more
 than a few seconds means it is gone.
+(in the future I will add it to omarchy plugin registry)
 
 ### Tmux
 

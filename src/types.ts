@@ -42,12 +42,7 @@ export type FontId =
   | "tiny";
 
 export type ThemeId =
-  | "default"
-  | "retro"
-  | "hacker"
-  | "cyberpunk"
-  | "ocean"
-  | "dracula";
+  "default" | "retro" | "hacker" | "cyberpunk" | "ocean" | "dracula";
 
 export type ConfigSchema = {
   pomodoroCount: number;

@@ -1,5 +1,4 @@
-import { Box, Text, useStdout } from "ink";
-import { useEffect, useState } from "react";
+import { Box, Text, useWindowSize } from "ink";
 import { useTheme } from "@hooks";
 import { NARROW_COLUMNS_THRESHOLD, type Control } from "./FooterBar";
 
@@ -15,16 +14,7 @@ type HelpOverlayProps = {
 
 export const HelpOverlay = ({ controls }: HelpOverlayProps) => {
   const theme = useTheme();
-  const { stdout } = useStdout();
-  const [columns, setColumns] = useState(stdout.columns || 80);
-
-  useEffect(() => {
-    const onResize = () => setColumns(stdout.columns);
-    stdout.on("resize", onResize);
-    return () => {
-      stdout.off("resize", onResize);
-    };
-  }, [stdout]);
+  const { columns } = useWindowSize();
 
   const isNarrow = columns < NARROW_COLUMNS_THRESHOLD;
   const shortcutWidth = Math.max(

@@ -1,5 +1,5 @@
 import { defineConfig } from "vitest/config";
-import path from "path";
+import path from "node:path";
 
 export default defineConfig({
   test: {
@@ -8,11 +8,11 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@screens": path.resolve(__dirname, "./src/components/screens"),
-      "@ui": path.resolve(__dirname, "./src/components/ui"),
-      "@hooks": path.resolve(__dirname, "./src/hooks"),
-      "@utils": path.resolve(__dirname, "./src/utils"),
-      "@types": path.resolve(__dirname, "./src/types"),
+      "@screens": path.resolve(import.meta.dirname, "./src/components/screens"),
+      "@ui": path.resolve(import.meta.dirname, "./src/components/ui"),
+      "@hooks": path.resolve(import.meta.dirname, "./src/hooks"),
+      "@utils": path.resolve(import.meta.dirname, "./src/utils"),
+      "@types": path.resolve(import.meta.dirname, "./src/types"),
     },
   },
 });

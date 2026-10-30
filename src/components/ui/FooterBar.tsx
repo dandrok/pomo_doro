@@ -1,5 +1,4 @@
-import { Box, Text, useStdout } from "ink";
-import { useEffect, useState } from "react";
+import { Box, Text, useWindowSize } from "ink";
 import { useTheme } from "@hooks";
 
 export type Control = {
@@ -16,16 +15,7 @@ export const NARROW_COLUMNS_THRESHOLD = 70;
 
 export const FooterBar = ({ controls }: FooterBarProps) => {
   const theme = useTheme();
-  const { stdout } = useStdout();
-  const [columns, setColumns] = useState(stdout.columns || 80);
-
-  useEffect(() => {
-    const onResize = () => setColumns(stdout.columns);
-    stdout.on("resize", onResize);
-    return () => {
-      stdout.off("resize", onResize);
-    };
-  }, [stdout]);
+  const { columns } = useWindowSize();
 
   const isNarrow = columns < NARROW_COLUMNS_THRESHOLD;
 

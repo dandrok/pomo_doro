@@ -1,5 +1,4 @@
-import { Box, Text, useInput, useStdout } from "ink";
-import { useState, useEffect } from "react";
+import { Box, Text, useInput, useWindowSize } from "ink";
 import { useHistory, useTheme, useHelp } from "@hooks";
 import { formatTime, calculateTagTotals, config, IS_TEST_MODE } from "@utils";
 import {
@@ -39,16 +38,7 @@ export const History = ({ onBack }: HistoryProps) => {
     char: charPalette[index % charPalette.length]!,
   }));
 
-  const { stdout } = useStdout();
-  const [columns, setColumns] = useState(stdout.columns || 80);
-
-  useEffect(() => {
-    const onResize = () => setColumns(stdout.columns);
-    stdout.on("resize", onResize);
-    return () => {
-      stdout.off("resize", onResize);
-    };
-  }, [stdout]);
+  const { columns } = useWindowSize();
 
   const isNarrow = columns <= 85;
 

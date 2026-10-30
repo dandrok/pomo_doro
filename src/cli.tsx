@@ -8,6 +8,7 @@ import {
   runControlCommand,
   isCommand,
 } from "./core";
+import { runWithScreen, takeOverScreen } from "./terminal";
 import { App } from "./app";
 
 const HELP = `
@@ -67,7 +68,27 @@ const main = async (): Promise<void> => {
     process.exit(await runControlCommand(verb, json ?? false));
   }
 
-  render(<App initialSessionConfig={sessionConfig} />);
+  let instance: ReturnType<typeof render> | undefined;
+
+  const stop = (): void => {
+    instance?.unmount();
+  };
+
+  process.on("SIGTERM", stop);
+  process.on("SIGHUP", stop);
+
+  try {
+    await runWithScreen({
+      takeOver: () => takeOverScreen(process.stdout),
+      mount: () => {
+        instance = render(<App initialSessionConfig={sessionConfig} />);
+        return instance;
+      },
+    });
+  } finally {
+    process.off("SIGTERM", stop);
+    process.off("SIGHUP", stop);
+  }
 };
 
 main().catch((err: unknown) => {

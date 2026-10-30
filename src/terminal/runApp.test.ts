@@ -1,105 +1,107 @@
 // @vitest-environment node
-import { describe, it, expect } from "vitest";
-import { runWithScreen, type AppRun } from "./runApp";
+import { describe, it, expect, vi } from "vitest";
+import { runApp, type MountedApp } from "./runApp";
 
-type TestApp = {
-  readonly waitUntilExit: () => Promise<unknown>;
-};
+describe("runApp", () => {
+  it("mounts app and resolves cleanly on normal exit", async () => {
+    let unmounted = false;
+    const mockApp: MountedApp = {
+      waitUntilExit: vi.fn().mockResolvedValue(undefined),
+      unmount: () => {
+        unmounted = true;
+      },
+    };
+    const exitProcess = vi.fn() as unknown as (code: number) => never;
 
-const createRecorder = (
-  options: {
-    mountThrows?: boolean;
-    exitRejects?: boolean;
-  } = {},
-) => {
-  const events: string[] = [];
-  const app: AppRun<TestApp> = {
-    takeOver: () => {
-      events.push("take-over");
-      return () => events.push("release-screen");
-    },
-    mount: () => {
-      if (options.mountThrows) {
-        events.push("mount-threw");
-        throw new Error("mount failed");
-      }
-      events.push("mount");
-      return {
-        waitUntilExit: async () => {
-          events.push("wait");
-          if (options.exitRejects) {
-            throw new Error("exit failed");
-          }
-        },
-      };
-    },
-    dispose: () => {
-      events.push("dispose");
-    },
-  };
-  return { events, app };
-};
+    await runApp(() => mockApp, exitProcess);
 
-describe("runWithScreen", () => {
-  it("orchestrates lifecycle in strict order: takeOver -> mount -> wait -> release -> dispose", async () => {
-    const { events, app } = createRecorder();
-
-    await runWithScreen(app);
-
-    expect(events).toEqual([
-      "take-over",
-      "mount",
-      "wait",
-      "release-screen",
-      "dispose",
-    ]);
+    expect(mockApp.waitUntilExit).toHaveBeenCalledTimes(1);
+    expect(unmounted).toBe(false);
+    expect(exitProcess).not.toHaveBeenCalled();
   });
 
-  it("releases screen and runs dispose even when mount throws", async () => {
-    const { events, app } = createRecorder({ mountThrows: true });
+  it("handles SIGTERM by unmounting and exiting with code 143", async () => {
+    let resolveWait: () => void = () => undefined;
+    let unmounted = false;
 
-    await expect(runWithScreen(app)).rejects.toThrow("mount failed");
-
-    expect(events).toEqual([
-      "take-over",
-      "mount-threw",
-      "release-screen",
-      "dispose",
-    ]);
-  });
-
-  it("releases screen and runs dispose even when exit rejects", async () => {
-    const { events, app } = createRecorder({ exitRejects: true });
-
-    await expect(runWithScreen(app)).rejects.toThrow("exit failed");
-
-    expect(events).toEqual([
-      "take-over",
-      "mount",
-      "wait",
-      "release-screen",
-      "dispose",
-    ]);
-  });
-
-  it("releases screen before dispose throws", async () => {
-    const { events, app } = createRecorder();
-    const throwingApp: AppRun<TestApp> = {
-      ...app,
-      dispose: () => {
-        events.push("dispose-threw");
-        throw new Error("dispose failed");
+    const mockApp: MountedApp = {
+      waitUntilExit: () =>
+        new Promise<void>((resolve) => {
+          resolveWait = resolve;
+        }),
+      unmount: () => {
+        unmounted = true;
+        resolveWait();
       },
     };
 
-    await expect(runWithScreen(throwingApp)).rejects.toThrow("dispose failed");
+    const exitCodes: number[] = [];
+    const exitProcess = vi.fn((code: number) => {
+      exitCodes.push(code);
+      return undefined as never;
+    });
 
-    expect(events).toEqual([
-      "take-over",
-      "mount",
-      "wait",
-      "release-screen",
-      "dispose-threw",
-    ]);
+    const runPromise = runApp(() => mockApp, exitProcess);
+
+    // Emit SIGTERM while running
+    process.emit("SIGTERM");
+
+    await runPromise;
+
+    expect(unmounted).toBe(true);
+    expect(exitCodes).toEqual([143]);
+  });
+
+  it("handles SIGHUP by unmounting and exiting with code 129", async () => {
+    let resolveWait: () => void = () => undefined;
+    let unmounted = false;
+
+    const mockApp: MountedApp = {
+      waitUntilExit: () =>
+        new Promise<void>((resolve) => {
+          resolveWait = resolve;
+        }),
+      unmount: () => {
+        unmounted = true;
+        resolveWait();
+      },
+    };
+
+    const exitCodes: number[] = [];
+    const exitProcess = vi.fn((code: number) => {
+      exitCodes.push(code);
+      return undefined as never;
+    });
+
+    const runPromise = runApp(() => mockApp, exitProcess);
+
+    // Emit SIGHUP while running
+    process.emit("SIGHUP");
+
+    await runPromise;
+
+    expect(unmounted).toBe(true);
+    expect(exitCodes).toEqual([129]);
+  });
+
+  it("removes signal listeners even when waitUntilExit throws", async () => {
+    const mockApp: MountedApp = {
+      waitUntilExit: vi.fn().mockRejectedValue(new Error("Ink runtime crash")),
+      unmount: vi.fn(),
+    };
+    const exitProcess = vi.fn() as unknown as (code: number) => never;
+
+    const listenerCountBefore =
+      process.listenerCount("SIGTERM") + process.listenerCount("SIGHUP");
+
+    await expect(runApp(() => mockApp, exitProcess)).rejects.toThrow(
+      "Ink runtime crash",
+    );
+
+    const listenerCountAfter =
+      process.listenerCount("SIGTERM") + process.listenerCount("SIGHUP");
+
+    expect(listenerCountAfter).toBe(listenerCountBefore);
+    expect(exitProcess).not.toHaveBeenCalled();
   });
 });

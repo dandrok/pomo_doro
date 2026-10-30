@@ -160,10 +160,12 @@ export const usePomodoroSession = (props: UsePomodoroSessionProps) => {
 
         // Ink owns Ctrl+C, and exiting from under it would skip its terminal
         // restore; `pomo stop` from elsewhere should end the session without
-        // closing the app someone is looking at. Both leave the release to
-        // serve()'s exit handler.
+        // closing the app someone is looking at. runApp owns SIGTERM / SIGHUP
+        // so it can restore the alternate screen and report signal exit codes.
+        // All leave the release to serve()'s exit handler.
         serve(server, session, {
           handleInterrupt: false,
+          handleTermination: false,
           exitOnStop: false,
         });
         const off = session.onChange(setState);

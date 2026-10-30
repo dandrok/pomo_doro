@@ -56,7 +56,10 @@ describe("ownership and the control socket", () => {
       tag: "Coding",
       owner: "headless",
     });
-    serve(server, session, { handleInterrupt: false });
+    serve(server, session, {
+      handleInterrupt: false,
+      handleTermination: false,
+    });
     session.start();
     return session;
   };
@@ -166,5 +169,27 @@ describe("ownership and the control socket", () => {
     expect(fs.existsSync(paths.socketPath)).toBe(false);
     expect(readState()).toMatchObject({ running: false, owner: "none" });
     expect(await probeOwner()).toBe(false);
+  });
+
+  it("allows disabling termination signal handlers", async () => {
+    const srv = await claimOwnership();
+    if (!srv) throw new Error("expected to win ownership");
+    const sess = new Session({
+      focus: 1,
+      shortBreak: 1,
+      longBreak: 2,
+      tag: "Coding",
+      owner: "headless",
+    });
+
+    const sigtermBefore = process.listenerCount("SIGTERM");
+    const sighupBefore = process.listenerCount("SIGHUP");
+
+    serve(srv, sess, { handleInterrupt: false, handleTermination: false });
+
+    expect(process.listenerCount("SIGTERM")).toBe(sigtermBefore);
+    expect(process.listenerCount("SIGHUP")).toBe(sighupBefore);
+
+    releaseOwnership(srv, sess);
   });
 });

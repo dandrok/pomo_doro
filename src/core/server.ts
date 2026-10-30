@@ -141,6 +141,12 @@ export type ServeOptions = {
    */
   handleInterrupt?: boolean;
   /**
+   * Whether to install SIGTERM and SIGHUP handlers that shut down the
+   * server. False for the Ink app, whose terminal runner handles unmounting
+   * and reports proper POSIX exit codes; true for a headless owner.
+   */
+  handleTermination?: boolean;
+  /**
    * Whether a `stop` command ends the process. True for a headless owner,
    * whose only reason to exist is the session. False for the Ink app, where
    * `pomo stop` in another terminal should end the session without also
@@ -156,7 +162,11 @@ export type ServeOptions = {
 export const serve = (
   server: net.Server,
   session: Session,
-  { handleInterrupt = true, exitOnStop = true }: ServeOptions = {},
+  {
+    handleInterrupt = true,
+    handleTermination = true,
+    exitOnStop = true,
+  }: ServeOptions = {},
 ): void => {
   server.on("connection", (socket) => {
     let buffer = "";
@@ -219,8 +229,10 @@ export const serve = (
 
   const onSignal = () => shutdown(server, session, 0);
   if (handleInterrupt) process.once("SIGINT", onSignal);
-  process.once("SIGTERM", onSignal);
-  process.once("SIGHUP", onSignal);
+  if (handleTermination) {
+    process.once("SIGTERM", onSignal);
+    process.once("SIGHUP", onSignal);
+  }
 
   // The Ink app owns its session for as long as the process lives - leaving
   // the Timer screen only detaches the view. So the release has to happen on

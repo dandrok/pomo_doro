@@ -146,3 +146,4 @@ vite.config.ts.timestamp-*
 GEMINI.md
 TODO.md
 github_release_draft.md
+.claude/

@@ -8,6 +8,7 @@ import {
   runControlCommand,
   isCommand,
 } from "./core";
+import { runApp } from "./terminal";
 import { App } from "./app";
 
 const HELP = `
@@ -67,7 +68,11 @@ const main = async (): Promise<void> => {
     process.exit(await runControlCommand(verb, json ?? false));
   }
 
-  render(<App initialSessionConfig={sessionConfig} />);
+  await runApp(() =>
+    render(<App initialSessionConfig={sessionConfig} />, {
+      alternateScreen: true,
+    }),
+  );
 };
 
 main().catch((err: unknown) => {

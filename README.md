@@ -209,6 +209,8 @@ The project follows a clean, modular architecture supported by TypeScript path a
 
 - `src/cli.tsx`: The CLI entry point.
 - `src/app.tsx`: Main app container.
+- `src/terminal/`: Terminal lifecycle and process signal orchestration:
+  - `runApp.ts`: Lifecycle runner handling graceful unmounting on POSIX signals (`SIGTERM`, `SIGHUP`) and propagating standard `128 + N` exit codes.
 - `src/types.ts`: Centralized TypeScript definitions. Mapped via `@types`.
 - `src/core/`: The session engine, with no React in it, so a process with no terminal can run the clock:
   - `state.ts`: The `state.json` contract, written atomically each tick.

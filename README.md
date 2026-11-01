@@ -51,6 +51,7 @@ pomo --work 50 --break 10
 | `--tag <string>`         | `-t`  | Set the tag/category name                                            |
 | `--description <string>` | `-d`  | Set an optional description for the session                          |
 | `--goal <number>`        | `-g`  | Set your Daily Pomodoro Goal                                         |
+| `--version`              | `-v`  | Print the version number                                             |
 | `--help`                 | `-h`  | Show help details                                                    |
 
 > [!NOTE]
@@ -109,6 +110,7 @@ so a session can be started and driven without one:
 | `pomo skip`                        | Skip to the next phase                     |
 | `pomo reset`                       | Restart the current phase                  |
 | `pomo stop`                        | End the running session                    |
+| `pomo version [--json]`            | Print the version details                  |
 
 ### One session, many views
 

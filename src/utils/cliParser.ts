@@ -17,9 +17,14 @@ export type ControlVerb = (typeof CONTROL_VERBS)[number];
 /** Internal verb the parent re-invokes itself with to become the owner. */
 export const HEADLESS_VERB = "__run";
 
-export type Verb = ControlVerb | "start" | typeof HEADLESS_VERB;
+export type Verb = ControlVerb | "start" | "version" | typeof HEADLESS_VERB;
 
-const VERBS: readonly string[] = [...CONTROL_VERBS, "start", HEADLESS_VERB];
+const VERBS: readonly string[] = [
+  ...CONTROL_VERBS,
+  "start",
+  "version",
+  HEADLESS_VERB,
+];
 
 export const isVerb = (value: string): value is Verb => VERBS.includes(value);
 
@@ -42,6 +47,7 @@ export type SessionOverrides = {
 
 export type ParsedArgs = {
   help: boolean;
+  version?: boolean | undefined;
   verb?: Verb | undefined;
   json?: boolean | undefined;
   goal?: number | undefined;
@@ -59,7 +65,7 @@ export const parseCliArgs = (args: string[]): ParsedArgs => {
   if (first !== undefined && !first.startsWith("-")) {
     if (!isVerb(first)) {
       throw new Error(
-        `Unknown command: ${first}. Valid commands are: start, ${CONTROL_VERBS.join(", ")}.`,
+        `Unknown command: ${first}. Valid commands are: start, ${CONTROL_VERBS.join(", ")}, version.`,
       );
     }
     verb = first;
@@ -74,6 +80,7 @@ export const parseCliArgs = (args: string[]): ParsedArgs => {
     description: { type: "string", short: "d" },
     goal: { type: "string", short: "g" },
     json: { type: "boolean" },
+    version: { type: "boolean", short: "v" },
     help: { type: "boolean", short: "h" },
   } as const;
 
@@ -103,9 +110,14 @@ export const parseCliArgs = (args: string[]): ParsedArgs => {
   const goal = parseNum(values.goal, "goal");
 
   const base: ParsedArgs = { help: false };
+  if (values.version) base.version = true;
   if (verb !== undefined) base.verb = verb;
   if (values.json) base.json = true;
   if (goal !== undefined) base.goal = goal;
+
+  if (verb === "version" || values.version) {
+    return base;
+  }
 
   // `start` and `__run` fill their gaps from the last session at run time, so
   // they take the durations raw rather than through the TUI's stricter rules.

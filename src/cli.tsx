@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import React from "react";
 import { render } from "ink";
-import { parseCliArgs, config, HEADLESS_VERB } from "@utils";
+import { parseCliArgs, config, HEADLESS_VERB, APP_VERSION } from "@utils";
 import {
   runHeadless,
   startDetached,
@@ -25,6 +25,7 @@ Commands:
   skip                        Skip to the next phase
   reset                       Restart the current phase
   stop                        End the running session
+  version                     Print the version details
 
 Options:
   -w, --work <minutes>        Set custom focus session duration
@@ -34,6 +35,7 @@ Options:
   -d, --description <string>  Set an optional description for the session
   -g, --goal <number>         Set your daily Pomodoro goal
       --json                  Print machine-readable state (with a command)
+  -v, --version               Print the version number
   -h, --help                  Show help details
 
 The terminal UI and the Omarchy bar widget drive the same session: whichever
@@ -41,17 +43,25 @@ starts first owns the clock, and everything else attaches to it.
 `;
 
 const main = async (): Promise<void> => {
-  const { help, verb, json, goal, sessionConfig, overrides } = parseCliArgs(
-    process.argv.slice(2),
-  );
-
-  if (goal !== undefined) {
-    config.set("dailyGoal", goal);
-  }
+  const { help, version, verb, json, goal, sessionConfig, overrides } =
+    parseCliArgs(process.argv.slice(2));
 
   if (help) {
     console.log(HELP);
     process.exit(0);
+  }
+
+  if (version || verb === "version") {
+    if (json) {
+      console.log(JSON.stringify({ version: APP_VERSION }));
+    } else {
+      console.log(`pomo ${APP_VERSION}`);
+    }
+    process.exit(0);
+  }
+
+  if (goal !== undefined) {
+    config.set("dailyGoal", goal);
   }
 
   if (verb === HEADLESS_VERB) {

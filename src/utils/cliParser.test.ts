@@ -87,4 +87,26 @@ describe("cliParser", () => {
     );
     expect(() => parseCliArgs(["-w", "25", "-l", "-10"])).toThrow();
   });
+
+  it("should parse version flags and command correctly", () => {
+    expect(parseCliArgs(["-v"])).toEqual({ help: false, version: true });
+    expect(parseCliArgs(["--version"])).toEqual({
+      help: false,
+      version: true,
+    });
+    expect(parseCliArgs(["version"])).toEqual({
+      help: false,
+      verb: "version",
+    });
+    expect(parseCliArgs(["version", "--json"])).toEqual({
+      help: false,
+      verb: "version",
+      json: true,
+    });
+    expect(parseCliArgs(["-v", "--json"])).toEqual({
+      help: false,
+      version: true,
+      json: true,
+    });
+  });
 });

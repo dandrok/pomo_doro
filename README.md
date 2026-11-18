@@ -1,47 +1,134 @@
-# Pomo Doro
+<h1 align="center">Pomo Doro</h1>
 
-A sleek, modular Pomodoro timer for your terminal, built with React, Ink, and TypeScript.
-![Pomo Doro Demo](./assets/demo.gif)
+<p align="center">
+  <strong>A sleek, modular Pomodoro timer for your terminal.</strong><br>
+  Built with React, Ink, and TypeScript.
+</p>
+
+<p align="center">
+  <a href="https://github.com/dandrok/pomo_doro/actions/workflows/publish.yml"><img src="https://img.shields.io/github/actions/workflow/status/dandrok/pomo_doro/publish.yml?branch=main&label=CI&logo=githubactions&logoColor=white&style=flat-square" alt="CI status"></a>
+  <a href="https://www.npmjs.com/package/pomo-doro-tui"><img src="https://img.shields.io/npm/v/pomo-doro-tui?label=npm&logo=npm&logoColor=white&style=flat-square" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/pomo-doro-tui"><img src="https://img.shields.io/npm/dm/pomo-doro-tui?label=downloads&logo=npm&logoColor=white&style=flat-square" alt="npm downloads"></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/github/license/dandrok/pomo_doro?label=license&style=flat-square" alt="MIT license"></a>
+  <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%E2%89%A522-5FA04E?logo=nodedotjs&logoColor=white&style=flat-square" alt="Node.js 22 or newer"></a>
+  <a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white&style=flat-square" alt="TypeScript 6.0"></a>
+  <a href="https://react.dev"><img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black&style=flat-square" alt="React 19"></a>
+</p>
+
+<p align="center">
+  <img src="./assets/demo.gif" alt="Pomo Doro terminal UI walkthrough" width="820">
+</p>
+
+Pomo Doro is a full-featured Pomodoro timer that runs entirely in your
+terminal. Sessions cycle between focus and breaks, your history and goals are
+tracked automatically, and a single owner process keeps every view — the TUI,
+the CLI, and your status bar — in sync.
+
+## Contents
+
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Controls](#controls)
+- [One session, many views](#one-session-many-views)
+- [Status bar integrations](#status-bar-integrations)
+- [Tech stack](#tech-stack)
+- [Project structure](#project-structure)
+- [Development](#development)
+- [CI/CD & releases](#cicd--releases)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Features
 
-- **TUI Interface**: Clean terminal UI with big text and progress bars.
-- **Smart & Customizable Sessions**: Cycle between Work and Breaks automatically with built-in presets, or create custom intervals using the interactive setup wizard.
-- **Manual Transition Mode**: Toggle (`a`) auto/manual transition mode to prevent timers from running while away from your keyboard, complete with clear UI prompts.
-- **Productivity Dashboard & Daily Goals**: Track your total focus time, set daily Pomodoro goals, configure your daily focus time goal, and see a 15-week history chart.
-- **Interactive Settings Menu**: Dynamically configure your daily goals and toggle OS notifications on the fly.
-- **Analytics Dashboard**: GitHub-style activity heatmaps, horizontal stacked bar charts, and productivity tracking over 15 weeks.
-- **Appearance Customizer**: Change the clock's font style and color theme in real-time using a dedicated, interactive preview screen.
-- **Contextual Help Overlay**: On screens with a footer control bar (Timer, Settings, Session Setup, About, History), press `h` to open a bordered help panel listing every available key alongside an arrow (`──▶`) pointing to what it does, without interrupting the running timer.
-- **Responsive Layout**: Gracefully adapts between side-by-side and vertical stacked layouts depending on terminal window size. The footer control bar itself collapses to bare `[key]` shortcuts (dropping labels) below ~70 columns to avoid crowding.
-- **System Integration**: Cross-platform system notifications with sound alerts using `node-notifier` and `play-sound` (supports Linux, macOS, and Windows).
-- **Tmux & Status Bar Integration**: Automatically exports the active timer state to `~/.config/pomo-doro-nodejs/current.txt` on every tick, perfect for embedding in `tmux`, `waybar`, or `polybar` modules.
-- **Runs Without a Terminal**: `pomo start` runs the clock detached, so a session survives closing the window it was started in.
-- **Omarchy Bar Widget**: A companion [Omarchy plugin](https://github.com/dandrok/omarchy-pomo-doro) shows and controls the very same session from the desktop bar.
-- **Persistence**: Remembers your progress and allows you to resume sessions.
-- **Development Sandbox**: Dedicated test mode with ultra-short timers for rapid testing.
+**Focus, without leaving the terminal**
 
-## Installation & Usage
+- **Terminal-native TUI** — a big-text countdown, progress bars, and a layout
+  that adapts between side-by-side and stacked as you resize the window.
+- **Automatic or manual transitions** — let the next phase start on its own, or
+  press `a` to require confirmation, so a timer never runs while you are away
+  from the keyboard.
+- **Keyboard-first controls** — pause, skip, restart, and mute without touching
+  a mouse.
+- **Presets and custom sessions** — start from a built-in preset or build your
+  own with the interactive setup wizard, including a tag and description.
+- **Contextual help** — press `h` on any screen with a footer to open a help
+  panel listing every shortcut and what it does.
+- **Appearance customizer** — change the clock font style and color theme with
+  a live preview.
 
-### Global Installation (Recommended)
+**A record of where your time went**
 
-You can install Pomo Doro globally and run it from anywhere in your terminal:
+- **Daily goals** — set a daily pomodoro goal and a focus-time goal, then watch
+  your progress on the timer screen.
+- **Analytics dashboard** — a GitHub-style activity heatmap, stacked bar
+  charts, and a 15-week productivity history.
+- **Persistence and resume** — progress is stored locally, and an interrupted
+  session can be resumed exactly where it left off.
+
+**Fits into your setup**
+
+- **Cross-platform notifications** — native desktop notifications and sound
+  alerts on Linux, macOS, and Windows, toggleable at any time with `m`.
+- **Headless sessions** — `pomo start` runs the clock detached from a terminal,
+  so a session survives closing the window it was started in.
+- **Status bar exports** — write a one-line status and the full session state
+  for tmux, Waybar, Polybar, or Starship, with a companion
+  [Omarchy bar widget](https://github.com/dandrok/omarchy-pomo-doro) available.
+- **One clock, many views** — exactly one process owns the timer; opening the
+  TUI attaches another view instead of starting a second timer.
+
+## Requirements
+
+- **Node.js 22 or newer** (required by Ink 8)
+- A terminal on **Linux**, **macOS**, or **Windows**
+- For Linux desktop notifications: `notify-send` (usually provided by
+  libnotify). macOS and Windows use built-in system tools.
+
+## Installation
+
+### npm (recommended)
+
+Install Pomo Doro globally and run `pomo` from anywhere:
 
 ```bash
 npm install -g pomo-doro-tui
+pomo
 ```
 
-After installation, run `pomo` to start the interactive menu, or launch a custom session directly using command-line options:
+Or try it without installing:
 
 ```bash
-# Start with interactive menu
-pomo
-
-# Start immediately with a 50-minute work session and a 10-minute break
-pomo --work 50 --break 10
+npx pomo-doro-tui
 ```
 
-#### CLI Options
+### From source
+
+```bash
+git clone https://github.com/dandrok/pomo_doro.git
+cd pomo_doro
+npm install
+npm run dev
+```
+
+## Usage
+
+Run `pomo` with no arguments to open the interactive menu. You can also start a
+session directly from the command line:
+
+```bash
+# A 50-minute focus block with a 10-minute break
+pomo --work 50 --break 10
+
+# A custom session with a tag and description
+pomo -w 25 -l 20 -t "Deep Work" -d "Refactor the auth module"
+```
+
+When CLI arguments are used, the main menu is bypassed and the session starts
+immediately.
+
+### CLI options
 
 | Option                   | Alias | Description                                                          |
 | :----------------------- | :---- | :------------------------------------------------------------------- |
@@ -50,31 +137,29 @@ pomo --work 50 --break 10
 | `--long-break <minutes>` | `-l`  | Set custom long break duration (minutes, defaults to 3x short break) |
 | `--tag <string>`         | `-t`  | Set the tag/category name                                            |
 | `--description <string>` | `-d`  | Set an optional description for the session                          |
-| `--goal <number>`        | `-g`  | Set your Daily Pomodoro Goal                                         |
+| `--goal <number>`        | `-g`  | Set your daily pomodoro goal                                         |
 | `--help`                 | `-h`  | Show help details                                                    |
 
 > [!NOTE]
-> The `--work` (or `-w`) option is required if you want to customize break durations via the command line. When you use CLI arguments to start a timer, the main menu is bypassed, and the session begins immediately.
+> `--work` (or `-w`) is required if you want to customize break durations via
+> the command line.
 
-### Local Development
+### CLI verbs
 
-Or if you want to run from source:
+A session can also be driven without the TUI:
 
-```bash
-# Clone the repository
-git clone https://github.com/dandrok/pomo_doro.git
-cd pomo_doro
-
-# Install dependencies
-npm install
-
-# Run the app
-npm run dev
-```
+| Command                            | Does                                       |
+| :--------------------------------- | :----------------------------------------- |
+| `pomo start [-w -b -l -t -d]`      | Start a pomodoro with no terminal attached |
+| `pomo status [--json]`             | Print the current session                  |
+| `pomo pause` / `resume` / `toggle` | Control the running session                |
+| `pomo skip`                        | Skip to the next phase                     |
+| `pomo reset`                       | Restart the current phase                  |
+| `pomo stop`                        | End the running session                    |
 
 ## Controls
 
-### General & Timer Controls
+### General and timer controls
 
 | Key      | Action                                                                         |
 | :------- | :----------------------------------------------------------------------------- |
@@ -87,30 +172,16 @@ npm run dev
 | `Esc`    | Go back to previous menu, or safely pause/exit the current timer to the menu   |
 | `Ctrl+C` | Force quit application                                                         |
 
-### Custom Preset & Settings Controls
+### Custom preset and settings controls
 
 | Key              | Action                                                                              |
 | :--------------- | :---------------------------------------------------------------------------------- |
 | `Up` / `Down`    | Navigate between fields (Focus, Short Break, Long Break, Tag, Description, Start)   |
-| `Left` / `Right` | Decrease / Increase the active duration value, or cycle between default/recent tags |
+| `Left` / `Right` | Decrease / increase the active duration value, or cycle between default/recent tags |
 | `Typing`         | Enter custom tags and descriptions on their respective fields                       |
-| `Enter`          | Advance to the next field, or start session (when on Start)                         |
+| `Enter`          | Advance to the next field, or start the session (when on Start)                     |
 
-## Command Line
-
-Running `pomo` with no arguments opens the terminal UI. It also takes verbs,
-so a session can be started and driven without one:
-
-| Command                            | Does                                       |
-| :--------------------------------- | :----------------------------------------- |
-| `pomo start [-w -b -l -t -d]`      | Start a pomodoro with no terminal attached |
-| `pomo status [--json]`             | Print the current session                  |
-| `pomo pause` / `resume` / `toggle` | Control the running session                |
-| `pomo skip`                        | Skip to the next phase                     |
-| `pomo reset`                       | Restart the current phase                  |
-| `pomo stop`                        | End the running session                    |
-
-### One session, many views
+## One session, many views
 
 Exactly one process runs the clock at a time. It claims that role by binding a
 unix socket in `$XDG_RUNTIME_DIR`, so whoever starts first owns the timer and
@@ -131,25 +202,17 @@ live countdown; its keys drive the same clock. Two independent timers would
 each credit the day once a second and double-count it, which is exactly what
 the single-owner rule exists to prevent.
 
-## Status Bar Integrations
+## Status bar integrations
 
 The timer writes two files on every tick, both next to `config.json` in
 `~/.config/pomo-doro-nodejs/`:
 
 - `current.txt` — one line of text, e.g. `◈ 24:59`
-- `state.json` — the full session state, for anything that wants more than a label
+- `state.json` — the full session state, for anything that wants more than a
+  label
 
-### Omarchy
-
-The [omarchy-pomo-doro](https://github.com/dandrok/omarchy-pomo-doro) plugin
-puts the countdown in the Omarchy bar, with start, pause, skip, today's stats,
-and a 14-day heatmap in its popup:
-
-```bash
-omarchy plugin add https://github.com/dandrok/omarchy-pomo-doro.git --enable
-```
-
-### state.json
+<details>
+<summary><code>state.json</code> example</summary>
 
 ```jsonc
 {
@@ -177,23 +240,35 @@ omarchy plugin add https://github.com/dandrok/omarchy-pomo-doro.git --enable
 }
 ```
 
+</details>
+
 The file is written atomically, so a reader never sees a half-written
 document. `running` is set to `false` on a clean exit — but a process killed
-outright cannot write that, so judge liveness by `updatedAt` instead: the
-owner rewrites this file every second, pauses included, and silence for more
-than a few seconds means it is gone.
-(in the future I will add it to omarchy plugin registry)
+outright cannot write that, so judge liveness by `updatedAt` instead: the owner
+rewrites this file every second, pauses included, and silence for more than a
+few seconds means it is gone.
 
-### Tmux
+### Omarchy
 
-Add the following to your `~/.tmux.conf` (in either `status-right` or `status-left`):
+The [omarchy-pomo-doro](https://github.com/dandrok/omarchy-pomo-doro) plugin
+puts the countdown in the Omarchy bar, with start, pause, skip, today's stats,
+and a 14-day heatmap in its popup:
+
+```bash
+omarchy plugin add https://github.com/dandrok/omarchy-pomo-doro.git --enable
+```
+
+### tmux
+
+Add the following to your `~/.tmux.conf` (in either `status-right` or
+`status-left`):
 
 ```tmux
 set -g status-interval 1
 set -g status-right "#(cat ~/.config/pomo-doro-nodejs/current.txt || echo '') | %a %Y-%m-%d %H:%M"
 ```
 
-### Zsh (Starship)
+### Starship
 
 Add a custom module to your `~/.config/starship.toml`:
 
@@ -203,32 +278,50 @@ command = "cat ~/.config/pomo-doro-nodejs/current.txt 2>/dev/null"
 when = "test -f ~/.config/pomo-doro-nodejs/current.txt"
 ```
 
-## Project Structure
+## Tech stack
 
-The project follows a clean, modular architecture supported by TypeScript path aliases:
+| Layer       | Choice                                                                          |
+| :---------- | :------------------------------------------------------------------------------ |
+| TUI         | [Ink 8](https://github.com/vadimdemedes/ink) with [React 19](https://react.dev) |
+| Language    | TypeScript (strict)                                                             |
+| Persistence | [conf](https://github.com/sindresorhus/conf)                                    |
+| Build       | [tsup](https://tsup.egoist.dev) — single ESM bundle in `dist/`                  |
+| Testing     | [Vitest](https://vitest.dev) with Testing Library                               |
+| Quality     | ESLint and Prettier                                                             |
 
-- `src/cli.tsx`: The CLI entry point.
-- `src/app.tsx`: Main app container.
-- `src/terminal/`: Terminal lifecycle and process signal orchestration:
-  - `runApp.ts`: Lifecycle runner handling graceful unmounting on POSIX signals (`SIGTERM`, `SIGHUP`) and propagating standard `128 + N` exit codes.
-- `src/types.ts`: Centralized TypeScript definitions. Mapped via `@types`.
-- `src/core/`: The session engine, with no React in it, so a process with no terminal can run the clock:
-  - `state.ts`: The `state.json` contract, written atomically each tick.
-  - `session.ts`: The timer itself - phase transitions, history, notifications.
-  - `server.ts`: Ownership of the control socket and command dispatch.
-  - `client.ts`: Liveness probe and one-shot commands.
-  - `commands.ts`: The CLI verbs.
-- `src/components/`: Reusable React components. Mapped via `@screens` and `@ui`:
-  - `screens/`: High-level views (e.g., `MainMenu`, `TimeSelect`, `SessionSetup`, `History`, `Settings`, `Appearance`, `Timer`, `About`, `Resume`, `Router`).
-  - `ui/`: Structure and display elements (e.g., `Layout`, `ProgressBar`, `ActivityHeatmap`, `StackedBarChart`, `HeaderBar`, `FooterBar`, `HelpOverlay`, `FormRow`).
-- `src/hooks/`: Custom React hooks (e.g., `useTimer`, `useHistory`, `usePomodoroSession`, `useSessionSetup`, `useHelp`). Mapped via `@hooks`.
-- `src/utils/`: Utilities, configs, and side-effects. Mapped via `@utils`:
-  - `config.ts`: Conf-based settings & history persistence.
-  - `constants.ts`: Timer presets, icons, and color rules.
-  - `helpers.ts`: Pure string and time formatters.
-  - `historyLogic.ts`: Aggregation logic for analytics.
-  - `notifications.ts`: Desktop notification & audio controller.
-  - `cliParser.ts`: Command-line arguments parser and validator.
+## Project structure
+
+The project follows a modular architecture supported by TypeScript path
+aliases:
+
+```text
+src/
+├── cli.tsx                  Entry point and argument parsing
+├── app.tsx                  Top-level app state and screen routing
+├── types.ts                 Shared TypeScript types (@types)
+├── core/                    Headless session engine (no React)
+│   ├── session.ts           Timer, phase transitions, history, notifications
+│   ├── server.ts            Control socket ownership and command dispatch
+│   ├── client.ts            Liveness probe and one-shot commands
+│   ├── state.ts             Atomic state.json writer
+│   └── commands.ts          CLI verbs
+├── terminal/
+│   └── runApp.ts            Terminal lifecycle and POSIX signal handling
+├── components/
+│   ├── screens/             MainMenu, SessionSetup, Timer, History, Settings, ...
+│   └── ui/                  Layout, ProgressBar, ActivityHeatmap, HelpOverlay, ...
+├── hooks/                   useTimer, useHistory, usePomodoroSession, ...
+└── utils/
+    ├── config.ts            Persistent settings and history (conf)
+    ├── constants.ts         Presets, icons, and color rules
+    ├── helpers.ts           Pure string and time formatters
+    ├── historyLogic.ts      Aggregation logic for analytics
+    ├── notifications.ts     Desktop notifications and audio
+    └── cliParser.ts         Argument parsing and validation
+```
+
+Path aliases: `@screens` and `@ui` for components, `@hooks` for hooks,
+`@utils` for utilities, and `@types` for shared types.
 
 ## Development
 
@@ -236,33 +329,48 @@ The project follows a clean, modular architecture supported by TypeScript path a
 # Run in development mode
 npm run dev
 
-# Run in Test Mode (Sandbox)
-# Uses 6-second timers and a separate database
+# Run in test mode (sandbox): 6-second timers and a separate database
 npm run dev:test
 
-# Run tests
-npm test
-
-# Run tests with Vitest UI dashboard
-npm run test:ui
-
-# Format the code (Prettier)
-npm run format
-
-# Run full QA check (Typecheck, Lint, Format)
-npm run check
-
-# Build the project
-npm run build
+# Run in development mode with CLI arguments
+npm run dev -- -w 45 -b 10
 ```
 
-## CI/CD & Releases
+| Command                | Description                                        |
+| :--------------------- | :------------------------------------------------- |
+| `npm test`             | Run the unit tests                                 |
+| `npm run test:watch`   | Run tests in watch mode                            |
+| `npm run test:ui`      | Open the Vitest UI dashboard                       |
+| `npm run typecheck`    | Type-check with `tsc --noEmit`                     |
+| `npm run lint`         | Lint with ESLint                                   |
+| `npm run format`       | Format the code with Prettier                      |
+| `npm run format:check` | Check formatting without writing changes           |
+| `npm run check`        | Run typecheck, lint, and format checks in sequence |
+| `npm run build`        | Bundle the app to `dist/cli.js`                    |
 
-This project uses **GitHub Actions** for automated quality control:
+Run `npm run check` and `npm test` before opening a pull request.
 
-- **On Push/PR**: Automatically runs type-checking and unit tests.
-- **On Release**: Automatically builds and publishes the new version to the NPM registry when a GitHub Release is created.
+## CI/CD & releases
+
+The [GitHub Actions workflow](.github/workflows/publish.yml) runs type-checking
+and unit tests on every push to `main` and on every pull request. Pushing a
+`v*` tag runs the same checks, builds the package, and publishes it to npm
+using trusted publishing (OIDC) with provenance. Dependabot checks for
+dependency updates weekly.
+
+## Contributing
+
+Contributions are welcome. To get started:
+
+1. Fork the repository and create a branch from `main`.
+2. Install dependencies with `npm install`.
+3. Make your change and add tests for any important logic.
+4. Run `npm run check` and `npm test`.
+5. Open a pull request describing what changed and why.
+
+Bug reports and feature requests are welcome in the
+[issue tracker](https://github.com/dandrok/pomo_doro/issues).
 
 ## License
 
-ISC
+Released under the [MIT License](./LICENSE). © 2026 dandrok.

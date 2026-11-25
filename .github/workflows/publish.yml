@@ -39,6 +39,18 @@ jobs:
         with:
           node-version: 24
           registry-url: "https://registry.npmjs.org"
+      # npm publishes package.json's version, not the tag name. When the two
+      # disagree the registry answers with "cannot publish over the previously
+      # published version", which reads like a permissions problem. Fail here
+      # instead, before installing anything, and say what is actually wrong.
+      - name: Verify tag matches package version
+        run: |
+          expected="v$(node -p 'require("./package.json").version')"
+          if [ "$GITHUB_REF_NAME" != "$expected" ]; then
+            msg="Tag $GITHUB_REF_NAME does not match package.json"
+            echo "::error::$msg ($expected). Bump the version and re-tag."
+            exit 1
+          fi
       # OIDC publishing needs npm 11.5.1 or newer. Which npm ships with Node 24
       # depends on the minor, so pin it here rather than leaving it to chance.
       - run: npm install -g npm@latest

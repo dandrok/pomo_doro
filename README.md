@@ -138,6 +138,7 @@ immediately.
 | `--tag <string>`         | `-t`  | Set the tag/category name                                            |
 | `--description <string>` | `-d`  | Set an optional description for the session                          |
 | `--goal <number>`        | `-g`  | Set your daily pomodoro goal                                         |
+| `--version`              | `-v`  | Print the version number                                             |
 | `--help`                 | `-h`  | Show help details                                                    |
 
 > [!NOTE]
@@ -156,6 +157,7 @@ A session can also be driven without the TUI:
 | `pomo skip`                        | Skip to the next phase                     |
 | `pomo reset`                       | Restart the current phase                  |
 | `pomo stop`                        | End the running session                    |
+| `pomo version [--json]`            | Print the version details                  |
 
 ## Controls
 

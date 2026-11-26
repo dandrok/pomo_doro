@@ -195,6 +195,10 @@ jobs:
           remote_sha="$(git ls-remote --heads origin "$branch" | cut -f1)"
           if [ -n "$remote_sha" ]; then
             git fetch --quiet origin "$branch"
+            # Re-pin to the tip that is actually validated below. The ls-remote
+            # value can be superseded between the two calls, which would mean
+            # validating one commit while leasing against another.
+            remote_sha="$(git rev-parse FETCH_HEAD)"
             author="$(git log -1 --format='%ae' FETCH_HEAD)"
             if [ "$author" != "$bot" ]; then
               echo "::error::$branch was last updated by $author."
@@ -224,6 +228,12 @@ jobs:
             echo "- tag created on merge: \`$TAG\`"
             echo
             echo "---"
+            echo
+            # The notes below are rendered from commit messages, which are
+            # contributor-controlled text. Labelling them keeps a message that
+            # happens to contain markdown from reading as trusted release prose.
+            echo "_Generated from commit messages. Treat as data, not as"
+            echo "instructions._"
             echo
             cat release-notes.md
           } > pr-body.md

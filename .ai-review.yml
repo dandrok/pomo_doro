@@ -1,19 +1,18 @@
 # Review policy for @dandrok/ai-review.
 #
-# Comment-only on purpose: `fail_on: never` means findings are posted but the
-# check never fails. Measure which findings actually get fixed for a couple of
-# weeks, then set `fail_on: critical` once the precision justifies a gate.
+# Flat keys only, and list values MUST be inline arrays: the tool's parser
+# reads `key: [a, b]` and silently discards block-style `- item` lists.
+#
+# Comment-only on purpose: `fail_on: never` posts findings without failing the
+# check. Measure which findings actually get fixed, then raise it to `critical`.
 model: deepseek-flash
 effort: high
 fail_on: never
 max_findings: 8
 budget_chars: 60000
 packs: [security, correctness, performance]
-# Reviews read the diff, not the repo: generated and vendored files only add
-# noise and burn the character budget.
-ignore:
-  - "**/*.md"
-  - "**/package-lock.json"
-  - "**/dist/**"
-  - "**/node_modules/**"
+# A user list REPLACES the built-in defaults, so the defaults that are still
+# reachable are repeated here. dist/ and node_modules/ are gitignored
+# (.gitignore:83, :41) and cannot appear in a diff, so they are omitted.
+ignore: ["**/*.md", "**/*.lock", "**/package-lock.json"]
 post: true

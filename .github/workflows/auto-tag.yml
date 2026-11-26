@@ -24,20 +24,38 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Create the tag when package.json is ahead of it
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: 24
+
+      - name: Tag the release and request publication
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
 
           version="v$(node -p 'require("./package.json").version')"
+          bare="${version#v}"
+
+          # Re-dispatching publish is what recovers from a failed run: the tag
+          # exists either way, so a plain "already tagged, exit" would leave an
+          # unpublished version stranded forever. publish.yml is idempotent, so
+          # asking again is safe when the registry does not have the version.
           if git rev-parse -q --verify "refs/tags/$version" > /dev/null; then
-            echo "Tag $version already exists; nothing to release."
+            published="$(
+              npm view "pomo-doro-tui@$bare" version 2>/dev/null || true
+            )"
+            if [ -n "$published" ]; then
+              echo "Tag $version exists and $bare is published; nothing to do."
+              exit 0
+            fi
+            echo "Tag $version exists but $bare is unpublished; retrying."
+            gh workflow run publish.yml --ref "$version"
             exit 0
           fi
 
           # Annotated on purpose: lightweight tags are invisible to plain
-          # `git describe`, which every downstream version range relies on.
+          # `git describe`, which downstream version ranges rely on.
           git config user.name "github-actions[bot]"
           git config user.email \
             "41898282+github-actions[bot]@users.noreply.github.com"

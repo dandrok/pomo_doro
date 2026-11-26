@@ -1,0 +1,95 @@
+name: Auto tag
+
+# Creates the release tag once the release PR is merged, then asks the publish
+# workflow to run. The tag is the deploy trigger; it is created only when
+# package.json is ahead of the newest tag, so ordinary merges are no-ops.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: auto-tag
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: 24
+
+      - name: Tag the release and request publication
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          version="v$(node -p 'require("./package.json").version')"
+          bare="${version#v}"
+
+          # Re-dispatching publish is what recovers from a failed run: the tag
+          # exists either way, so a plain "already tagged, exit" would leave an
+          # unpublished version stranded forever. publish.yml is idempotent, so
+          # asking again is safe when the registry does not have the version.
+          if git rev-parse -q --verify "refs/tags/$version" > /dev/null; then
+            # Classify the registry lookup rather than swallowing it: only an
+            # E404 means the version is genuinely absent.
+            if published="$(npm view "pomo-doro-tui@$bare" version 2>&1)"; then
+              have_pkg=yes
+            elif printf '%s' "$published" | grep -q 'E404'; then
+              have_pkg=no
+            else
+              printf '%s\n' "$published" >&2
+              echo "::error::registry lookup failed; not guessing whether"
+              echo "$bare is published."
+              exit 1
+            fi
+
+            # Recovery is split by what actually failed. publish.yml is
+            # idempotent, so repairing a *bookkeeping* gap — npm published but
+            # the GitHub release missing — is safe to do automatically.
+            if [ "$have_pkg" = yes ]; then
+              if gh release view "$version" > /dev/null 2>&1; then
+                echo "Tag $version, npm $bare and release all exist."
+                exit 0
+              fi
+              echo "npm $bare exists but its release is missing;"
+              echo "re-requesting publish to repair it."
+              gh workflow run publish.yml --ref "$version"
+              exit 0
+            fi
+
+            # npm missing means the publish itself failed. Re-dispatching on
+            # every push to main would re-request the release approval each
+            # time and never converge, so this needs a human decision instead
+            # of an unattended loop.
+            echo "::warning::Tag $version exists but npm $bare is missing."
+            echo "The publish run did not complete. Re-run publish.yml from"
+            echo "the Actions tab to request the release approval again."
+            exit 0
+          fi
+
+          # Annotated on purpose: lightweight tags are invisible to plain
+          # `git describe`, which downstream version ranges rely on.
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$version" -m "$version"
+          git push origin "refs/tags/$version"
+          echo "Created tag $version"
+
+          # Events caused by GITHUB_TOKEN never start another workflow, so the
+          # tag push above cannot trigger publish.yml on its own. Dispatching
+          # the run explicitly is the documented exception that does work.
+          gh workflow run publish.yml --ref "$version"
+          echo "Requested publish.yml for $version"

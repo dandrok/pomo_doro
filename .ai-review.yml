@@ -1,0 +1,18 @@
+# Review policy for @dandrok/ai-review.
+#
+# Flat keys only, and list values MUST be inline arrays: the tool's parser
+# reads `key: [a, b]` and silently discards block-style `- item` lists.
+#
+# Comment-only on purpose: `fail_on: never` posts findings without failing the
+# check. Measure which findings actually get fixed, then raise it to `critical`.
+model: deepseek-flash
+effort: high
+fail_on: never
+max_findings: 8
+budget_chars: 60000
+packs: [security, correctness, performance]
+# A user list REPLACES the built-in defaults, so the defaults that are still
+# reachable are repeated here. dist/ and node_modules/ are gitignored
+# (.gitignore:83, :41) and cannot appear in a diff, so they are omitted.
+ignore: ["**/*.md", "**/*.lock", "**/package-lock.json"]
+post: true

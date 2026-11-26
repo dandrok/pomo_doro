@@ -1,0 +1,73 @@
+# git-cliff configuration for pomo-doro-tui.
+#
+# Release notes and CHANGELOG.md are derived from commit messages, so the
+# commit subject is the source of truth. Merge commits are skipped: this repo
+# merges pull requests (17 merge commits at v1.18.0), and `Merge pull request
+# #25 from ...` would otherwise appear as an entry in every release.
+
+[changelog]
+header = """
+# Changelog
+
+All notable changes to Pomo Doro are documented in this file.
+
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+<!-- git-cliff: end of header -->
+"""
+body = """
+{% if version %}## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}{% else %}## [Unreleased]{% endif %}
+
+{% for group, commits in commits | group_by(attribute="group") %}### {{ group | striptags | trim | upper_first }}
+{% for commit in commits %}- {% if commit.scope %}**{{ commit.scope }}**: {% endif %}{{ commit.message | upper_first }}{% if commit.breaking %} — **breaking**{% endif %}{% if remote_url %} ([`{{ commit.id | truncate(length=7, end="") }}`]({{ remote_url }}/commit/{{ commit.id }})){% endif %}
+{% endfor %}{% endfor %}"""
+trim = false
+render_always = true
+postprocessors = [
+  # `--prepend` leaves an extra run of blank lines at the seam.
+  { pattern = '\n{3,}', replace = "\n\n" },
+]
+
+[git]
+conventional_commits = true
+# Drop anything that is not a conventional commit rather than guessing a group.
+filter_unconventional = true
+require_conventional = false
+split_commits = false
+commit_preprocessors = []
+protect_breaking_commits = false
+filter_commits = false
+fail_on_unmatched_commit = false
+link_parsers = []
+use_branch_tags = false
+topo_order = false
+topo_order_commits = true
+sort_commits = "oldest"
+tag_pattern = "v[0-9]*"
+
+# Order matters: the first matching parser wins.
+commit_parsers = [
+  # Pull-request merges and branch merges carry no release-relevant content.
+  { message = "^Merge (pull request|branch|remote-tracking)", skip = true },
+  # The version bump itself is represented by the release heading.
+  { message = "^chore\\(release\\)", skip = true },
+  { message = "^feat", group = "<!-- 0 -->✨ Features" },
+  { message = "^fix", group = "<!-- 1 -->🐛 Bug Fixes" },
+  { message = "^perf", group = "<!-- 2 -->⚡ Performance" },
+  { message = "^refactor", group = "<!-- 3 -->🛠 Refactoring" },
+  { message = "^docs", group = "<!-- 4 -->📚 Documentation" },
+  { message = "^test", group = "<!-- 5 -->🧪 Testing" },
+  { message = "^build", group = "<!-- 6 -->📦 Dependencies" },
+  { message = "^ci", group = "<!-- 7 -->⚙️ CI/CD" },
+  { message = "^chore\\(deps", group = "<!-- 6 -->📦 Dependencies" },
+  { message = "^style", group = "<!-- 8 -->🎨 Styling" },
+  { message = "^chore", group = "<!-- 9 -->🧹 Maintenance" },
+  { body = ".*security", group = "<!-- 10 -->🛡️ Security" },
+  { message = "^revert", group = "<!-- 11 -->◀️ Revert" },
+  { message = ".*", group = "<!-- 12 -->💼 Other" },
+]
+
+[remote.github]
+owner = "dandrok"
+repo = "pomo_doro"

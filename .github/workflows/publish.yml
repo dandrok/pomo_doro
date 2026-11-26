@@ -7,14 +7,18 @@ on:
       - "v*"
   pull_request:
     branches: [main]
+  # auto-tag.yml dispatches this workflow explicitly. Tags pushed by the
+  # workflow token never start a run on their own, so the dispatch is the
+  # mechanism that actually begins the release.
+  workflow_dispatch:
 
 jobs:
   test:
     name: Test and Typecheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: 24
           cache: "npm"
@@ -27,15 +31,26 @@ jobs:
     needs: test
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    # Add required reviewers to this environment in settings to gate publishing
+    # behind an explicit approval. Run starts, pauses before the first step,
+    # and waits for a human.
+    environment:
+      name: release
+      url: https://www.npmjs.com/package/pomo-doro-tui
     permissions:
       # Trusted publishing authenticates over OIDC instead of a token. Without
       # id-token, no token is minted and the publish falls back to anonymous,
       # which the registry answers with a 404 rather than a 401.
       id-token: write
-      contents: read
+      # The release step below creates or edits the GitHub release for the tag.
+      contents: write
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          # Nothing in this job pushes. Leaving the token in .git/config only
+          # widens the window for it to leak into logs or artifacts.
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: 24
           registry-url: "https://registry.npmjs.org"
@@ -59,4 +74,58 @@ jobs:
       # No NODE_AUTH_TOKEN: the OIDC identity is the credential, and a stale
       # token here would take precedence over it. Provenance is attached
       # automatically on this path.
-      - run: npm publish --access public
+      #
+      # The version check makes a re-run safe. Without it, a failure in the
+      # release step below would leave the run permanently unrecoverable: the
+      # registry rejects republishing an existing version.
+      - name: Publish to npm
+        run: |
+          set -euo pipefail
+          version="$(node -p 'require("./package.json").version')"
+          # `npm view` exits non-zero both for a version that does not exist and
+          # for a registry or network failure, so the exit status alone cannot
+          # decide whether to publish. Only E404 means "absent from the
+          # registry"; anything else must fail here, or a transient outage
+          # would push a duplicate and the run would die on "cannot publish
+          # over the previously published version".
+          if out="$(npm view "pomo-doro-tui@$version" version 2>&1)"; then
+            echo "pomo-doro-tui@$version is published; skipping."
+          elif printf '%s' "$out" | grep -q 'E404'; then
+            npm publish --access public
+          else
+            printf '%s\n' "$out" >&2
+            echo "::error::npm view failed for a reason other than not found"
+            exit 1
+          fi
+
+      # Release notes come from CHANGELOG.md rather than a fresh git-cliff run,
+      # so the published notes are exactly the text reviewed in the release PR.
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="$version" '
+            index($0, "## [" v "]") == 1 { found = 1; next }
+            found && substr($0, 1, 4) == "## [" { exit }
+            found
+          ' CHANGELOG.md > release-notes.md
+
+          if [ ! -s release-notes.md ]; then
+            echo "::warning::No CHANGELOG.md section for $GITHUB_REF_NAME."
+            echo "See CHANGELOG.md for the notes of $GITHUB_REF_NAME." \
+              > release-notes.md
+          fi
+
+          # Editing an existing release keeps a re-run idempotent.
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            gh release edit "$GITHUB_REF_NAME" --notes-file release-notes.md
+            echo "Updated release $GITHUB_REF_NAME"
+          else
+            gh release create "$GITHUB_REF_NAME" \
+              --title "$GITHUB_REF_NAME" \
+              --notes-file release-notes.md
+            echo "Created release $GITHUB_REF_NAME"
+          fi

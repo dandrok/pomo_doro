@@ -1,0 +1,52 @@
+name: Auto tag
+
+# Creates the release tag once the release PR is merged, then asks the publish
+# workflow to run. The tag is the deploy trigger; it is created only when
+# package.json is ahead of the newest tag, so ordinary merges are no-ops.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: auto-tag
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Create the tag when package.json is ahead of it
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          version="v$(node -p 'require("./package.json").version')"
+          if git rev-parse -q --verify "refs/tags/$version" > /dev/null; then
+            echo "Tag $version already exists; nothing to release."
+            exit 0
+          fi
+
+          # Annotated on purpose: lightweight tags are invisible to plain
+          # `git describe`, which every downstream version range relies on.
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$version" -m "$version"
+          git push origin "refs/tags/$version"
+          echo "Created tag $version"
+
+          # Events caused by GITHUB_TOKEN never start another workflow, so the
+          # tag push above cannot trigger publish.yml on its own. Dispatching
+          # the run explicitly is the documented exception that does work.
+          gh workflow run publish.yml --ref "$version"
+          echo "Requested publish.yml for $version"

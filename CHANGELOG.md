@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- git-cliff: end of header -->
 
+## [1.18.1] - 2026-11-26
+
+### 🐛 Bug Fixes
+- **ci**: Stop the release boundary lookup from dying on SIGPIPE
+- **ci**: Let a label lookup failure fall back instead of losing the release PR
+### 📦 Dependencies
+- **deps**: Update dev dependencies to latest
+### ⚙️ CI/CD
+- Automate release pull requests, changelog, and GitHub releases
+- Review pull requests with @dandrok/ai-review
+- Pin actions to commit SHAs and bump to checkout/setup-node v7
+- Address review findings in release automation
+- Distinguish registry misses from lookup failures and guard the release branch
+- Install git-cliff, align changelog range, and repair incomplete releases
+- Stop the retry loop, surface git log failures, and lease the release push
+- Lease the tip that was validated and label generated release notes
+## [1.18.0] - 2026-11-25
+
+### ⚙️ CI/CD
+- Fail publish when the tag does not match package.json
+
 ## [1.18.0] - 2026-11-25
 
 ### ✨ Features

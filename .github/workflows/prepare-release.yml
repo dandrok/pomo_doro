@@ -66,9 +66,15 @@ jobs:
           # The subject is matched on its own field: `git log --grep` searches
           # the whole message, so a commit body that merely mentions
           # chore(release) would otherwise be mistaken for the boundary.
+          # `git log ... | awk { exit }` cannot be used under `set -o pipefail`:
+          # awk closing the pipe kills git log with SIGPIPE, so the pipeline
+          # reports 141 and takes the whole step down. A file has no pipe.
+          git log --no-merges --format='%s%x09%H' > commits.tsv
           base="$(
-            git log --no-merges --format='%s%x09%H' \
-              | awk -F'\t' '$1 ~ /^chore\(release\)/ { print $2; exit }'
+            awk -F'\t' '$1 ~ /^chore\(release\)/ && !seen {
+              print $2
+              seen = 1
+            }' commits.tsv
           )"
           if [ -z "$base" ]; then
             # No release commit yet: fall back to the newest tag.
@@ -253,8 +259,13 @@ jobs:
             # Passing it when it does not exist fails the whole PR creation, so
             # it is added only when the repository actually defines it.
             label_args=()
-            if gh label list --json name --jq '.[].name' \
-              | grep -qx release; then
+            # Captured first: grep -q exits on the first match, and piping a
+            # producer into it triggers SIGPIPE (141) under pipefail.
+            # The lookup is optional, so a bare assignment would let an API or
+            # token failure abort the step and lose the release PR over a label
+            # that nothing downstream reads.
+            labels="$(gh label list --json name --jq '.[].name' || true)"
+            if grep -qx release <<< "$labels"; then
               label_args=(--label release)
             fi
 

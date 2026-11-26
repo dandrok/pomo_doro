@@ -42,21 +42,31 @@ jobs:
           # unpublished version stranded forever. publish.yml is idempotent, so
           # asking again is safe when the registry does not have the version.
           if git rev-parse -q --verify "refs/tags/$version" > /dev/null; then
-            # `|| true` here would turn a registry outage into "unpublished"
-            # and re-dispatch publish for a version that already exists, so the
-            # lookup failure is classified instead of swallowed. Only E404
-            # means the version is genuinely absent.
+            # Classify the registry lookup rather than swallowing it: only an
+            # E404 means the version is genuinely absent.
             if published="$(npm view "pomo-doro-tui@$bare" version 2>&1)"; then
-              echo "Tag $version exists and $bare is published; nothing to do."
-              exit 0
-            fi
-            if ! printf '%s' "$published" | grep -q 'E404'; then
+              have_pkg=yes
+            elif printf '%s' "$published" | grep -q 'E404'; then
+              have_pkg=no
+            else
               printf '%s\n' "$published" >&2
               echo "::error::registry lookup failed; not guessing whether"
               echo "$bare is published."
               exit 1
             fi
-            echo "Tag $version exists but $bare is unpublished; retrying."
+
+            # Recovery is intentional. publish.yml is idempotent — it skips an
+            # existing npm version and creates or edits the release — so asking
+            # again is safe whenever either artifact is missing. That is how a
+            # run that died after publishing gets repaired.
+            if [ "$have_pkg" = yes ] &&
+              gh release view "$version" > /dev/null 2>&1; then
+              echo "Tag $version, npm $bare and release all exist."
+              exit 0
+            fi
+
+            echo "Tag $version exists but the release is incomplete"
+            echo "(npm published: $have_pkg); re-requesting publish."
             gh workflow run publish.yml --ref "$version"
             exit 0
           fi

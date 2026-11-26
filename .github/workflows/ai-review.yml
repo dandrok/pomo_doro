@@ -34,7 +34,7 @@ jobs:
           echo "::notice::DEEPSEEK_API_KEY is unset or this is a fork pull \
           request, so no review was run."
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         if: env.AI_REVIEW_ENABLED == 'true'
         with:
           # The base branch must exist locally: the review diffs against it.
@@ -42,7 +42,7 @@ jobs:
           # The tool posts over the API with GITHUB_TOKEN; it never pushes.
           persist-credentials: false
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         if: env.AI_REVIEW_ENABLED == 'true'
         with:
           node-version: 24

@@ -9,6 +9,10 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    # Wait a week before adopting a release, so a compromised or yanked
+    # version is caught upstream before it lands here.
+    cooldown:
+      default-days: 7
     groups:
       dependencies:
         patterns:
@@ -16,3 +20,16 @@ updates:
         update-types:
           - "minor"
           - "patch"
+
+  # Workflow steps are pinned to commit SHAs, so without this they would never
+  # pick up security fixes. Dependabot rewrites the pin and its # vN comment.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns:
+          - "*"

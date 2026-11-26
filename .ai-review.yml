@@ -1,0 +1,19 @@
+# Review policy for @dandrok/ai-review.
+#
+# Comment-only on purpose: `fail_on: never` means findings are posted but the
+# check never fails. Measure which findings actually get fixed for a couple of
+# weeks, then set `fail_on: critical` once the precision justifies a gate.
+model: deepseek-flash
+effort: high
+fail_on: never
+max_findings: 8
+budget_chars: 60000
+packs: [security, correctness, performance]
+# Reviews read the diff, not the repo: generated and vendored files only add
+# noise and burn the character budget.
+ignore:
+  - "**/*.md"
+  - "**/package-lock.json"
+  - "**/dist/**"
+  - "**/node_modules/**"
+post: true

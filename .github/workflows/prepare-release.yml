@@ -94,9 +94,14 @@ jobs:
           # stream lets a body line such as "this documents BREAKING CHANGE"
           # masquerade as a breaking commit, and lets prose defeat the type
           # checks below.
-          git log --no-merges --format='%s' "$range" \
-            | grep -vE '^chore\(release\)' > subjects.txt || true
-          git log --no-merges --format='%b' "$range" > bodies.txt || true
+          # git log and grep are separated on purpose. A failing `git log`
+          # (stale boundary, bad range) must abort the run, but grep exits 1
+          # whenever it filters every line, which is a legitimate empty result.
+          # Merging the two under `|| true` turned a real failure into "no
+          # release-worthy commits" and skipped the release silently.
+          git log --no-merges --format='%s' "$range" > raw-subjects.txt
+          git log --no-merges --format='%b' "$range" > bodies.txt
+          grep -vE '^chore\(release\)' raw-subjects.txt > subjects.txt || true
 
           if [ ! -s subjects.txt ]; then
             echo "release=false" >> "$GITHUB_OUTPUT"
@@ -184,10 +189,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "$bot"
 
-          # --force is safe only while every commit on the remote branch is
-          # ours. A human editing the generated changelog in the open PR would
-          # be destroyed silently, so refuse and let a human resolve it.
-          if git fetch --quiet origin "$branch" 2>/dev/null; then
+          # Resolve the remote branch explicitly instead of treating any fetch
+          # failure as "absent": a transport or auth error would otherwise skip
+          # validation and then clobber an existing branch with a forced push.
+          remote_sha="$(git ls-remote --heads origin "$branch" | cut -f1)"
+          if [ -n "$remote_sha" ]; then
+            git fetch --quiet origin "$branch"
             author="$(git log -1 --format='%ae' FETCH_HEAD)"
             if [ "$author" != "$bot" ]; then
               echo "::error::$branch was last updated by $author."
@@ -195,12 +202,19 @@ jobs:
               echo "manually, then re-run this workflow."
               exit 1
             fi
+            # Pin the push to the tip that was just validated. A commit pushed
+            # between this check and the push is then rejected rather than
+            # destroyed by --force.
+            lease="--force-with-lease=refs/heads/$branch:$remote_sha"
+          else
+            # Absent at validation, so it must still be absent when we push.
+            lease="--force-with-lease=refs/heads/$branch:"
           fi
 
           git checkout -b "$branch"
           git add package.json package-lock.json CHANGELOG.md
           git commit -m "chore(release): bump version to $VERSION"
-          git push --force origin "$branch"
+          git push "$lease" origin "$branch"
 
           {
             echo "Merging this pull request **publishes \`$VERSION\` to npm**."

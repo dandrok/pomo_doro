@@ -55,19 +55,27 @@ jobs:
               exit 1
             fi
 
-            # Recovery is intentional. publish.yml is idempotent — it skips an
-            # existing npm version and creates or edits the release — so asking
-            # again is safe whenever either artifact is missing. That is how a
-            # run that died after publishing gets repaired.
-            if [ "$have_pkg" = yes ] &&
-              gh release view "$version" > /dev/null 2>&1; then
-              echo "Tag $version, npm $bare and release all exist."
+            # Recovery is split by what actually failed. publish.yml is
+            # idempotent, so repairing a *bookkeeping* gap — npm published but
+            # the GitHub release missing — is safe to do automatically.
+            if [ "$have_pkg" = yes ]; then
+              if gh release view "$version" > /dev/null 2>&1; then
+                echo "Tag $version, npm $bare and release all exist."
+                exit 0
+              fi
+              echo "npm $bare exists but its release is missing;"
+              echo "re-requesting publish to repair it."
+              gh workflow run publish.yml --ref "$version"
               exit 0
             fi
 
-            echo "Tag $version exists but the release is incomplete"
-            echo "(npm published: $have_pkg); re-requesting publish."
-            gh workflow run publish.yml --ref "$version"
+            # npm missing means the publish itself failed. Re-dispatching on
+            # every push to main would re-request the release approval each
+            # time and never converge, so this needs a human decision instead
+            # of an unattended loop.
+            echo "::warning::Tag $version exists but npm $bare is missing."
+            echo "The publish run did not complete. Re-run publish.yml from"
+            echo "the Actions tab to request the release approval again."
             exit 0
           fi
 

@@ -82,10 +82,20 @@ jobs:
         run: |
           set -euo pipefail
           version="$(node -p 'require("./package.json").version')"
-          if npm view "pomo-doro-tui@$version" version > /dev/null 2>&1; then
-            echo "pomo-doro-tui@$version is already published; skipping."
-          else
+          # `npm view` exits non-zero both for a version that does not exist and
+          # for a registry or network failure, so the exit status alone cannot
+          # decide whether to publish. Only E404 means "absent from the
+          # registry"; anything else must fail here, or a transient outage
+          # would push a duplicate and the run would die on "cannot publish
+          # over the previously published version".
+          if out="$(npm view "pomo-doro-tui@$version" version 2>&1)"; then
+            echo "pomo-doro-tui@$version is published; skipping."
+          elif printf '%s' "$out" | grep -q 'E404'; then
             npm publish --access public
+          else
+            printf '%s\n' "$out" >&2
+            echo "::error::npm view failed for a reason other than not found"
+            exit 1
           fi
 
       # Release notes come from CHANGELOG.md rather than a fresh git-cliff run,

@@ -42,12 +42,19 @@ jobs:
           # unpublished version stranded forever. publish.yml is idempotent, so
           # asking again is safe when the registry does not have the version.
           if git rev-parse -q --verify "refs/tags/$version" > /dev/null; then
-            published="$(
-              npm view "pomo-doro-tui@$bare" version 2>/dev/null || true
-            )"
-            if [ -n "$published" ]; then
+            # `|| true` here would turn a registry outage into "unpublished"
+            # and re-dispatch publish for a version that already exists, so the
+            # lookup failure is classified instead of swallowed. Only E404
+            # means the version is genuinely absent.
+            if published="$(npm view "pomo-doro-tui@$bare" version 2>&1)"; then
               echo "Tag $version exists and $bare is published; nothing to do."
               exit 0
+            fi
+            if ! printf '%s' "$published" | grep -q 'E404'; then
+              printf '%s\n' "$published" >&2
+              echo "::error::registry lookup failed; not guessing whether"
+              echo "$bare is published."
+              exit 1
             fi
             echo "Tag $version exists but $bare is unpublished; retrying."
             gh workflow run publish.yml --ref "$version"

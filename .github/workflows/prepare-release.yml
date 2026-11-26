@@ -261,7 +261,10 @@ jobs:
             label_args=()
             # Captured first: grep -q exits on the first match, and piping a
             # producer into it triggers SIGPIPE (141) under pipefail.
-            labels="$(gh label list --json name --jq '.[].name')"
+            # The lookup is optional, so a bare assignment would let an API or
+            # token failure abort the step and lose the release PR over a label
+            # that nothing downstream reads.
+            labels="$(gh label list --json name --jq '.[].name' || true)"
             if grep -qx release <<< "$labels"; then
               label_args=(--label release)
             fi

@@ -46,7 +46,7 @@ jobs:
             # E404 means the version is genuinely absent.
             if published="$(npm view "pomo-doro-tui@$bare" version 2>&1)"; then
               have_pkg=yes
-            elif printf '%s' "$published" | grep -q 'E404'; then
+            elif grep -q 'E404' <<< "$published"; then
               have_pkg=no
             else
               printf '%s\n' "$published" >&2

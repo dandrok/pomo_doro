@@ -90,7 +90,7 @@ jobs:
           # over the previously published version".
           if out="$(npm view "pomo-doro-tui@$version" version 2>&1)"; then
             echo "pomo-doro-tui@$version is published; skipping."
-          elif printf '%s' "$out" | grep -q 'E404'; then
+          elif grep -q 'E404' <<< "$out"; then
             npm publish --access public
           else
             printf '%s\n' "$out" >&2
